@@ -1,4 +1,4 @@
-// The Vault — smooth 3D tilt + finish-aware foil rendering
+// The Vault — smooth 3D tilt + stronger reactive foil rendering
 (() => {
   const cardEl = document.getElementById('tiltCard');
   const modal = document.getElementById('cardModal');
@@ -49,11 +49,11 @@
   }
 
   function animate(){
-    const ease = dragging ? 0.18 : 0.11;
+    const ease = dragging ? 0.20 : 0.11;
     currentX += (targetX-currentX)*ease;
     currentY += (targetY-currentY)*ease;
-    currentMX += (targetMX-currentMX)*0.16;
-    currentMY += (targetMY-currentMY)*0.16;
+    currentMX += (targetMX-currentMX)*0.19;
+    currentMY += (targetMY-currentMY)*0.19;
 
     if(Math.abs(targetX-currentX)<0.01) currentX=targetX;
     if(Math.abs(targetY-currentY)<0.01) currentY=targetY;
@@ -64,7 +64,13 @@
     cardEl.style.setProperty('--ry',`${currentX.toFixed(3)}deg`);
     cardEl.style.setProperty('--mx',`${currentMX.toFixed(2)}%`);
     cardEl.style.setProperty('--my',`${currentMY.toFixed(2)}%`);
-    cardEl.style.setProperty('--foil-angle',`${(110 + currentX*2.2 - currentY*1.4).toFixed(1)}deg`);
+    cardEl.style.setProperty('--foil-angle',`${(110 + currentX*3.4 - currentY*2.4).toFixed(1)}deg`);
+
+    // Move the coloured edge blooms against the tilt so the holographic field visibly shifts.
+    const edgeX = (currentMX - 50) * -0.16;
+    const edgeY = (currentMY - 50) * -0.13;
+    cardEl.style.setProperty('--edge-x',`${edgeX.toFixed(2)}%`);
+    cardEl.style.setProperty('--edge-y',`${edgeY.toFixed(2)}%`);
 
     raf=requestAnimationFrame(animate);
   }
@@ -73,8 +79,8 @@
     const r=cardEl.getBoundingClientRect();
     const x=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width));
     const y=Math.max(0,Math.min(1,(e.clientY-r.top)/r.height));
-    targetX=(x-.5)*22;
-    targetY=(.5-y)*22;
+    targetX=(x-.5)*24;
+    targetY=(.5-y)*24;
     targetMX=x*100;
     targetMY=y*100;
   }
@@ -94,7 +100,6 @@
     try{ if(e?.pointerId!=null) cardEl.releasePointerCapture(e.pointerId); }catch{}
   }
 
-  // Capture + stopImmediatePropagation blocks the old direct tilt handler so only this smoother engine drives the card.
   ['pointerdown','pointermove','pointerup','pointercancel'].forEach(type=>{
     cardEl.addEventListener(type,e=>{
       if(type==='pointerdown') onDown(e);
@@ -116,15 +121,14 @@
   const foilButton=document.getElementById('toggleFoilBtn');
   foilButton?.addEventListener('click',()=>setTimeout(syncMaterial,60));
 
-  // Use device orientation as an optional subtle motion source when inspector is open and user is not touching.
   window.addEventListener('deviceorientation',e=>{
     if(dragging || modal.classList.contains('hidden') || e.beta==null || e.gamma==null) return;
-    const gx=Math.max(-12,Math.min(12,e.gamma));
-    const gy=Math.max(-12,Math.min(12,e.beta-45));
-    targetX=gx*.32;
-    targetY=-gy*.24;
-    targetMX=50+gx*1.2;
-    targetMY=50+gy*.9;
+    const gx=Math.max(-15,Math.min(15,e.gamma));
+    const gy=Math.max(-15,Math.min(15,e.beta-45));
+    targetX=gx*.40;
+    targetY=-gy*.30;
+    targetMX=50+gx*1.65;
+    targetMY=50+gy*1.25;
   },{passive:true});
 
   cancelAnimationFrame(raf);
