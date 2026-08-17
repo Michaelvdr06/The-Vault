@@ -110,3 +110,10 @@ body{background:radial-gradient(circle at 85% -10%,rgba(72,49,132,.13),transpare
 @keyframes bcPageFan25{0%{transform:rotateY(0deg) translateZ(calc(var(--page) * 1px));opacity:1}38%{transform:rotateY(-62deg) translateZ(18px) skewY(-1deg);opacity:1;filter:brightness(1.08)}68%{transform:rotateY(-132deg) translateZ(12px) skewY(1deg);opacity:1;filter:brightness(.78)}100%{transform:rotateY(-179deg) translateZ(2px);opacity:0;filter:brightness(.6)}}
 @keyframes bcSpread25{0%,28%{opacity:0}42%{opacity:.65}55%,82%{opacity:1}100%{opacity:0;filter:blur(2px)}}
 @keyframes bcRealPage25{0%,81%{opacity:0;transform:scale(.94);filter:blur(5px)}100%{opacity:1;transform:none;filter:none}}
+
+
+/* Arcane 2.6 - return to page one: full left-to-right 180 degree turns */
+.bc-flip{inset:0 50% 0 0;transform-origin:100% 50%;border-radius:15px 6px 6px 15px;transform:rotateY(0) translateZ(calc(var(--page) * 1px))}
+.binder-cinematic.is-playing .bc-flip{animation:bcPageReturn26 .78s cubic-bezier(.42,0,.15,1) both!important;animation-delay:calc(.74s + (9 - var(--page)) * .11s)!important}
+@keyframes bcPageReturn26{0%{transform:rotateY(0deg) translateZ(calc(var(--page) * 1px));opacity:1;filter:brightness(1)}42%{transform:rotateY(82deg) translateZ(24px) skewY(1.2deg);opacity:1;filter:brightness(1.12)}76%{transform:rotateY(148deg) translateZ(13px) skewY(-.6deg);opacity:1;filter:brightness(.76)}94%{transform:rotateY(180deg) translateZ(3px);opacity:1;filter:brightness(.62)}100%{transform:rotateY(182deg) translateZ(2px);opacity:0;filter:brightness(.6)}}
+@media(max-width:760px){.bc-flip{inset:0 50% 0 0;transform-origin:100% 50%}}
