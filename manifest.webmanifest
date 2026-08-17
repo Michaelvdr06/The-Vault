@@ -1,9 +1,9 @@
 {
-  "name": "The Vault — Card Collector",
+  "name": "The Vault",
   "short_name": "The Vault",
-  "start_url": "./",
+  "start_url": "/The-Vault/",
   "display": "standalone",
-  "background_color": "#0a0b0d",
-  "theme_color": "#0a0b0d",
-  "description": "Persoonlijke One Piece TCG en Magic: The Gathering collectie."
+  "background_color": "#070b14",
+  "theme_color": "#0b1020",
+  "description": "Digitale kaartencollectie voor One Piece TCG en Magic: The Gathering."
 }
