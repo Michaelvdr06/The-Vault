@@ -149,11 +149,28 @@
   }
 })();
 
-// Load scanner v2 after the original app. It replaces only the Scan button handler.
+// Keep scanner v2 for compatibility; scanner v3 loads after it and owns the final Scan handler.
 (() => {
-  if(document.querySelector('script[data-vault-scanner-v2]')) return;
-  const js=document.createElement('script');
-  js.src='scanner-v2.js?v=1';
-  js.dataset.vaultScannerV2='1';
-  document.body.appendChild(js);
+  if(!document.querySelector('script[data-vault-scanner-v2]')){
+    const js=document.createElement('script');
+    js.src='scanner-v2.js?v=1';
+    js.dataset.vaultScannerV2='1';
+    document.body.appendChild(js);
+  }
+  if(!document.querySelector('script[data-vault-scanner-v3]')){
+    const js=document.createElement('script');
+    js.src='scanner-v3.js?v=1';
+    js.dataset.vaultScannerV3='1';
+    document.body.appendChild(js);
+  }
+})();
+
+// Mobile-first UI overrides load last so they can safely polish every existing feature.
+(() => {
+  if(document.querySelector('link[data-vault-mobile]')) return;
+  const css=document.createElement('link');
+  css.rel='stylesheet';
+  css.href='mobile.css?v=1';
+  css.dataset.vaultMobile='1';
+  document.head.appendChild(css);
 })();
