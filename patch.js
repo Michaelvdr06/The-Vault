@@ -184,12 +184,12 @@
 (() => {
   if(!document.querySelector('link[data-vault-bulk]')){
     const css=document.createElement('link');
-    css.rel='stylesheet'; css.href='bulk-add.css?v=5'; css.dataset.vaultBulk='1';
+    css.rel='stylesheet'; css.href='bulk-add.css?v=6'; css.dataset.vaultBulk='1';
     document.head.appendChild(css);
   }
   if(!document.querySelector('script[data-vault-bulk]')){
     const js=document.createElement('script');
-    js.src='bulk-add.js?v=7'; js.dataset.vaultBulk='1';
+    js.src='bulk-add.js?v=8'; js.dataset.vaultBulk='1';
     document.body.appendChild(js);
   }
 })();
@@ -200,7 +200,7 @@
   if(document.querySelector('link[data-vault-mobile-hotfix]')) return;
   const css=document.createElement('link');
   css.rel='stylesheet';
-  css.href='mobile-hotfix.css?v=2';
+  css.href='mobile-hotfix.css?v=3';
   css.dataset.vaultMobileHotfix='1';
   document.head.appendChild(css);
 })();
