@@ -140,11 +140,11 @@
   }
 })();
 
-// Scanner v3.2 owns the Scan button directly.
+// Scanner v3.3 owns the Scan button directly.
 (() => {
   if(document.querySelector('script[data-vault-scanner-v3]')) return;
   const js=document.createElement('script');
-  js.src='scanner-v3.js?v=3';
+  js.src='scanner-v3.js?v=4';
   js.dataset.vaultScannerV3='1';
   document.body.appendChild(js);
 })();
