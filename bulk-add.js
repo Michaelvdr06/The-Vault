@@ -228,9 +228,16 @@
   }
   function cardFromTitle(text){
     const lines=String(text||'').split(/\n+/).map(x=>x.trim()).filter(x=>x.length>2&&x.length<60);
-    let best=null,score=0;
-    for(const line of lines)for(const card of state.cards){const s=nameScore(line,card.name);if(s>score){score=s;best=card}}
-    return score>=.68?best:null;
+    let bestName='',score=0;
+    for(const line of lines)for(const card of state.cards){
+      const s=nameScore(line,card.name);
+      if(s>score){score=s;bestName=card.name}
+    }
+    if(score<.74||!bestName)return null;
+    const sameName=state.cards.filter(card=>norm(card.name)===norm(bestName));
+    // A title cannot distinguish regular, showcase and full-art variants.
+    // Only accept a title-only scan when the selected set has one printing.
+    return sameName.length===1?sameName[0]:null;
   }
   async function recognizeCanvas(source){
     if(state.busy||!window.Tesseract)return;state.busy=true;$('#bulkCapture').disabled=true;setStatus('bulkCameraStatus','Onderkant verscherpen en collector number lezen…');
