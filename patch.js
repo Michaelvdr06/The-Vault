@@ -134,3 +134,21 @@
     }catch(err){ console.warn(err); }
   },900);
 })();
+
+// Load the Set Checklist as an isolated feature so the core collector stays stable.
+(() => {
+  if(!document.querySelector('link[data-vault-sets]')){
+    const css=document.createElement('link');
+    css.rel='stylesheet';
+    css.href='sets.css?v=1';
+    css.dataset.vaultSets='1';
+    document.head.appendChild(css);
+  }
+  if(!document.querySelector('script[data-vault-sets]')){
+    const js=document.createElement('script');
+    js.src='sets.js?v=1';
+    js.dataset.vaultSets='1';
+    js.defer=true;
+    document.body.appendChild(js);
+  }
+})();
