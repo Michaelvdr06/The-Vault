@@ -1,4 +1,4 @@
-/* The Vault — vivid reactive holo foil, clean rounded clipping */
+/* The Vault — vivid reactive holo foil, exact rounded clipping */
 .tilt-card{
   --foil-angle:115deg;
   --edge-x:0%;
@@ -11,16 +11,28 @@
   backface-visibility:hidden;
   -webkit-backface-visibility:hidden;
   transform:perspective(1100px) rotateX(var(--rx)) rotateY(var(--ry)) translateZ(0);
-
-  /* Everything, including oversized holo layers, is clipped to the card's rounded corners. */
+  border-radius:22px!important;
   overflow:hidden!important;
   isolation:isolate;
+  clip-path:inset(0 round 22px);
+  -webkit-clip-path:inset(0 round 22px);
+  contain:paint;
+}
+
+.tilt-card>img,
+.tilt-card .foil-layer,
+.tilt-card .shine-layer,
+.tilt-card::before,
+.tilt-card::after{
+  border-radius:22px!important;
 }
 
 .tilt-card .foil-layer,
 .tilt-card .shine-layer{
   pointer-events:none;
-  border-radius:inherit;
+  overflow:hidden!important;
+  clip-path:inset(0 round 22px);
+  -webkit-clip-path:inset(0 round 22px);
 }
 
 /* HARD GATE: non-foil cards never show legacy shine/glitter/foil overlays. */
@@ -37,110 +49,72 @@
   visibility:visible!important;
 }
 
-/* Keep the vivid colour palette and overscan, now safely clipped by the rounded card. */
+/* Rainbow layer is exactly card-sized: no transformed/oversized square can leak past Safari's rounded clipping. */
 .tilt-card.is-foil::before{
   content:"";
   position:absolute;
-  inset:-12%;
+  inset:0;
   z-index:2;
   pointer-events:none;
-  border-radius:inherit;
+  border-radius:22px!important;
+  overflow:hidden!important;
+  clip-path:inset(0 round 22px);
+  -webkit-clip-path:inset(0 round 22px);
   opacity:.84;
   mix-blend-mode:screen;
-  transform:translate3d(var(--edge-x),var(--edge-y),0) scale(1.14);
+  transform:none!important;
   background:
-    radial-gradient(ellipse 68% 64% at -1% 15%, rgba(255,24,78,.66) 0%, rgba(255,82,114,.39) 26%, rgba(255,82,114,.13) 49%, transparent 76%),
-    radial-gradient(ellipse 78% 54% at 42% -5%, rgba(255,227,55,.57) 0%, rgba(255,171,47,.32) 33%, transparent 75%),
-    radial-gradient(ellipse 66% 64% at 102% 16%, rgba(58,246,101,.61) 0%, rgba(45,229,145,.35) 31%, rgba(45,229,145,.12) 52%, transparent 78%),
-    radial-gradient(ellipse 70% 68% at 103% 81%, rgba(25,209,255,.62) 0%, rgba(58,136,255,.36) 31%, rgba(58,136,255,.12) 53%, transparent 79%),
-    radial-gradient(ellipse 74% 64% at 49% 106%, rgba(87,48,255,.59) 0%, rgba(192,48,255,.35) 31%, transparent 76%),
-    radial-gradient(ellipse 62% 62% at -2% 84%, rgba(239,31,255,.56) 0%, rgba(187,43,255,.32) 31%, transparent 76%);
+    radial-gradient(ellipse 72% 68% at -1% 15%, rgba(255,24,78,.66) 0%, rgba(255,82,114,.39) 26%, rgba(255,82,114,.13) 49%, transparent 78%),
+    radial-gradient(ellipse 82% 58% at 42% -5%, rgba(255,227,55,.57) 0%, rgba(255,171,47,.32) 33%, transparent 77%),
+    radial-gradient(ellipse 70% 68% at 102% 16%, rgba(58,246,101,.61) 0%, rgba(45,229,145,.35) 31%, rgba(45,229,145,.12) 52%, transparent 80%),
+    radial-gradient(ellipse 74% 72% at 103% 81%, rgba(25,209,255,.62) 0%, rgba(58,136,255,.36) 31%, rgba(58,136,255,.12) 53%, transparent 81%),
+    radial-gradient(ellipse 78% 68% at 49% 106%, rgba(87,48,255,.59) 0%, rgba(192,48,255,.35) 31%, transparent 78%),
+    radial-gradient(ellipse 66% 66% at -2% 84%, rgba(239,31,255,.56) 0%, rgba(187,43,255,.32) 31%, transparent 78%);
   filter:hue-rotate(var(--holo-hue)) saturate(1.55) contrast(1.035) blur(.10px);
 }
 
 /* Main diffraction field: preserve the colour behaviour that already looks right. */
 .tilt-card.is-foil .foil-layer{
+  position:absolute!important;
+  inset:0!important;
   z-index:3;
   opacity:.39!important;
   mix-blend-mode:soft-light;
   background:
     radial-gradient(circle at var(--mx) var(--my), rgba(255,255,255,.46) 0 2.2%, rgba(255,255,255,.15) 5%, transparent 16%),
     conic-gradient(from var(--foil-angle) at var(--prism-x) var(--prism-y),
-      rgba(255,46,110,.24),
-      rgba(255,163,52,.23),
-      rgba(255,235,64,.22),
-      rgba(62,245,125,.23),
-      rgba(38,221,235,.24),
-      rgba(57,119,255,.25),
-      rgba(166,54,255,.24),
-      rgba(255,46,181,.23),
-      rgba(255,46,110,.24)),
-    linear-gradient(calc(var(--foil-angle) + 38deg),
-      rgba(255,40,105,.23) 0%,
-      rgba(255,208,62,.20) 17%,
-      rgba(70,244,135,.22) 34%,
-      rgba(43,213,244,.23) 51%,
-      rgba(72,100,255,.23) 68%,
-      rgba(196,50,255,.22) 85%,
-      rgba(255,40,105,.23) 100%);
+      rgba(255,46,110,.24),rgba(255,163,52,.23),rgba(255,235,64,.22),rgba(62,245,125,.23),rgba(38,221,235,.24),rgba(57,119,255,.25),rgba(166,54,255,.24),rgba(255,46,181,.23),rgba(255,46,110,.24)),
+    linear-gradient(calc(var(--foil-angle) + 38deg),rgba(255,40,105,.23) 0%,rgba(255,208,62,.20) 17%,rgba(70,244,135,.22) 34%,rgba(43,213,244,.23) 51%,rgba(72,100,255,.23) 68%,rgba(196,50,255,.22) 85%,rgba(255,40,105,.23) 100%);
   background-size:100% 100%,195% 195%,390% 390%;
-  background-position:
-    center,
-    calc(100% - var(--mx)) calc(100% - var(--my)),
-    calc(235% - var(--mx) * 3.7) calc(235% - var(--my) * 3.7);
+  background-position:center,calc(100% - var(--mx)) calc(100% - var(--my)),calc(235% - var(--mx) * 3.7) calc(235% - var(--my) * 3.7);
   filter:hue-rotate(var(--holo-hue)) saturate(1.44) contrast(1.045);
 }
 
-/* One clean, broad reflection only. No sparkle dots, glitter balls or thin white streaks. */
+/* One clean broad reflection only. */
 .tilt-card.is-foil .shine-layer{
+  position:absolute!important;
+  inset:0!important;
   z-index:4;
   opacity:.18!important;
   mix-blend-mode:screen;
-  background:
-    radial-gradient(ellipse 34% 25% at var(--mx) var(--my),
-      rgba(255,255,255,.42) 0%,
-      rgba(255,255,255,.12) 30%,
-      rgba(255,255,255,.035) 48%,
-      transparent 70%);
+  background:radial-gradient(ellipse 34% 25% at var(--mx) var(--my),rgba(255,255,255,.42) 0%,rgba(255,255,255,.12) 30%,rgba(255,255,255,.035) 48%,transparent 70%);
   filter:blur(.35px);
 }
 
 .tilt-card.is-foil.foil-standard::before{opacity:.90}
 .tilt-card.is-foil.foil-standard .foil-layer{opacity:.43!important}
-
-.tilt-card.is-foil.foil-etched::before{
-  opacity:.25;
-  filter:hue-rotate(0deg) saturate(.52) sepia(.18) blur(.10px);
-}
-.tilt-card.is-foil.foil-etched .foil-layer{
-  opacity:.19!important;
-  mix-blend-mode:screen;
-  filter:saturate(.62) contrast(1.05);
-}
-
+.tilt-card.is-foil.foil-etched::before{opacity:.25;filter:hue-rotate(0deg) saturate(.52) sepia(.18) blur(.10px)}
+.tilt-card.is-foil.foil-etched .foil-layer{opacity:.19!important;mix-blend-mode:screen;filter:saturate(.62) contrast(1.05)}
 .tilt-card.is-foil.foil-prismatic::before{opacity:.96}
 .tilt-card.is-foil.foil-prismatic .foil-layer{opacity:.47!important}
 
-/* No micro-grain dots anymore. */
-.tilt-card.is-foil::after{
-  content:none!important;
-  display:none!important;
-}
+.tilt-card.is-foil::after{content:none!important;display:none!important}
 
 .card-frame.foil-preview::after{
   opacity:.13!important;
   animation:binderFoil 6.5s ease-in-out infinite!important;
-  background:linear-gradient(118deg,
-    rgba(255,72,110,.15) 0%,
-    transparent 17%,
-    rgba(255,205,90,.13) 32%,
-    rgba(80,225,145,.16) 47%,
-    rgba(72,195,255,.18) 62%,
-    rgba(170,90,255,.16) 77%,
-    transparent 92%)!important;
+  background:linear-gradient(118deg,rgba(255,72,110,.15) 0%,transparent 17%,rgba(255,205,90,.13) 32%,rgba(80,225,145,.16) 47%,rgba(72,195,255,.18) 62%,rgba(170,90,255,.16) 77%,transparent 92%)!important;
   background-size:245% 245%!important;
 }
 
-@media (prefers-reduced-motion:reduce){
-  .tilt-card{transform:none!important}
-}
+@media (prefers-reduced-motion:reduce){.tilt-card{transform:none!important}}
