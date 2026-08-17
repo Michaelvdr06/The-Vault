@@ -341,8 +341,13 @@
     const setCode=String(state.set?.code||'').toUpperCase();
     const letterView=raw.replace(/0/g,'O').replace(/1/g,'I').replace(/[^A-Z]/g,'');
     const setSeen=!!setCode&&letterView.includes(setCode);
-    const foil=/[*★✶✦✧]/.test(raw);
-    const regular=/[•·'’]/.test(raw);
+    // A foil star is often read by OCR as X, M or K between the set code and EN.
+    // Treat that exact metadata position as foil; never infer foil from a loose letter elsewhere.
+    const escapedSet=setCode.replace(/[.*+?^${}()|[\]\\]/g,'\\    const foil=/[*★✶✦✧]/.test(raw);
+    const regular=/[•·'’]/.test(raw);');
+    const starLookalike=!!setCode&&new RegExp(`(?:^|\\s)${escapedSet}\\s*[XMK]\\s*EN(?:\\s|$)`).test(raw);
+    const foil=/[*★✶✦✧]/.test(raw)||starLookalike;
+    const regular=/[•·'’]/.test(raw)&&!starLookalike;
     return{raw,numbers,setSeen,foil,regular};
   }
   async function runOcr(image,parameters={}){
