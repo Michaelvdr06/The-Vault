@@ -41,6 +41,7 @@
               <div class="bulk-camera-empty" id="bulkCameraEmpty"><span>⌁</span><strong>Camera staat uit</strong><small>Leg één kaart recht en beeldvullend in beeld.</small></div>
               <div class="bulk-scan-line"></div><div class="bulk-number-target"><span>HOB ★ EN</span></div>
             </div>
+            <div class="bulk-live-text"><span>LIVE OCR</span><code id="bulkOcrReadout">Wacht op zichtbare tekst…</code></div>
             <div class="action-row"><button class="primary-btn" id="bulkCameraStart">Start camera</button><button class="ghost-btn" id="bulkCapture" disabled>Scan huidige kaart</button></div>
             <label class="bulk-upload"><span>Of gebruik een foto</span><input id="bulkPhoto" type="file" accept="image/*" capture="environment"></label>
             <div id="bulkCameraStatus" class="status-text muted">Selecteer eerst een set en start daarna de camera.</div>
@@ -158,10 +159,10 @@
     if(state.stream){stopCamera();return}
     if(!state.set)return setStatus('bulkCameraStatus','Kies eerst een Magic-set.');
     try{
-      state.stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080}},audio:false});
+      state.stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080},advanced:[{focusMode:'continuous'}]},audio:false});
       const v=$('#bulkVideo');v.srcObject=state.stream;await v.play();
       $('#bulkCameraEmpty').classList.add('hidden');$('#bulkCapture').disabled=false;$('#bulkCameraStart').textContent='Stop camera';
-      setStatus('bulkCameraStatus','Live macroscan actief · houd alleen de regel “0061 HOB ★ EN” in het horizontale vak.');
+      setStatus('bulkCameraStatus','Live OCR actief · houd de tekst linksonder groot en scherp in beeld.');
       scheduleAuto(250);
     }catch{setStatus('bulkCameraStatus','Camera kon niet worden geopend. Gebruik eventueel “foto kiezen”.')}
   }
@@ -324,6 +325,15 @@
     for(let i=0;i<d.length;i+=4){const g=.299*d[i]+.587*d[i+1]+.114*d[i+2];let v=(g-128)*2.05+128;if(threshold)v=v>145?255:0;v=Math.max(0,Math.min(255,v));d[i]=d[i+1]=d[i+2]=v}
     ctx.putImageData(img,0,0);return out;
   }
+  function preparedVisibleFrame(source,threshold=false){
+    const view=cameraVisibleBox(source),scale=Math.min(2.4,1800/Math.max(1,view.w)),out=document.createElement('canvas');
+    out.width=Math.max(1,Math.round(view.w*scale));out.height=Math.max(1,Math.round(view.h*scale));
+    const ctx=out.getContext('2d',{willReadFrequently:true});
+    ctx.drawImage(source,view.x,view.y,view.w,view.h,0,0,out.width,out.height);
+    const img=ctx.getImageData(0,0,out.width,out.height),d=img.data;
+    for(let i=0;i<d.length;i+=4){const g=.299*d[i]+.587*d[i+1]+.114*d[i+2];let v=(g-128)*1.7+128;if(threshold)v=v>148?255:0;v=Math.max(0,Math.min(255,v));d[i]=d[i+1]=d[i+2]=v}
+    ctx.putImageData(img,0,0);return out;
+  }
   function parseMetadata(text){
     const raw=String(text||'').toUpperCase().replace(/\s+/g,' ').trim();
     const corrected=raw.replace(/O(?=\d)/g,'0').replace(/[IL|](?=\d)/g,'1');
@@ -344,44 +354,42 @@
   async function recognizeCanvas(source,automatic=false){
     if(state.busy||state.reviewOpen||!window.Tesseract)return;
     if(!state.set)return setStatus('bulkCameraStatus','Kies eerst een Magic-set.');
-    state.busy=true;$('#bulkCapture').disabled=true;setStatus('bulkCameraStatus','Metadata lezen: nummer · set · finish…');
+    state.busy=true;$('#bulkCapture').disabled=true;setStatus('bulkCameraStatus','Alle zichtbare tekst lezen…');
     try{
       const whitelist="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ*★.'• ";
       const passes=[
-        {crop:preparedMetadataCrop(source,false,false),psm:'6'},
-        {crop:preparedMetadataCrop(source,true,false),psm:'6'},
-        {crop:preparedMetadataCrop(source,false,true),psm:'11'}
+        {crop:preparedVisibleFrame(source,false),psm:'11'},
+        {crop:preparedVisibleFrame(source,true),psm:'11'},
+        {crop:preparedMetadataCrop(source,false,true),psm:'6'}
       ];
-      const reads=[];
+      const reads=[],rawTexts=[];
       for(const pass of passes){
         const result=await runOcr(pass.crop,{tessedit_pageseg_mode:pass.psm,tessedit_char_whitelist:whitelist,preserve_interword_spaces:'1'});
-        reads.push(parseMetadata(result.data?.text));
+        const text=String(result.data?.text||'').trim();rawTexts.push(text);reads.push(parseMetadata(text));
       }
+      const visible=[...new Set(rawTexts.flatMap(t=>t.split(/\n+/)).map(x=>x.trim()).filter(Boolean))].slice(0,8);
+      const readout=$('#bulkOcrReadout');if(readout)readout.textContent=visible.join(' · ')||'Nog geen bruikbare tekst…';
       const counts=new Map();
       reads.flatMap(r=>r.numbers).forEach(n=>counts.set(n,(counts.get(n)||0)+1));
       const setVotes=reads.filter(r=>r.setSeen).length;
       const ranked=[...counts.entries()].sort((a,b)=>b[1]-a[1]),best=ranked[0];
-      const card=best&&setVotes?state.byNumber.get(best[0]):null;
+      const card=best?state.byNumber.get(best[0]):null;
       if(card){
-        const foilVotes=reads.filter(r=>r.foil).length;
-        const regularVotes=reads.filter(r=>r.regular).length;
+        const foilVotes=reads.filter(r=>r.foil).length,regularVotes=reads.filter(r=>r.regular).length;
         const detectedFoil=foilVotes>regularVotes,finishCertain=Math.max(foilVotes,regularVotes)>=1;
-        const strong=(best[1]>=2&&setVotes>=1)||(best[1]>=1&&setVotes>=2),key=`${best[0]}:${detectedFoil?'F':'N'}`,now=Date.now();
+        const strong=best[1]>=2||(best[1]>=1&&setVotes>=1),key=`${best[0]}:${detectedFoil?'F':'N'}`,now=Date.now();
         if(key===state.lastCandidate&&now-state.candidateAt<8000)state.candidateHits++;
         else{state.lastCandidate=key;state.candidateHits=1}
         state.candidateAt=now;
         if(strong||state.candidateHits>=2){
-          state.lastCandidate='';state.candidateHits=0;
-          scanReview([card],'metadata',detectedFoil,finishCertain);
-          return;
+          state.lastCandidate='';state.candidateHits=0;scanReview([card],'full text',detectedFoil,finishCertain);return;
         }
-        setStatus('bulkCameraStatus',`${String(state.set.code).toUpperCase()} #${card.collector_number} gezien · bevestigen…`);
+        setStatus('bulkCameraStatus',`#${card.collector_number} gelezen · automatisch bevestigen…`);
       }else{
         state.lastCandidate='';state.candidateHits=0;
-        const sawNumber=reads.some(r=>r.numbers.length),sawSet=setVotes>0;
-        setStatus('bulkCameraStatus',sawNumber&&!sawSet?`Nummer gezien, maar ${String(state.set.code).toUpperCase()} nog niet scherp.`:'Houd beide regels “C 0001” en “HOB ★ EN” groot binnen het vak.');
+        setStatus('bulkCameraStatus',visible.length?'Tekst gezien, maar nog geen collector number uit deze set.':'Live OCR actief · houd de tekst scherp in beeld.');
       }
-    }catch(err){console.warn('Bulk metadata scan failed',err);setStatus('bulkCameraStatus','Live macroscan herstelt automatisch · houd de metadataregel stil.')}
+    }catch(err){console.warn('Bulk full-text scan failed',err);setStatus('bulkCameraStatus','Live OCR herstelt automatisch · houd de tekst stil.')}
     state.busy=false;$('#bulkCapture').disabled=!state.stream;
     if(automatic||state.stream)scheduleAuto(360);
   }
