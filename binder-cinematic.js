@@ -1,4 +1,4 @@
-// Arcane 2.3 — cover, page flips, final spread, zoom into page one.
+// Arcane 2.4 — realistic hinged cover, page flips, final spread, zoom into page one.
 (() => {
   const collection=document.querySelector('#collection');if(!collection)return;
   const cinematic=document.createElement('div');cinematic.className='binder-cinematic';cinematic.setAttribute('aria-hidden','true');
@@ -16,7 +16,7 @@
   function play(){
     clearTimeout(timer);populate();cinematic.classList.remove('is-playing');collection.classList.remove('binder-cinematic-content');void cinematic.offsetWidth;
     cinematic.classList.add('is-playing');collection.classList.add('binder-cinematic-content');
-    timer=setTimeout(()=>{cinematic.classList.remove('is-playing');collection.classList.remove('binder-cinematic-content')},3550);
+    timer=setTimeout(()=>{cinematic.classList.remove('is-playing');collection.classList.remove('binder-cinematic-content')},4400);
   }
   const observer=new MutationObserver(()=>{if(collection.classList.contains('active')&&!collection.dataset.cinematicOpen){collection.dataset.cinematicOpen='1';requestAnimationFrame(play)}else if(!collection.classList.contains('active'))delete collection.dataset.cinematicOpen});
   observer.observe(collection,{attributes:true,attributeFilter:['class']});if(collection.classList.contains('active'))play();
