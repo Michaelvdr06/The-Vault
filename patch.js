@@ -160,7 +160,9 @@
     const css=document.createElement('link');css.rel='stylesheet';css.href='scanner-ui.css?v=1';css.dataset.vaultScannerUi='1';document.head.appendChild(css);
   }
   if(!document.querySelector('script[data-vault-scanner-ui]')){
-    const js=document.createElement('script');js.src='scanner-ui.js?v=1';js.dataset.vaultScannerUi='1';document.body.appendChild(js);
+    const js=document.createElement('script');js.src='scanner-ui.js?v=1';js.dataset.vaultScannerUi='1';
+    js.onload=()=>{const render=window.scanRender;if(typeof render==='function')window.scanRender=items=>render((Array.isArray(items)?items:[]).filter(c=>c.game==='Magic: The Gathering'))};
+    document.body.appendChild(js);
   }
 })();
 
