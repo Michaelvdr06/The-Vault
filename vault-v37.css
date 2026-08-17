@@ -1,0 +1,4 @@
+/* Vault 3.7 - full application chamber, excluding navigation */
+.vault-cinematic{position:fixed!important;z-index:300;left:280px!important;top:0!important;right:0!important;bottom:0!important;width:auto!important;height:auto!important;min-height:100vh!important;border-radius:0!important}.vault-frame{inset:clamp(18px,2.4vw,38px)!important;border-radius:22px}
+@media(max-width:1120px){.vault-cinematic{left:86px!important}.vault-frame{inset:16px!important;border-radius:18px}}
+@media(max-width:760px){.vault-cinematic{left:0!important;bottom:76px!important;min-height:calc(100vh - 76px)!important}.vault-frame{inset:10px!important;border-radius:14px}}
