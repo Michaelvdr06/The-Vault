@@ -136,7 +136,7 @@
     const css=document.createElement('link');css.rel='stylesheet';css.href='sets.css?v=2';css.dataset.vaultSets='1';document.head.appendChild(css);
   }
   if(!document.querySelector('script[data-vault-sets]')){
-    const js=document.createElement('script');js.src='sets.js?v=2';js.dataset.vaultSets='1';js.defer=true;document.body.appendChild(js);
+    const js=document.createElement('script');js.src='sets.js?v=3';js.dataset.vaultSets='1';js.defer=true;document.body.appendChild(js);
   }
 })();
 
