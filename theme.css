@@ -188,3 +188,34 @@ body::before{content:"";position:fixed;z-index:-2;inset:0;pointer-events:none;ba
 input:focus,select:focus,textarea:focus{border-color:rgba(143,105,207,.66)!important;box-shadow:0 0 0 3px rgba(116,79,179,.12),0 0 24px rgba(91,57,150,.08)!important}
 .small-label,.kicker{letter-spacing:.17em}
 @media(prefers-reduced-motion:reduce){.primary-btn::after{display:none}}
+
+
+/* Vault 4.12 — Mythic Archive art direction */
+:root{--arcane-violet:#9d76df;--arcane-gold:#b99a59;--arcane-blue:#4b718d;--arcane-ember:#80404a}
+.content{position:relative}
+.content::before{content:"";position:fixed;z-index:-1;inset:0;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.012) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.009) 1px,transparent 1px);background-size:48px 48px;mask-image:radial-gradient(circle at 62% 35%,#000,transparent 70%);opacity:.42}
+.topbar{position:relative;border-bottom:1px solid rgba(153,127,200,.08)}
+.topbar::after{content:"✦  THE MYTHIC ARCHIVE  ✦";position:absolute;right:0;bottom:-8px;padding:0 10px;color:rgba(179,150,224,.28);background:#030305;font:700 8px/1 Cinzel;letter-spacing:.24em}
+.hero-card{position:relative;overflow:hidden;border:1px solid rgba(168,137,218,.19)!important;background:radial-gradient(circle at 78% 35%,rgba(93,60,154,.18),transparent 30%),linear-gradient(118deg,#100d17,#050507 55%,#120b19)!important;box-shadow:0 38px 100px rgba(0,0,0,.5),inset 0 1px rgba(255,255,255,.04)!important}
+.hero-card::before{content:"V";position:absolute;right:5%;top:50%;transform:translateY(-50%) rotate(-4deg);color:rgba(180,142,238,.055);font:700 clamp(150px,22vw,330px)/.8 Cinzel;text-shadow:0 0 55px rgba(118,73,197,.12)}
+.hero-card::after{content:"";position:absolute;inset:13px;pointer-events:none;border:1px solid rgba(192,163,232,.055);clip-path:polygon(0 0,34% 0,35% 1px,65% 1px,66% 0,100% 0,100% 34%,calc(100% - 1px) 35%,calc(100% - 1px) 65%,100% 66%,100% 100%,66% 100%,65% calc(100% - 1px),35% calc(100% - 1px),34% 100%,0 100%,0 66%,1px 65%,1px 35%,0 34%)}
+.hero-copy,.hero-side{position:relative;z-index:1}
+.hero-copy h2{font-family:Cinzel,serif;text-shadow:0 5px 32px rgba(0,0,0,.8)}
+.hero-copy h2 span{background:linear-gradient(90deg,#d6c3ff,#9a74dd 52%,#c9aa68);-webkit-background-clip:text;background-clip:text;color:transparent}
+.stats-grid .stat-card{position:relative;overflow:hidden;border-color:rgba(144,121,184,.14)!important;background:linear-gradient(145deg,rgba(17,14,22,.98),rgba(6,6,8,.99))!important;box-shadow:0 22px 52px rgba(0,0,0,.3),inset 0 1px rgba(255,255,255,.025)}
+.stats-grid .stat-card::after{content:"✦";position:absolute;right:13px;top:11px;color:rgba(167,135,221,.15);font-size:18px}
+.stats-grid .stat-card:nth-child(2)::after{color:rgba(79,130,159,.22)}.stats-grid .stat-card:nth-child(3)::after{color:rgba(191,130,152,.22)}.stats-grid .stat-card:nth-child(4)::after{color:rgba(194,159,88,.22)}
+.stats-grid .stat-card:hover{transform:translateY(-4px);border-color:rgba(167,133,222,.28)!important;box-shadow:0 28px 62px rgba(0,0,0,.4),0 0 25px rgba(101,68,160,.08)}
+.panel{position:relative;border-color:rgba(147,125,185,.13)!important;background:linear-gradient(145deg,rgba(13,12,17,.985),rgba(5,5,7,.99))!important}
+.panel-header h3{font-family:Cinzel,serif;letter-spacing:-.01em}
+.toolbar-panel{border-top-color:rgba(177,147,225,.25)!important}
+.binder-card{transition:transform .25s cubic-bezier(.2,.8,.2,1),border-color .25s,box-shadow .25s!important}
+.binder-card:hover{transform:translateY(-7px) scale(1.018);border-color:rgba(169,137,224,.28)!important;box-shadow:0 27px 55px rgba(0,0,0,.55),0 0 28px rgba(110,76,173,.1)!important}
+.lookup-card,.form-panel,.preview-panel{background-image:radial-gradient(circle at 95% 0,rgba(111,72,179,.07),transparent 28%)!important}
+.card-modal-sheet{border-color:rgba(185,153,234,.24)!important;background:radial-gradient(circle at 78% 15%,rgba(101,63,169,.13),transparent 32%),linear-gradient(145deg,#100d16,#060609 60%)!important;box-shadow:0 48px 130px rgba(0,0,0,.86),0 0 55px rgba(104,65,174,.14)!important}
+.modal-topbar::after{content:"ARCANE RELIC";color:rgba(184,151,233,.28);font:700 8px Cinzel;letter-spacing:.24em}
+.game-chip.mtg{border:1px solid rgba(188,153,233,.22);background:linear-gradient(120deg,#503374,#2e2044)!important;box-shadow:0 0 18px rgba(117,73,183,.16)}
+.set-card{position:relative;overflow:hidden}.set-card::after{content:"✦";position:absolute;right:12px;top:10px;color:rgba(178,145,228,.12);font-size:20px}
+button,.binder-card,.set-card{tap-highlight-color:transparent}
+@media(max-width:760px){.topbar::after{display:none}.hero-card::before{right:-16%;font-size:180px}.content::before{background-size:36px 36px}.stats-grid .stat-card:hover,.binder-card:hover{transform:none}}
+@media(prefers-reduced-motion:reduce){.stats-grid .stat-card,.binder-card{transition:none!important}}
