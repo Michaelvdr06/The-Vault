@@ -117,3 +117,13 @@ body{background:radial-gradient(circle at 85% -10%,rgba(72,49,132,.13),transpare
 .binder-cinematic.is-playing .bc-flip{animation:bcPageReturn26 .78s cubic-bezier(.42,0,.15,1) both!important;animation-delay:calc(.74s + (9 - var(--page)) * .11s)!important}
 @keyframes bcPageReturn26{0%{transform:rotateY(0deg) translateZ(calc(var(--page) * 1px));opacity:1;filter:brightness(1)}42%{transform:rotateY(82deg) translateZ(24px) skewY(1.2deg);opacity:1;filter:brightness(1.12)}76%{transform:rotateY(148deg) translateZ(13px) skewY(-.6deg);opacity:1;filter:brightness(.76)}94%{transform:rotateY(180deg) translateZ(3px);opacity:1;filter:brightness(.62)}100%{transform:rotateY(182deg) translateZ(2px);opacity:0;filter:brightness(.6)}}
 @media(max-width:760px){.bc-flip{inset:0 50% 0 0;transform-origin:100% 50%}}
+
+
+/* Arcane 2.7 - a genuinely closed first frame; pages enter only after the cover opens */
+.bc-final-spread{visibility:hidden;opacity:0}
+.bc-flip{visibility:hidden;opacity:0}
+.bc-cover{visibility:visible;opacity:1}
+.binder-cinematic.is-playing .bc-final-spread{visibility:visible;animation:bcSpread27 4.2s both}
+.binder-cinematic.is-playing .bc-flip{visibility:visible;animation:bcPageReturn27 .78s cubic-bezier(.42,0,.15,1) forwards!important;animation-delay:calc(.74s + (9 - var(--page)) * .11s)!important}
+@keyframes bcPageReturn27{0%{transform:rotateY(0deg) translateZ(calc(var(--page) * 1px));opacity:1}42%{transform:rotateY(82deg) translateZ(24px) skewY(1.2deg);opacity:1;filter:brightness(1.12)}76%{transform:rotateY(148deg) translateZ(13px) skewY(-.6deg);opacity:1;filter:brightness(.76)}96%{transform:rotateY(180deg) translateZ(3px);opacity:1;filter:brightness(.62)}100%{transform:rotateY(182deg) translateZ(2px);opacity:0;visibility:hidden}}
+@keyframes bcSpread27{0%,20%{visibility:hidden;opacity:0}21%{visibility:visible;opacity:0}34%{opacity:.72}50%,82%{visibility:visible;opacity:1}100%{visibility:visible;opacity:0;filter:blur(2px)}}
