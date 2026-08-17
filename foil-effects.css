@@ -1,4 +1,4 @@
-/* The Vault — Safari-safe edge rainbow foil + smooth inspector */
+/* The Vault — stronger Safari-safe edge rainbow foil + smooth inspector */
 .tilt-card{
   --foil-x:50%;
   --foil-y:50%;
@@ -18,8 +18,8 @@
 
 /*
   iOS/Safari-safe rainbow rim.
-  No masks: separate colour blooms live around the perimeter and fade naturally
-  before reaching most of the artwork, matching the low-key binder look.
+  Slightly stronger than v6: the colour blooms are easier to see,
+  while the artwork in the centre stays readable and clean.
 */
 .tilt-card.is-foil::before{
   content:"";
@@ -28,63 +28,63 @@
   z-index:2;
   pointer-events:none;
   border-radius:inherit;
-  opacity:.48;
+  opacity:.62;
   mix-blend-mode:screen;
   background:
     radial-gradient(ellipse 52% 48% at -5% 18%,
-      rgba(255,48,86,.42) 0%,
-      rgba(255,72,100,.24) 24%,
-      rgba(255,72,100,.08) 43%,
+      rgba(255,48,86,.50) 0%,
+      rgba(255,72,100,.30) 24%,
+      rgba(255,72,100,.11) 43%,
       transparent 66%),
     radial-gradient(ellipse 62% 38% at 42% -8%,
-      rgba(255,218,82,.30) 0%,
-      rgba(255,196,76,.16) 28%,
+      rgba(255,218,82,.38) 0%,
+      rgba(255,196,76,.21) 28%,
       transparent 65%),
     radial-gradient(ellipse 50% 48% at 103% 18%,
-      rgba(91,234,112,.34) 0%,
-      rgba(74,222,126,.19) 27%,
-      rgba(74,222,126,.06) 45%,
+      rgba(91,234,112,.43) 0%,
+      rgba(74,222,126,.25) 27%,
+      rgba(74,222,126,.09) 45%,
       transparent 68%),
     radial-gradient(ellipse 54% 52% at 104% 77%,
-      rgba(57,205,255,.34) 0%,
-      rgba(70,166,255,.20) 28%,
-      rgba(70,166,255,.06) 47%,
+      rgba(57,205,255,.43) 0%,
+      rgba(70,166,255,.26) 28%,
+      rgba(70,166,255,.09) 47%,
       transparent 69%),
     radial-gradient(ellipse 58% 48% at 48% 108%,
-      rgba(116,70,255,.30) 0%,
-      rgba(178,74,255,.20) 28%,
+      rgba(116,70,255,.38) 0%,
+      rgba(178,74,255,.25) 28%,
       transparent 65%),
     radial-gradient(ellipse 46% 46% at -4% 82%,
-      rgba(220,57,255,.28) 0%,
-      rgba(180,65,255,.16) 28%,
+      rgba(220,57,255,.36) 0%,
+      rgba(180,65,255,.21) 28%,
       transparent 66%);
-  filter:saturate(1.12) blur(.15px);
+  filter:saturate(1.18) blur(.15px);
 }
 
 /* Small interior colour shift while tilting; artwork stays readable. */
 .tilt-card.is-foil .foil-layer{
   z-index:3;
-  opacity:.13!important;
+  opacity:.16!important;
   mix-blend-mode:soft-light;
   background:
     radial-gradient(circle at var(--mx) var(--my),
-      rgba(255,255,255,.25) 0 2%,
-      rgba(255,255,255,.07) 5%,
+      rgba(255,255,255,.27) 0 2%,
+      rgba(255,255,255,.08) 5%,
       transparent 15%),
     linear-gradient(calc(var(--foil-angle) + 8deg),
       transparent 8%,
-      rgba(255,75,130,.10) 26%,
-      rgba(255,220,95,.08) 38%,
-      rgba(80,225,155,.08) 50%,
-      rgba(75,185,255,.10) 63%,
-      rgba(170,85,255,.09) 76%,
+      rgba(255,75,130,.13) 26%,
+      rgba(255,220,95,.10) 38%,
+      rgba(80,225,155,.10) 50%,
+      rgba(75,185,255,.13) 63%,
+      rgba(170,85,255,.12) 76%,
       transparent 92%);
   background-size:100% 100%,225% 225%;
   background-position:center,calc(100% - var(--mx)) calc(100% - var(--my));
-  filter:saturate(1.02) contrast(1.01);
+  filter:saturate(1.05) contrast(1.01);
 }
 
-/* Clean moving glossy reflection. */
+/* Keep the glossy reflection restrained: stronger rainbow, same clean shine. */
 .tilt-card .shine-layer{
   z-index:4;
   opacity:.12!important;
@@ -103,17 +103,17 @@
   filter:blur(.2px);
 }
 
-/* Normal Magic rainbow foil — clearly visible, still low-key. */
+/* Normal Magic rainbow foil — more visible, still low-key. */
 .tilt-card.is-foil.foil-standard::before{
-  opacity:.55;
+  opacity:.70;
 }
 .tilt-card.is-foil.foil-standard .foil-layer{
-  opacity:.14!important;
+  opacity:.17!important;
 }
 
 /* Etched foil stays metallic and much less rainbow. */
 .tilt-card.is-foil.foil-etched::before{
-  opacity:.13;
+  opacity:.16;
   filter:saturate(.35) sepia(.2) blur(.15px);
 }
 .tilt-card.is-foil.foil-etched .foil-layer{
@@ -128,10 +128,10 @@
 
 /* One Piece / unknown foil can be a touch more colourful. */
 .tilt-card.is-foil.foil-prismatic::before{
-  opacity:.60;
+  opacity:.76;
 }
 .tilt-card.is-foil.foil-prismatic .foil-layer{
-  opacity:.16!important;
+  opacity:.19!important;
 }
 
 /* Faint physical surface texture. */
@@ -148,7 +148,7 @@
   background-size:5px 5px;
 }
 
-/* Binder keeps the low-key rainbow wash from the reference. */
+/* Binder keeps the existing low-key rainbow wash. */
 .card-frame.foil-preview::after{
   opacity:.10!important;
   animation:binderFoil 7s ease-in-out infinite!important;
