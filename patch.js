@@ -21,7 +21,6 @@
     }
   }
 
-  // Capture phase means overlays/child nodes cannot swallow the tap on iOS.
   document.addEventListener('pointerup', e => {
     if(e.pointerType === 'mouse') return;
     openFromTarget(e.target);
@@ -84,7 +83,6 @@
     }catch(err){ console.warn(err); }
   }
 
-  // Replace the old modal foil toggle with one that also updates the exact printing price.
   const toggle = q('#toggleFoilBtn');
   if(toggle){
     toggle.onclick = async () => {
@@ -109,7 +107,6 @@
     };
   }
 
-  // Manual form: selecting Foil should update the shown price before saving when possible.
   const foilBox=q('#foil');
   if(foilBox){
     foilBox.addEventListener('change', async () => {
@@ -122,7 +119,6 @@
     });
   }
 
-  // Existing foil Magic cards get corrected once per load if Scryfall has a foil EUR price.
   setTimeout(async()=>{
     try{
       if(typeof cards==='undefined') return;
@@ -151,4 +147,13 @@
     js.defer=true;
     document.body.appendChild(js);
   }
+})();
+
+// Load scanner v2 after the original app. It replaces only the Scan button handler.
+(() => {
+  if(document.querySelector('script[data-vault-scanner-v2]')) return;
+  const js=document.createElement('script');
+  js.src='scanner-v2.js?v=1';
+  js.dataset.vaultScannerV2='1';
+  document.body.appendChild(js);
 })();
