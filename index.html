@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0a0b0d" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <title>The Vault — Card Collector</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">V</div>
+      <div>
+        <div class="brand-name">THE VAULT</div>
+        <div class="brand-sub">Card Collector</div>
+      </div>
+    </div>
+
+    <nav>
+      <button class="nav-item active" data-page="dashboard">
+        <span>◈</span> Dashboard
+      </button>
+      <button class="nav-item" data-page="collection">
+        <span>▦</span> Mijn collectie
+      </button>
+      <button class="nav-item" data-page="add">
+        <span>＋</span> Kaart toevoegen
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="mini-stat">
+        <span>Opslag</span>
+        <strong>Browser lokaal</strong>
+      </div>
+      <p>Laravel + API koppeling volgt later.</p>
+    </div>
+  </aside>
+
+  <main>
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">PERSONAL TCG ARCHIVE</p>
+        <h1 id="pageTitle">Dashboard</h1>
+      </div>
+      <button class="primary-btn" id="quickAdd">+ Kaart toevoegen</button>
+    </header>
+
+    <section class="page active" id="dashboard">
+      <div class="hero-card">
+        <div>
+          <p class="eyebrow gold">COLLECTION OVERVIEW</p>
+          <h2>Welkom in <span>The Vault</span></h2>
+          <p>Bewaar je One Piece TCG- en Magic: The Gathering-kaarten in één digitale binder.</p>
+        </div>
+        <div class="hero-value">
+          <span>Geschatte waarde</span>
+          <strong id="totalValue">€0,00</strong>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <article class="stat-card">
+          <span>Totaal kaarten</span>
+          <strong id="totalCards">0</strong>
+          <small>Alle exemplaren samen</small>
+        </article>
+        <article class="stat-card">
+          <span>One Piece</span>
+          <strong id="opCount">0</strong>
+          <small>Kaarten in collectie</small>
+        </article>
+        <article class="stat-card">
+          <span>Magic</span>
+          <strong id="mtgCount">0</strong>
+          <small>Kaarten in collectie</small>
+        </article>
+        <article class="stat-card">
+          <span>Unieke kaarten</span>
+          <strong id="uniqueCards">0</strong>
+          <small>Verschillende prints</small>
+        </article>
+      </div>
+
+      <div class="content-grid">
+        <article class="panel">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">RECENT</p>
+              <h3>Laatst toegevoegd</h3>
+            </div>
+            <button class="text-btn" data-goto="collection">Bekijk alles →</button>
+          </div>
+          <div id="recentCards" class="recent-list"></div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">BREAKDOWN</p>
+              <h3>Collectie per game</h3>
+            </div>
+          </div>
+          <div class="breakdown">
+            <div class="breakdown-row">
+              <div>
+                <span class="dot op"></span>
+                <b>One Piece TCG</b>
+              </div>
+              <strong id="opPercent">0%</strong>
+            </div>
+            <div class="bar"><div id="opBar" class="fill op-fill"></div></div>
+
+            <div class="breakdown-row">
+              <div>
+                <span class="dot mtg"></span>
+                <b>Magic: The Gathering</b>
+              </div>
+              <strong id="mtgPercent">0%</strong>
+            </div>
+            <div class="bar"><div id="mtgBar" class="fill mtg-fill"></div></div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="page" id="collection">
+      <div class="toolbar">
+        <div class="search-wrap">
+          <span>⌕</span>
+          <input id="searchInput" placeholder="Zoek op naam, set of kaartnummer..." />
+        </div>
+        <select id="gameFilter">
+          <option value="all">Alle games</option>
+          <option value="One Piece TCG">One Piece TCG</option>
+          <option value="Magic: The Gathering">Magic: The Gathering</option>
+        </select>
+        <select id="rarityFilter">
+          <option value="all">Alle rarities</option>
+          <option value="Common">Common</option>
+          <option value="Uncommon">Uncommon</option>
+          <option value="Rare">Rare</option>
+          <option value="Super Rare">Super Rare</option>
+          <option value="Secret Rare">Secret Rare</option>
+          <option value="Mythic">Mythic</option>
+        </select>
+      </div>
+      <div class="collection-meta">
+        <span id="resultCount">0 kaarten</span>
+        <span>Binder view</span>
+      </div>
+      <div id="cardGrid" class="card-grid"></div>
+      <div id="emptyState" class="empty-state hidden">
+        <div>◇</div>
+        <h3>Geen kaarten gevonden</h3>
+        <p>Voeg je eerste kaart toe of pas je filters aan.</p>
+      </div>
+    </section>
+
+    <section class="page" id="add">
+      <div class="add-layout">
+        <form id="cardForm" class="panel form-panel">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">NEW CARD</p>
+              <h3>Kaart toevoegen</h3>
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <label>
+              <span>Game</span>
+              <select id="game" required>
+                <option value="One Piece TCG">One Piece TCG</option>
+                <option value="Magic: The Gathering">Magic: The Gathering</option>
+              </select>
+            </label>
+
+            <label>
+              <span>Naam</span>
+              <input id="name" required placeholder="Bijv. Monkey.D.Luffy" />
+            </label>
+
+            <label>
+              <span>Set</span>
+              <input id="setName" required placeholder="Bijv. OP05" />
+            </label>
+
+            <label>
+              <span>Kaartnummer</span>
+              <input id="cardNumber" placeholder="Bijv. OP05-060" />
+            </label>
+
+            <label>
+              <span>Rarity</span>
+              <select id="rarity">
+                <option>Common</option>
+                <option>Uncommon</option>
+                <option selected>Rare</option>
+                <option>Super Rare</option>
+                <option>Secret Rare</option>
+                <option>Mythic</option>
+              </select>
+            </label>
+
+            <label>
+              <span>Conditie</span>
+              <select id="condition">
+                <option selected>Near Mint</option>
+                <option>Excellent</option>
+                <option>Good</option>
+                <option>Played</option>
+              </select>
+            </label>
+
+            <label>
+              <span>Aantal</span>
+              <input id="quantity" type="number" min="1" value="1" required />
+            </label>
+
+            <label>
+              <span>Waarde per kaart (€)</span>
+              <input id="price" type="number" step="0.01" min="0" value="0" />
+            </label>
+
+            <label class="full">
+              <span>Afbeelding URL <small>(optioneel)</small></span>
+              <input id="image" placeholder="https://..." />
+            </label>
+
+            <label class="full check-label">
+              <input id="foil" type="checkbox" />
+              <span>Foil / glimmende variant</span>
+            </label>
+          </div>
+
+          <button class="primary-btn full-btn" type="submit">Kaart opslaan</button>
+        </form>
+
+        <aside class="preview panel">
+          <p class="eyebrow">PREVIEW</p>
+          <h3>Digitale binder</h3>
+          <div class="preview-card">
+            <div class="preview-image" id="previewImage">
+              <span id="previewInitials">TCG</span>
+            </div>
+            <div class="preview-info">
+              <span id="previewGame">One Piece TCG</span>
+              <h4 id="previewName">Nieuwe kaart</h4>
+              <p><span id="previewSet">SET</span> · <span id="previewNumber">000</span></p>
+            </div>
+          </div>
+          <p class="muted">Later kunnen we hier automatisch echte kaartdata en afbeeldingen ophalen uit API's.</p>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast">Kaart toegevoegd aan The Vault.</div>
+
+  <script src="app.js"></script>
+</body>
+</html>
