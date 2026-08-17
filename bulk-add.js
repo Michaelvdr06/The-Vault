@@ -39,7 +39,7 @@
               <video id="bulkVideo" playsinline muted></video>
               <canvas id="bulkCanvas" hidden></canvas>
               <div class="bulk-camera-empty" id="bulkCameraEmpty"><span>⌁</span><strong>Camera staat uit</strong><small>Leg één kaart recht en beeldvullend in beeld.</small></div>
-              <div class="bulk-scan-line"></div><div class="bulk-number-target"><span>0061 · HOB · ★ · EN</span></div>
+              <div class="bulk-scan-line"></div><div class="bulk-number-target"><span>HOB ★ EN</span></div>
             </div>
             <div class="action-row"><button class="primary-btn" id="bulkCameraStart">Start camera</button><button class="ghost-btn" id="bulkCapture" disabled>Scan huidige kaart</button></div>
             <label class="bulk-upload"><span>Of gebruik een foto</span><input id="bulkPhoto" type="file" accept="image/*" capture="environment"></label>
