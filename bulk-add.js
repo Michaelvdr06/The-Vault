@@ -1,0 +1,209 @@
+// The Vault — Bulk Add
+(() => {
+  const $=(s,r=document)=>r.querySelector(s);
+  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+  const norm=s=>String(s??'').toUpperCase().trim().replace(/^0+(?=\d)/,'').replace(/[^A-Z0-9]/g,'');
+  const state={sets:[],set:null,cards:[],byNumber:new Map(),queue:new Map(),history:[],stream:null,busy:false};
+
+  function ensureUI(){
+    if($('#bulk')) return;
+    const navList=$('.nav-list'), scanner=$('.nav-item[data-page="scanner"]');
+    const navBtn=document.createElement('button');
+    navBtn.className='nav-item'; navBtn.dataset.page='bulk'; navBtn.innerHTML='<span>⊞</span> Bulk toevoegen';
+    navList?.insertBefore(navBtn,scanner||null);
+    const page=document.createElement('section');
+    page.id='bulk'; page.className='page';
+    page.innerHTML=`
+      <section class="bulk-hero">
+        <div><p class="small-label">RAPID INTAKE</p><h2>Een stapel kaarten. <span>Één keer opslaan.</span></h2><p>Kies eerst de set. Plak daarna collector numbers of scan kaarten achter elkaar; dubbelen worden automatisch opgeteld.</p></div>
+        <div class="bulk-counter"><strong id="bulkTotal">0</strong><span>kaarten klaar</span></div>
+      </section>
+      <section class="panel bulk-setup">
+        <label><span>MAGIC SET</span><select id="bulkSet"><option value="">Sets laden…</option></select></label>
+        <div id="bulkSetStatus" class="status-text muted">Magic-sets ophalen…</div>
+      </section>
+      <div class="bulk-layout">
+        <section class="panel bulk-input-panel">
+          <div class="bulk-tabs" role="tablist">
+            <button class="bulk-tab active" data-bulk-tab="list">Nummerlijst</button>
+            <button class="bulk-tab" data-bulk-tab="camera">Camera scan</button>
+          </div>
+          <div class="bulk-mode active" data-bulk-mode="list">
+            <p class="muted">Eén nummer per regel werkt het snelst. Ook <b>61 x2</b>, komma's en spaties worden begrepen.</p>
+            <textarea id="bulkNumbers" rows="12" placeholder="61&#10;142&#10;203 x3"></textarea>
+            <div class="action-row"><button class="primary-btn" id="bulkResolve">Kaarten herkennen</button><button class="ghost-btn" id="bulkClearInput">Invoer wissen</button></div>
+            <div id="bulkListStatus" class="status-text muted">Nog geen nummers ingevoerd.</div>
+          </div>
+          <div class="bulk-mode" data-bulk-mode="camera">
+            <div class="bulk-camera">
+              <video id="bulkVideo" playsinline muted></video>
+              <canvas id="bulkCanvas" hidden></canvas>
+              <div class="bulk-camera-empty" id="bulkCameraEmpty"><span>⌁</span><strong>Camera staat uit</strong><small>Leg één kaart recht en beeldvullend in beeld.</small></div>
+              <div class="bulk-scan-line"></div>
+            </div>
+            <div class="action-row"><button class="primary-btn" id="bulkCameraStart">Start camera</button><button class="ghost-btn" id="bulkCapture" disabled>Scan huidige kaart</button></div>
+            <label class="bulk-upload"><span>Of gebruik een foto</span><input id="bulkPhoto" type="file" accept="image/*" capture="environment"></label>
+            <div id="bulkCameraStatus" class="status-text muted">Selecteer eerst een set en start daarna de camera.</div>
+          </div>
+        </section>
+        <section class="panel bulk-review">
+          <div class="panel-header"><div><p class="small-label">CONTROLELIJST</p><h3>Gevonden kaarten</h3></div><button class="text-btn" id="bulkUndo" disabled>↶ Laatste terug</button></div>
+          <div id="bulkQueue" class="bulk-queue"><div class="bulk-empty">Nog niets gescand of ingevoerd.</div></div>
+          <div class="bulk-review-footer"><div><span id="bulkUnique">0 unieke printings</span><small>Foil kun je per kaart aanpassen.</small></div><button class="primary-btn" id="bulkSave" disabled>Alles opslaan</button></div>
+        </section>
+      </div>`;
+    $('main.content')?.appendChild(page);
+    navBtn.onclick=()=>openPage();
+    bind();
+    loadSets();
+  }
+
+  function openPage(){
+    if(typeof nav==='function') nav('bulk');
+    const title=$('#pageTitle'); if(title) title.textContent='Bulk toevoegen';
+  }
+
+  function bind(){
+    $('#bulkSet').onchange=loadSet;
+    document.addEventListener('click',e=>{
+      const tab=e.target.closest('[data-bulk-tab]');
+      if(tab){document.querySelectorAll('.bulk-tab').forEach(x=>x.classList.toggle('active',x===tab));document.querySelectorAll('.bulk-mode').forEach(x=>x.classList.toggle('active',x.dataset.bulkMode===tab.dataset.bulkTab));}
+      const foil=e.target.closest('[data-bulk-foil]');
+      if(foil){const item=state.queue.get(foil.dataset.bulkFoil);if(item){item.foil=!item.foil;render();}}
+      const remove=e.target.closest('[data-bulk-remove]');
+      if(remove){removeQuantity(remove.dataset.bulkRemove,state.queue.get(remove.dataset.bulkRemove)?.quantity||1);render();}
+    });
+    $('#bulkResolve').onclick=resolveList;
+    $('#bulkClearInput').onclick=()=>{$('#bulkNumbers').value='';$('#bulkListStatus').textContent='Invoer gewist.'};
+    $('#bulkCameraStart').onclick=toggleCamera;
+    $('#bulkCapture').onclick=captureVideo;
+    $('#bulkPhoto').onchange=e=>{const f=e.target.files?.[0];if(f)scanImageFile(f);e.target.value=''};
+    $('#bulkUndo').onclick=undo;
+    $('#bulkSave').onclick=saveAll;
+  }
+
+  async function getJson(url){const r=await fetch(url,{headers:{Accept:'application/json'}});if(!r.ok)throw new Error(String(r.status));return r.json()}
+  async function loadSets(){
+    try{
+      const d=await getJson('https://api.scryfall.com/sets');
+      state.sets=(d.data||[]).filter(s=>!s.digital&&s.card_count>0&&!['token','memorabilia','minigame'].includes(s.set_type)).sort((a,b)=>String(b.released_at||'').localeCompare(String(a.released_at||'')));
+      $('#bulkSet').innerHTML='<option value="">Kies een set…</option>'+state.sets.map(s=>`<option value="${esc(s.code)}">${esc(s.name)} · ${esc(s.code.toUpperCase())}</option>`).join('');
+      $('#bulkSetStatus').textContent='Kies de set van je stapel.';
+    }catch{$('#bulkSetStatus').textContent='Sets konden niet geladen worden. Probeer opnieuw.'}
+  }
+  async function loadSet(){
+    const code=$('#bulkSet').value;
+    state.set=state.sets.find(s=>s.code===code)||null;state.cards=[];state.byNumber.clear();
+    if(!state.set)return;
+    $('#bulkSetStatus').textContent=`${state.set.name} laden…`;
+    try{
+      let url=`https://api.scryfall.com/cards/search?q=${encodeURIComponent(`e:${code} game:paper`)}&unique=prints&order=set`,all=[];
+      while(url){const d=await getJson(url);all.push(...(d.data||[]));url=d.has_more?d.next_page:null}
+      state.cards=all;
+      all.forEach(c=>state.byNumber.set(norm(c.collector_number),c));
+      $('#bulkSetStatus').textContent=`${all.length} printings klaar voor snelle invoer.`;
+    }catch{$('#bulkSetStatus').textContent='Deze set kon niet geladen worden.'}
+  }
+
+  function parseInput(text){
+    const out=[];
+    String(text||'').split(/[\n,;]+/).forEach(line=>{
+      const clean=line.trim();if(!clean)return;
+      const explicit=clean.match(/^([^\s×x*]+)(?:\s*[×x*]\s*(\d+))?$/i);
+      if(explicit){out.push({number:explicit[1],quantity:Math.max(1,Number(explicit[2]||1))});return}
+      clean.split(/\s+/).filter(Boolean).forEach(number=>out.push({number,quantity:1}));
+    });
+    return out;
+  }
+  function addCard(card,quantity=1,source='list'){
+    const key=norm(card.collector_number),existing=state.queue.get(key);
+    state.history.push({key,quantity});
+    if(existing)existing.quantity+=quantity;
+    else state.queue.set(key,{key,game:'Magic: The Gathering',name:card.name,setName:card.set_name,cardNumber:card.collector_number,rarity:String(card.rarity||'rare').replace(/^./,x=>x.toUpperCase()),condition:'Near Mint',quantity,price:Number(card.prices?.eur||0)||0,foil:false,image:card.image_uris?.normal||card.card_faces?.find(x=>x.image_uris)?.image_uris?.normal||'',source});
+  }
+  function removeQuantity(key,quantity){
+    const item=state.queue.get(key);if(!item)return;
+    item.quantity-=quantity;if(item.quantity<=0)state.queue.delete(key);
+  }
+  function resolveList(){
+    if(!state.set)return setStatus('bulkListStatus','Kies eerst een Magic-set.');
+    const entries=parseInput($('#bulkNumbers').value),missing=[];
+    entries.forEach(x=>{const card=state.byNumber.get(norm(x.number));if(card)addCard(card,x.quantity);else missing.push(x.number)});
+    setStatus('bulkListStatus',entries.length?(missing.length?`${entries.length-missing.length} herkend · niet gevonden: ${missing.join(', ')}`:`Alle ${entries.length} regels herkend.`):'Voer eerst collector numbers in.');
+    if(entries.length)$('#bulkNumbers').value='';
+    render();
+  }
+  function setStatus(id,text){$('#'+id).textContent=text}
+
+  function render(){
+    const items=[...state.queue.values()],total=items.reduce((n,x)=>n+x.quantity,0);
+    $('#bulkTotal').textContent=total;$('#bulkUnique').textContent=`${items.length} unieke printing${items.length===1?'':'s'}`;
+    $('#bulkUndo').disabled=!state.history.length;$('#bulkSave').disabled=!items.length;
+    $('#bulkQueue').innerHTML=items.length?items.map(x=>`<article class="bulk-queue-item">
+      <div class="bulk-thumb">${x.image?`<img src="${esc(x.image)}" alt="${esc(x.name)}">`:'<span>MTG</span>'}</div>
+      <div class="bulk-item-copy"><strong>${esc(x.name)}</strong><span>#${esc(x.cardNumber)} · ${esc(x.rarity)}</span></div>
+      <div class="bulk-qty">×${x.quantity}</div>
+      <button class="bulk-foil ${x.foil?'active':''}" data-bulk-foil="${esc(x.key)}">FOIL</button>
+      <button class="bulk-remove" data-bulk-remove="${esc(x.key)}" aria-label="Verwijderen">×</button>
+    </article>`).join(''):'<div class="bulk-empty">Nog niets gescand of ingevoerd.</div>';
+  }
+  function undo(){const h=state.history.pop();if(h){removeQuantity(h.key,h.quantity);render()}}
+
+  async function toggleCamera(){
+    if(state.stream){stopCamera();return}
+    if(!state.set)return setStatus('bulkCameraStatus','Kies eerst een Magic-set.');
+    try{
+      state.stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:1920}},audio:false});
+      const v=$('#bulkVideo');v.srcObject=state.stream;await v.play();
+      $('#bulkCameraEmpty').classList.add('hidden');$('#bulkCapture').disabled=false;$('#bulkCameraStart').textContent='Stop camera';
+      setStatus('bulkCameraStatus','Houd één kaart stil in beeld en druk op scannen.');
+    }catch{setStatus('bulkCameraStatus','Camera kon niet worden geopend. Gebruik eventueel “foto kiezen”.')}
+  }
+  function stopCamera(){
+    state.stream?.getTracks().forEach(t=>t.stop());state.stream=null;$('#bulkVideo').srcObject=null;$('#bulkCameraEmpty').classList.remove('hidden');$('#bulkCapture').disabled=true;$('#bulkCameraStart').textContent='Start camera';
+  }
+  async function captureVideo(){
+    const v=$('#bulkVideo'),c=$('#bulkCanvas');if(!v.videoWidth||state.busy)return;
+    c.width=v.videoWidth;c.height=v.videoHeight;c.getContext('2d').drawImage(v,0,0);
+    await recognizeCanvas(c);
+  }
+  async function scanImageFile(file){
+    if(!state.set)return setStatus('bulkCameraStatus','Kies eerst een Magic-set.');
+    const img=new Image(),url=URL.createObjectURL(file);
+    img.onload=async()=>{const c=$('#bulkCanvas');c.width=img.naturalWidth;c.height=img.naturalHeight;c.getContext('2d').drawImage(img,0,0);URL.revokeObjectURL(url);await recognizeCanvas(c)};img.src=url;
+  }
+  async function recognizeCanvas(source){
+    if(state.busy||!window.Tesseract)return;state.busy=true;$('#bulkCapture').disabled=true;setStatus('bulkCameraStatus','Collector number lezen…');
+    try{
+      const crop=document.createElement('canvas'),ctx=crop.getContext('2d');
+      crop.width=source.width;crop.height=Math.round(source.height*.38);
+      ctx.drawImage(source,0,Math.round(source.height*.62),source.width,crop.height,0,0,crop.width,crop.height);
+      const result=await Tesseract.recognize(crop,'eng');
+      const text=String(result.data?.text||'').toUpperCase();
+      const candidates=[...text.matchAll(/[A-Z]?\d{1,4}[A-Z]?/g)].map(m=>m[0]);
+      const found=candidates.map(x=>state.byNumber.get(norm(x))).find(Boolean);
+      if(found){addCard(found,1,'camera');render();cue(true);setStatus('bulkCameraStatus',`✓ ${found.name} (#${found.collector_number}) toegevoegd. Volgende kaart!`)}
+      else{cue(false);setStatus('bulkCameraStatus',`Geen zeker nummer gevonden${candidates.length?` (gelezen: ${candidates.join(', ')})`:''}. Houd de onderkant scherper in beeld.`)}
+    }catch{setStatus('bulkCameraStatus','Scannen mislukte. Probeer opnieuw met meer licht.')}
+    state.busy=false;$('#bulkCapture').disabled=!state.stream;
+  }
+  function cue(ok){
+    try{const A=window.AudioContext||window.webkitAudioContext,a=new A(),o=a.createOscillator(),g=a.createGain();o.frequency.value=ok?880:220;g.gain.setValueAtTime(.06,a.currentTime);g.gain.exponentialRampToValueAtTime(.001,a.currentTime+.13);o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+.14)}catch{}
+    if(ok&&navigator.vibrate)navigator.vibrate(35);
+  }
+  function saveAll(){
+    if(!state.queue.size)return;
+    let total=0;
+    for(const item of state.queue.values()){
+      total+=item.quantity;
+      const existing=(typeof cards!=='undefined'?cards:[]).find(c=>c.game===item.game&&norm(c.cardNumber)===norm(item.cardNumber)&&String(c.setName||'').toLowerCase()===String(item.setName||'').toLowerCase()&&!!c.foil===!!item.foil);
+      if(existing)existing.quantity=Number(existing.quantity||1)+item.quantity;
+      else cards.unshift({id:crypto.randomUUID(),addedAt:Date.now(),...item});
+    }
+    if(typeof save==='function')save();if(typeof dash==='function')dash();if(typeof binder==='function')binder();
+    state.queue.clear();state.history=[];render();stopCamera();
+    if(typeof toast==='function')toast(`${total} kaarten veilig toegevoegd aan je collectie.`);
+    if(typeof nav==='function')nav('collection');
+  }
+  ensureUI();
+})();
