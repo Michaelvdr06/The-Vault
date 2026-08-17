@@ -193,3 +193,18 @@
     document.body.appendChild(js);
   }
 })();
+
+// Load targeted mobile and bulk-scanner fixes after the feature modules.
+(() => {
+  const css=document.createElement('link');
+  css.rel='stylesheet'; css.href='mobile-hotfix.css?v=1'; css.dataset.vaultMobileHotfix='1';
+  document.head.appendChild(css);
+
+  const loadScannerFix=()=>{
+    if(document.querySelector('script[data-vault-bulk-scanner-hotfix]')) return;
+    const js=document.createElement('script');
+    js.src='bulk-scanner-hotfix.js?v=1'; js.dataset.vaultBulkScannerHotfix='1';
+    document.body.appendChild(js);
+  };
+  setTimeout(loadScannerFix,0);
+})();
