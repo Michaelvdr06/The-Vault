@@ -172,19 +172,93 @@
     const img=new Image(),url=URL.createObjectURL(file);
     img.onload=async()=>{const c=$('#bulkCanvas');c.width=img.naturalWidth;c.height=img.naturalHeight;c.getContext('2d').drawImage(img,0,0);URL.revokeObjectURL(url);await recognizeCanvas(c)};img.src=url;
   }
+  function cardBox(source){
+    const ratio=.716,margin=.94;
+    let w=Math.min(source.width*margin,source.height*margin*ratio),h=w/ratio;
+    if(h>source.height*margin){h=source.height*margin;w=h*ratio}
+    return{x:(source.width-w)/2,y:(source.height-h)/2,w,h};
+  }
+  function preparedCrop(source,from,to,threshold=false){
+    const box=cardBox(source),scale=Math.min(3,2200/Math.max(1,box.w));
+    const out=document.createElement('canvas');
+    out.width=Math.max(1,Math.round(box.w*scale));
+    out.height=Math.max(1,Math.round(box.h*(to-from)*scale));
+    const ctx=out.getContext('2d',{willReadFrequently:true});
+    ctx.drawImage(source,box.x,box.y+box.h*from,box.w,box.h*(to-from),0,0,out.width,out.height);
+    const image=ctx.getImageData(0,0,out.width,out.height),d=image.data;
+    for(let i=0;i<d.length;i+=4){
+      const gray=.299*d[i]+.587*d[i+1]+.114*d[i+2];
+      let value=(gray-128)*1.85+128;
+      if(threshold)value=value>148?255:0;
+      value=Math.max(0,Math.min(255,value));
+      d[i]=d[i+1]=d[i+2]=value;
+    }
+    ctx.putImageData(image,0,0);return out;
+  }
+  function editDistance(a,b){
+    a=String(a);b=String(b);const row=Array.from({length:b.length+1},(_,i)=>i);
+    for(let i=1;i<=a.length;i++){let prev=row[0];row[0]=i;for(let j=1;j<=b.length;j++){const old=row[j];row[j]=Math.min(row[j]+1,row[j-1]+1,prev+(a[i-1]===b[j-1]?0:1));prev=old}}
+    return row[b.length];
+  }
+  function numberCandidates(text){
+    const raw=String(text||'').toUpperCase().replace(/[|]/g,'1');
+    const parts=raw.match(/[A-Z0-9]{1,7}/g)||[],out=[];
+    for(const part of parts){
+      const corrected=part.replace(/O/g,'0').replace(/[IL]/g,'1').replace(/S/g,'5').replace(/B/g,'8').replace(/G/g,'6');
+      for(const token of [part,corrected]){
+        const match=token.match(/\d{1,4}[A-Z]?/);
+        if(match)out.push(norm(match[0]));
+      }
+    }
+    return [...new Set(out.filter(Boolean))];
+  }
+  function cardFromNumbers(candidates){
+    for(const value of candidates){const exact=state.byNumber.get(value);if(exact)return exact}
+    const valid=[...state.byNumber.keys()];
+    for(const value of candidates){
+      const near=valid.filter(n=>Math.abs(n.length-value.length)<=1&&editDistance(n,value)<=1);
+      if(near.length===1)return state.byNumber.get(near[0]);
+    }
+    return null;
+  }
+  function nameScore(a,b){
+    a=String(a||'').toLowerCase().replace(/[^a-z0-9]/g,'');b=String(b||'').toLowerCase().replace(/[^a-z0-9]/g,'');
+    if(!a||!b)return 0;if(a===b||a.includes(b)||b.includes(a))return 1;
+    return 1-editDistance(a,b)/Math.max(a.length,b.length);
+  }
+  function cardFromTitle(text){
+    const lines=String(text||'').split(/\n+/).map(x=>x.trim()).filter(x=>x.length>2&&x.length<60);
+    let best=null,score=0;
+    for(const line of lines)for(const card of state.cards){const s=nameScore(line,card.name);if(s>score){score=s;best=card}}
+    return score>=.68?best:null;
+  }
   async function recognizeCanvas(source){
-    if(state.busy||!window.Tesseract)return;state.busy=true;$('#bulkCapture').disabled=true;setStatus('bulkCameraStatus','Collector number lezen…');
+    if(state.busy||!window.Tesseract)return;state.busy=true;$('#bulkCapture').disabled=true;setStatus('bulkCameraStatus','Onderkant verscherpen en collector number lezen…');
     try{
-      const crop=document.createElement('canvas'),ctx=crop.getContext('2d');
-      crop.width=source.width;crop.height=Math.round(source.height*.38);
-      ctx.drawImage(source,0,Math.round(source.height*.62),source.width,crop.height,0,0,crop.width,crop.height);
-      const result=await Tesseract.recognize(crop,'eng');
-      const text=String(result.data?.text||'').toUpperCase();
-      const candidates=[...text.matchAll(/[A-Z]?\d{1,4}[A-Z]?/g)].map(m=>m[0]);
-      const found=candidates.map(x=>state.byNumber.get(norm(x))).find(Boolean);
-      if(found){addCard(found,1,'camera');render();cue(true);setStatus('bulkCameraStatus',`✓ ${found.name} (#${found.collector_number}) toegevoegd. Volgende kaart!`)}
-      else{cue(false);setStatus('bulkCameraStatus',`Geen zeker nummer gevonden${candidates.length?` (gelezen: ${candidates.join(', ')})`:''}. Houd de onderkant scherper in beeld.`)}
-    }catch{setStatus('bulkCameraStatus','Scannen mislukte. Probeer opnieuw met meer licht.')}
+      const lower=preparedCrop(source,.64,.99,false);
+      const numberResult=await Tesseract.recognize(lower,'eng');
+      const candidates=numberCandidates(numberResult.data?.text);
+      let found=cardFromNumbers(candidates),method='collector number';
+      if(!found){
+        setStatus('bulkCameraStatus','Nummer onzeker · kaartnaam controleren…');
+        const lowerBW=preparedCrop(source,.64,.99,true);
+        const retry=await Tesseract.recognize(lowerBW,'eng');
+        candidates.push(...numberCandidates(retry.data?.text));
+        found=cardFromNumbers([...new Set(candidates)]);
+      }
+      if(!found){
+        const title=preparedCrop(source,.025,.23,false);
+        const titleResult=await Tesseract.recognize(title,'eng');
+        found=cardFromTitle(titleResult.data?.text);method='kaartnaam';
+      }
+      if(found){
+        addCard(found,1,'camera');render();cue(true);
+        setStatus('bulkCameraStatus',`✓ ${found.name} (#${found.collector_number}) herkend via ${method}. Volgende kaart!`);
+      }else{
+        cue(false);
+        setStatus('bulkCameraStatus',`Geen zekere match${candidates.length?` (mogelijk nummer: ${[...new Set(candidates)].slice(0,5).join(', ')})`:''}. Vul de paarse kaartomlijning en houd de kaart stil.`);
+      }
+    }catch(err){console.warn('Bulk scan failed',err);setStatus('bulkCameraStatus','Scannen mislukte. Houd de hele kaart recht in beeld en probeer opnieuw.')}
     state.busy=false;$('#bulkCapture').disabled=!state.stream;
   }
   function cue(ok){
