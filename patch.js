@@ -163,3 +163,10 @@
     const js=document.createElement('script');js.src='scanner-ui.js?v=1';js.dataset.vaultScannerUi='1';document.body.appendChild(js);
   }
 })();
+
+// Load the cohesive black/red theme after every feature stylesheet.
+(() => {
+  if(document.querySelector('link[data-vault-theme]')) return;
+  const css=document.createElement('link');css.rel='stylesheet';css.href='theme.css?v=1';css.dataset.vaultTheme='1';document.head.appendChild(css);
+})();
+
