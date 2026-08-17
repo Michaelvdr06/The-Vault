@@ -153,3 +153,13 @@
   if(document.querySelector('link[data-vault-mobile]')) return;
   const css=document.createElement('link');css.rel='stylesheet';css.href='mobile.css?v=1';css.dataset.vaultMobile='1';document.head.appendChild(css);
 })();
+
+// Scanner presentation layer loads last: it formats OCR output and upgrades suggestion cards only.
+(() => {
+  if(!document.querySelector('link[data-vault-scanner-ui]')){
+    const css=document.createElement('link');css.rel='stylesheet';css.href='scanner-ui.css?v=1';css.dataset.vaultScannerUi='1';document.head.appendChild(css);
+  }
+  if(!document.querySelector('script[data-vault-scanner-ui]')){
+    const js=document.createElement('script');js.src='scanner-ui.js?v=1';js.dataset.vaultScannerUi='1';document.body.appendChild(js);
+  }
+})();
