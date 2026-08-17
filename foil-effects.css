@@ -1,4 +1,4 @@
-/* The Vault — vivid reactive holo foil + moving glitter */
+/* The Vault — vivid reactive holo foil, motion-only glitter */
 .tilt-card{
   --foil-angle:115deg;
   --edge-x:0%;
@@ -6,8 +6,7 @@
   --holo-hue:0deg;
   --prism-x:50%;
   --prism-y:50%;
-  --sparkle-alpha:.40;
-  --sparkle-scale:1;
+  --sparkle-alpha:0;
   --s1x:62%; --s1y:35%;
   --s2x:38%; --s2y:63%;
   --s3x:70%; --s3y:71%;
@@ -29,28 +28,28 @@
   border-radius:inherit;
 }
 
-/* Strong moving colour pools around the perimeter. */
+/* Keep the vivid colour palette, but overscan the colour field so it cannot slide off the card. */
 .tilt-card.is-foil::before{
   content:"";
   position:absolute;
-  inset:-4%;
+  inset:-12%;
   z-index:2;
   pointer-events:none;
   border-radius:inherit;
   opacity:.84;
   mix-blend-mode:screen;
-  transform:translate3d(var(--edge-x),var(--edge-y),0) scale(1.055);
+  transform:translate3d(var(--edge-x),var(--edge-y),0) scale(1.14);
   background:
-    radial-gradient(ellipse 58% 54% at -2% 16%, rgba(255,24,78,.66) 0%, rgba(255,82,114,.39) 24%, rgba(255,82,114,.13) 45%, transparent 69%),
-    radial-gradient(ellipse 68% 44% at 42% -7%, rgba(255,227,55,.57) 0%, rgba(255,171,47,.32) 30%, transparent 68%),
-    radial-gradient(ellipse 56% 54% at 103% 17%, rgba(58,246,101,.61) 0%, rgba(45,229,145,.35) 29%, rgba(45,229,145,.12) 49%, transparent 71%),
-    radial-gradient(ellipse 60% 58% at 104% 80%, rgba(25,209,255,.62) 0%, rgba(58,136,255,.36) 29%, rgba(58,136,255,.12) 50%, transparent 72%),
-    radial-gradient(ellipse 64% 54% at 49% 108%, rgba(87,48,255,.59) 0%, rgba(192,48,255,.35) 29%, transparent 69%),
-    radial-gradient(ellipse 52% 52% at -4% 83%, rgba(239,31,255,.56) 0%, rgba(187,43,255,.32) 29%, transparent 69%);
+    radial-gradient(ellipse 68% 64% at -1% 15%, rgba(255,24,78,.66) 0%, rgba(255,82,114,.39) 26%, rgba(255,82,114,.13) 49%, transparent 76%),
+    radial-gradient(ellipse 78% 54% at 42% -5%, rgba(255,227,55,.57) 0%, rgba(255,171,47,.32) 33%, transparent 75%),
+    radial-gradient(ellipse 66% 64% at 102% 16%, rgba(58,246,101,.61) 0%, rgba(45,229,145,.35) 31%, rgba(45,229,145,.12) 52%, transparent 78%),
+    radial-gradient(ellipse 70% 68% at 103% 81%, rgba(25,209,255,.62) 0%, rgba(58,136,255,.36) 31%, rgba(58,136,255,.12) 53%, transparent 79%),
+    radial-gradient(ellipse 74% 64% at 49% 106%, rgba(87,48,255,.59) 0%, rgba(192,48,255,.35) 31%, transparent 76%),
+    radial-gradient(ellipse 62% 62% at -2% 84%, rgba(239,31,255,.56) 0%, rgba(187,43,255,.32) 31%, transparent 76%);
   filter:hue-rotate(var(--holo-hue)) saturate(1.55) contrast(1.035) blur(.10px);
 }
 
-/* Main diffraction field. Multiple layers move differently so the card actually changes colour. */
+/* Main diffraction field: the colour behaviour from v10 is preserved. */
 .tilt-card.is-foil .foil-layer{
   z-index:3;
   opacity:.39!important;
@@ -83,23 +82,21 @@
   filter:hue-rotate(var(--holo-hue)) saturate(1.44) contrast(1.045);
 }
 
-/* Gloss + eight tiny holo glitter points and two cross-shaped flashes. */
+/* Gloss is always clean; glitter has zero alpha at rest and only appears during real movement. */
 .tilt-card .shine-layer{
   z-index:4;
   opacity:.34!important;
   mix-blend-mode:screen;
   background:
     radial-gradient(ellipse 26% 20% at var(--mx) var(--my), rgba(255,255,255,.72) 0%, rgba(255,255,255,.21) 27%, transparent 64%),
-    radial-gradient(circle at var(--s1x) var(--s1y), rgba(255,255,255,var(--sparkle-alpha)) 0 .46%, rgba(255,255,255,.42) .74%, transparent 1.72%),
-    radial-gradient(circle at var(--s2x) var(--s2y), rgba(255,235,140,var(--sparkle-alpha)) 0 .40%, rgba(255,214,100,.36) .69%, transparent 1.60%),
-    radial-gradient(circle at var(--s3x) var(--s3y), rgba(142,222,255,var(--sparkle-alpha)) 0 .39%, rgba(101,190,255,.34) .67%, transparent 1.55%),
-    radial-gradient(circle at var(--s4x) var(--s4y), rgba(240,164,255,var(--sparkle-alpha)) 0 .37%, rgba(216,122,255,.32) .64%, transparent 1.50%),
-    radial-gradient(circle at var(--s5x) var(--s5y), rgba(150,255,205,var(--sparkle-alpha)) 0 .34%, rgba(103,242,168,.28) .60%, transparent 1.42%),
-    radial-gradient(circle at var(--s6x) var(--s6y), rgba(255,183,204,var(--sparkle-alpha)) 0 .33%, rgba(255,127,168,.27) .58%, transparent 1.38%),
-    radial-gradient(circle at var(--s7x) var(--s7y), rgba(255,255,211,var(--sparkle-alpha)) 0 .31%, rgba(255,242,166,.25) .55%, transparent 1.32%),
-    radial-gradient(circle at var(--s8x) var(--s8y), rgba(178,195,255,var(--sparkle-alpha)) 0 .30%, rgba(133,154,255,.25) .54%, transparent 1.30%),
-    conic-gradient(from 45deg at var(--s1x) var(--s1y), transparent 0 23%, rgba(255,255,255,.82) 24% 26%, transparent 27% 48%, rgba(255,255,255,.62) 49% 51%, transparent 52% 100%),
-    conic-gradient(from 45deg at var(--s3x) var(--s3y), transparent 0 23%, rgba(255,255,255,.68) 24% 26%, transparent 27% 48%, rgba(255,255,255,.52) 49% 51%, transparent 52% 100%),
+    radial-gradient(circle at var(--s1x) var(--s1y), rgba(255,255,255,var(--sparkle-alpha)) 0 .46%, rgba(255,255,255,var(--sparkle-alpha)) .72%, transparent 1.72%),
+    radial-gradient(circle at var(--s2x) var(--s2y), rgba(255,235,140,var(--sparkle-alpha)) 0 .40%, rgba(255,214,100,var(--sparkle-alpha)) .67%, transparent 1.60%),
+    radial-gradient(circle at var(--s3x) var(--s3y), rgba(142,222,255,var(--sparkle-alpha)) 0 .39%, rgba(101,190,255,var(--sparkle-alpha)) .65%, transparent 1.55%),
+    radial-gradient(circle at var(--s4x) var(--s4y), rgba(240,164,255,var(--sparkle-alpha)) 0 .37%, rgba(216,122,255,var(--sparkle-alpha)) .62%, transparent 1.50%),
+    radial-gradient(circle at var(--s5x) var(--s5y), rgba(150,255,205,var(--sparkle-alpha)) 0 .34%, rgba(103,242,168,var(--sparkle-alpha)) .58%, transparent 1.42%),
+    radial-gradient(circle at var(--s6x) var(--s6y), rgba(255,183,204,var(--sparkle-alpha)) 0 .33%, rgba(255,127,168,var(--sparkle-alpha)) .56%, transparent 1.38%),
+    radial-gradient(circle at var(--s7x) var(--s7y), rgba(255,255,211,var(--sparkle-alpha)) 0 .31%, rgba(255,242,166,var(--sparkle-alpha)) .53%, transparent 1.32%),
+    radial-gradient(circle at var(--s8x) var(--s8y), rgba(178,195,255,var(--sparkle-alpha)) 0 .30%, rgba(133,154,255,var(--sparkle-alpha)) .52%, transparent 1.30%),
     linear-gradient(var(--foil-angle), transparent 33%, rgba(255,255,255,.07) 42%, rgba(255,255,255,.30) 50%, rgba(255,255,255,.07) 58%, transparent 67%);
   filter:hue-rotate(calc(var(--holo-hue) * .35)) blur(.055px);
 }
@@ -120,6 +117,7 @@
 .tilt-card.is-foil.foil-prismatic::before{opacity:.96}
 .tilt-card.is-foil.foil-prismatic .foil-layer{opacity:.47!important}
 
+/* Micro grain only — removed the repeating white line texture. */
 .tilt-card.is-foil::after{
   content:"";
   position:absolute;
@@ -127,12 +125,10 @@
   z-index:5;
   pointer-events:none;
   border-radius:inherit;
-  opacity:.055;
+  opacity:.035;
   mix-blend-mode:overlay;
-  background-image:
-    repeating-radial-gradient(circle at 20% 30%,rgba(255,255,255,.58) 0 .28px,transparent .34px 2px),
-    repeating-linear-gradient(122deg,transparent 0 8px,rgba(255,255,255,.10) 9px,transparent 10px 17px);
-  background-size:5px 5px,30px 30px;
+  background-image:repeating-radial-gradient(circle at 20% 30%,rgba(255,255,255,.50) 0 .25px,transparent .31px 2.2px);
+  background-size:5px 5px;
 }
 
 .card-frame.foil-preview::after{
