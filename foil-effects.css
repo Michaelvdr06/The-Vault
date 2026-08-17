@@ -28,6 +28,20 @@
   border-radius:inherit;
 }
 
+/* HARD GATE: non-foil cards never show legacy shine/glitter/foil overlays. */
+.tilt-card:not(.is-foil) .shine-layer,
+.tilt-card:not(.is-foil) .foil-layer{
+  display:none!important;
+  visibility:hidden!important;
+  opacity:0!important;
+}
+
+.tilt-card.is-foil .shine-layer,
+.tilt-card.is-foil .foil-layer{
+  display:block!important;
+  visibility:visible!important;
+}
+
 /* Keep the vivid colour palette, but overscan the colour field so it cannot slide off the card. */
 .tilt-card.is-foil::before{
   content:"";
@@ -82,8 +96,8 @@
   filter:hue-rotate(var(--holo-hue)) saturate(1.44) contrast(1.045);
 }
 
-/* Gloss is always clean; glitter has zero alpha at rest and only appears during real movement. */
-.tilt-card .shine-layer{
+/* Foil-only gloss + glitter. There is no white layer at all when foil is disabled. */
+.tilt-card.is-foil .shine-layer{
   z-index:4;
   opacity:.34!important;
   mix-blend-mode:screen;
