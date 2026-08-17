@@ -33,7 +33,7 @@
       </div>
       <section class="panel sets-toolbar">
         <div class="sets-toolbar-grid">
-          <label><span>GAME</span><select id="setGame"><option>Magic: The Gathering</option><option>One Piece TCG</option></select></label>
+          <label><span>GAME</span><select id="setGame"><option>Magic: The Gathering</option></select></label>
           <label><span>SET</span><select id="setSelect"><option value="">Sets laden…</option></select></label>
           <label><span>ZOEK IN SET</span><input id="setSearch" type="search" placeholder="Naam of kaartnummer…"></label>
         </div>
@@ -194,3 +194,4 @@
 
   ensureUI();
 })();
+
