@@ -94,3 +94,19 @@ body{background:radial-gradient(circle at 85% -10%,rgba(72,49,132,.13),transpare
 @keyframes bcSpread24{0%,18%{opacity:0}29%{opacity:.55}48%,82%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1);filter:blur(2px)}}
 @keyframes bcRealPage24{0%,80%{opacity:0;transform:scale(.94);filter:blur(5px)}100%{opacity:1;transform:none;filter:none}}
 @media(max-width:760px){.bc-cover,.bc-flip{inset:0 0 0 50%}}
+
+
+/* Arcane 2.5 - fast overlapping storybook page fan */
+.bc-flip{z-index:calc(10 + var(--page));transform:rotateY(0deg) translateZ(calc(var(--page) * 1px));animation:none!important}
+.binder-cinematic.is-playing{animation:bcCinematic25 4.2s both}
+.binder-cinematic.is-playing .bc-book{animation:bcBook25 4.2s cubic-bezier(.2,.7,.18,1) both}
+.binder-cinematic.is-playing .bc-cover{animation:bcCover25 4.2s cubic-bezier(.18,.72,.16,1) both}
+.binder-cinematic.is-playing .bc-flip{animation:bcPageFan25 .72s cubic-bezier(.34,.04,.18,1) both!important;animation-delay:calc(.72s + (9 - var(--page)) * .105s)!important}
+.binder-cinematic.is-playing .bc-final-spread{animation:bcSpread25 4.2s both}
+.binder-cinematic-content>.toolbar-panel,.binder-cinematic-content>.binder-grid,.binder-cinematic-content>.empty-state{animation:bcRealPage25 4.2s both}
+@keyframes bcCinematic25{0%{opacity:0}4%,91%{opacity:1}100%{opacity:0;visibility:hidden}}
+@keyframes bcBook25{0%,10%{transform:translateX(-25%) scale(.84) rotateX(3deg)}30%,72%{transform:translateX(0) scale(1) rotateX(2deg)}100%{transform:translateX(24%) scale(2.55);transform-origin:25% 50%}}
+@keyframes bcCover25{0%,10%{transform:rotateY(0) translateZ(14px);opacity:1}15%{transform:rotateY(-22deg) translateZ(18px)}31%{transform:rotateY(-179deg) translateZ(5px);opacity:1}34%,100%{transform:rotateY(-179deg);opacity:0}}
+@keyframes bcPageFan25{0%{transform:rotateY(0deg) translateZ(calc(var(--page) * 1px));opacity:1}38%{transform:rotateY(-62deg) translateZ(18px) skewY(-1deg);opacity:1;filter:brightness(1.08)}68%{transform:rotateY(-132deg) translateZ(12px) skewY(1deg);opacity:1;filter:brightness(.78)}100%{transform:rotateY(-179deg) translateZ(2px);opacity:0;filter:brightness(.6)}}
+@keyframes bcSpread25{0%,28%{opacity:0}42%{opacity:.65}55%,82%{opacity:1}100%{opacity:0;filter:blur(2px)}}
+@keyframes bcRealPage25{0%,81%{opacity:0;transform:scale(.94);filter:blur(5px)}100%{opacity:1;transform:none;filter:none}}
