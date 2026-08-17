@@ -1,4 +1,4 @@
-/* The Vault — vivid reactive holo foil, motion-only glitter */
+/* The Vault — vivid reactive holo foil, clean rounded clipping */
 .tilt-card{
   --foil-angle:115deg;
   --edge-x:0%;
@@ -6,20 +6,15 @@
   --holo-hue:0deg;
   --prism-x:50%;
   --prism-y:50%;
-  --sparkle-alpha:0;
-  --s1x:62%; --s1y:35%;
-  --s2x:38%; --s2y:63%;
-  --s3x:70%; --s3y:71%;
-  --s4x:29%; --s4y:29%;
-  --s5x:82%; --s5y:48%;
-  --s6x:19%; --s6y:52%;
-  --s7x:54%; --s7y:19%;
-  --s8x:46%; --s8y:84%;
   will-change:transform;
   transition:none!important;
   backface-visibility:hidden;
   -webkit-backface-visibility:hidden;
   transform:perspective(1100px) rotateX(var(--rx)) rotateY(var(--ry)) translateZ(0);
+
+  /* Everything, including oversized holo layers, is clipped to the card's rounded corners. */
+  overflow:hidden!important;
+  isolation:isolate;
 }
 
 .tilt-card .foil-layer,
@@ -42,7 +37,7 @@
   visibility:visible!important;
 }
 
-/* Keep the vivid colour palette, but overscan the colour field so it cannot slide off the card. */
+/* Keep the vivid colour palette and overscan, now safely clipped by the rounded card. */
 .tilt-card.is-foil::before{
   content:"";
   position:absolute;
@@ -63,7 +58,7 @@
   filter:hue-rotate(var(--holo-hue)) saturate(1.55) contrast(1.035) blur(.10px);
 }
 
-/* Main diffraction field: the colour behaviour from v10 is preserved. */
+/* Main diffraction field: preserve the colour behaviour that already looks right. */
 .tilt-card.is-foil .foil-layer{
   z-index:3;
   opacity:.39!important;
@@ -96,23 +91,18 @@
   filter:hue-rotate(var(--holo-hue)) saturate(1.44) contrast(1.045);
 }
 
-/* Foil-only gloss + glitter. There is no white layer at all when foil is disabled. */
+/* One clean, broad reflection only. No sparkle dots, glitter balls or thin white streaks. */
 .tilt-card.is-foil .shine-layer{
   z-index:4;
-  opacity:.34!important;
+  opacity:.18!important;
   mix-blend-mode:screen;
   background:
-    radial-gradient(ellipse 26% 20% at var(--mx) var(--my), rgba(255,255,255,.72) 0%, rgba(255,255,255,.21) 27%, transparent 64%),
-    radial-gradient(circle at var(--s1x) var(--s1y), rgba(255,255,255,var(--sparkle-alpha)) 0 .46%, rgba(255,255,255,var(--sparkle-alpha)) .72%, transparent 1.72%),
-    radial-gradient(circle at var(--s2x) var(--s2y), rgba(255,235,140,var(--sparkle-alpha)) 0 .40%, rgba(255,214,100,var(--sparkle-alpha)) .67%, transparent 1.60%),
-    radial-gradient(circle at var(--s3x) var(--s3y), rgba(142,222,255,var(--sparkle-alpha)) 0 .39%, rgba(101,190,255,var(--sparkle-alpha)) .65%, transparent 1.55%),
-    radial-gradient(circle at var(--s4x) var(--s4y), rgba(240,164,255,var(--sparkle-alpha)) 0 .37%, rgba(216,122,255,var(--sparkle-alpha)) .62%, transparent 1.50%),
-    radial-gradient(circle at var(--s5x) var(--s5y), rgba(150,255,205,var(--sparkle-alpha)) 0 .34%, rgba(103,242,168,var(--sparkle-alpha)) .58%, transparent 1.42%),
-    radial-gradient(circle at var(--s6x) var(--s6y), rgba(255,183,204,var(--sparkle-alpha)) 0 .33%, rgba(255,127,168,var(--sparkle-alpha)) .56%, transparent 1.38%),
-    radial-gradient(circle at var(--s7x) var(--s7y), rgba(255,255,211,var(--sparkle-alpha)) 0 .31%, rgba(255,242,166,var(--sparkle-alpha)) .53%, transparent 1.32%),
-    radial-gradient(circle at var(--s8x) var(--s8y), rgba(178,195,255,var(--sparkle-alpha)) 0 .30%, rgba(133,154,255,var(--sparkle-alpha)) .52%, transparent 1.30%),
-    linear-gradient(var(--foil-angle), transparent 33%, rgba(255,255,255,.07) 42%, rgba(255,255,255,.30) 50%, rgba(255,255,255,.07) 58%, transparent 67%);
-  filter:hue-rotate(calc(var(--holo-hue) * .35)) blur(.055px);
+    radial-gradient(ellipse 34% 25% at var(--mx) var(--my),
+      rgba(255,255,255,.42) 0%,
+      rgba(255,255,255,.12) 30%,
+      rgba(255,255,255,.035) 48%,
+      transparent 70%);
+  filter:blur(.35px);
 }
 
 .tilt-card.is-foil.foil-standard::before{opacity:.90}
@@ -131,18 +121,10 @@
 .tilt-card.is-foil.foil-prismatic::before{opacity:.96}
 .tilt-card.is-foil.foil-prismatic .foil-layer{opacity:.47!important}
 
-/* Micro grain only — removed the repeating white line texture. */
+/* No micro-grain dots anymore. */
 .tilt-card.is-foil::after{
-  content:"";
-  position:absolute;
-  inset:0;
-  z-index:5;
-  pointer-events:none;
-  border-radius:inherit;
-  opacity:.035;
-  mix-blend-mode:overlay;
-  background-image:repeating-radial-gradient(circle at 20% 30%,rgba(255,255,255,.50) 0 .25px,transparent .31px 2.2px);
-  background-size:5px 5px;
+  content:none!important;
+  display:none!important;
 }
 
 .card-frame.foil-preview::after{
