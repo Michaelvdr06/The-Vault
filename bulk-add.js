@@ -38,11 +38,11 @@
             <div class="bulk-camera">
               <video id="bulkVideo" playsinline muted></video>
               <canvas id="bulkCanvas" hidden></canvas>
-              <div class="bulk-camera-empty" id="bulkCameraEmpty"><span>⌁</span><strong>Camera staat uit</strong><small>Leg één kaart recht en beeldvullend in beeld.</small></div>
+              <div class="bulk-camera-empty" id="bulkCameraEmpty"><span>✦</span><strong>De arcane scanner wacht</strong><small>Kies een set, open je camera en houd de tekst rustig in beeld.</small></div>
               <div class="bulk-scan-line"></div><div class="bulk-number-target"><span>HOB ★ EN</span></div>
             </div>
             <div class="bulk-live-text"><span>LIVE OCR</span><code id="bulkOcrReadout">Wacht op zichtbare tekst…</code></div>
-            <div class="action-row"><button class="primary-btn" id="bulkCameraStart">Start camera</button><button class="ghost-btn" id="bulkCapture" disabled>Scan huidige kaart</button></div>
+            <div class="action-row bulk-scan-controls"><button class="ghost-btn bulk-camera-toggle" id="bulkCameraStart"><span>◉</span> Camera openen</button><button class="primary-btn bulk-scan-now" id="bulkCapture" disabled><span>✦</span><b>Start scan</b><small>Lees de kaarttekst nu</small></button></div>
             <label class="bulk-upload"><span>Of gebruik een foto</span><input id="bulkPhoto" type="file" accept="image/*" capture="environment"></label>
             <div id="bulkCameraStatus" class="status-text muted">Selecteer eerst een set en start daarna de camera.</div>
           </div>
@@ -77,7 +77,7 @@
     $('#bulkResolve').onclick=resolveList;
     $('#bulkClearInput').onclick=()=>{$('#bulkNumbers').value='';$('#bulkListStatus').textContent='Invoer gewist.'};
     $('#bulkCameraStart').onclick=toggleCamera;
-    $('#bulkCapture').onclick=()=>captureVideo(false);
+    $('#bulkCapture').onclick=()=>{setStatus('bulkCameraStatus','✦ Tekst wordt nu gelezen…');captureVideo(false)};
     $('#bulkPhoto').onchange=e=>{const f=e.target.files?.[0];if(f)scanImageFile(f);e.target.value=''};
     $('#bulkUndo').onclick=undo;
     $('#bulkSave').onclick=saveAll;
@@ -161,14 +161,14 @@
     try{
       state.stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080},advanced:[{focusMode:'continuous'}]},audio:false});
       const v=$('#bulkVideo');v.srcObject=state.stream;await v.play();
-      $('#bulkCameraEmpty').classList.add('hidden');$('#bulkCapture').disabled=false;$('#bulkCameraStart').textContent='Stop camera';
+      $('#bulkCameraEmpty').classList.add('hidden');$('#bulkCapture').disabled=false;$('#bulkCameraStart').innerHTML='<span>◉</span> Camera sluiten';
       setStatus('bulkCameraStatus','Live OCR actief · houd de tekst linksonder groot en scherp in beeld.');
       scheduleAuto(250);
     }catch{setStatus('bulkCameraStatus','Camera kon niet worden geopend. Gebruik eventueel “foto kiezen”.')}
   }
   function stopCamera(){
     clearTimeout(state.autoTimer);state.autoTimer=null;state.lastCandidate='';state.candidateHits=0;
-    state.stream?.getTracks().forEach(t=>t.stop());state.stream=null;$('#bulkVideo').srcObject=null;$('#bulkCameraEmpty').classList.remove('hidden');$('#bulkCapture').disabled=true;$('#bulkCameraStart').textContent='Start camera';
+    state.stream?.getTracks().forEach(t=>t.stop());state.stream=null;$('#bulkVideo').srcObject=null;$('#bulkCameraEmpty').classList.remove('hidden');$('#bulkCapture').disabled=true;$('#bulkCameraStart').innerHTML='<span>◉</span> Camera openen';
   }
   async function captureVideo(automatic=false){
     const v=$('#bulkVideo'),c=$('#bulkCanvas');if(!v.videoWidth||state.busy||state.reviewOpen)return;
