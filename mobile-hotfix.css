@@ -32,7 +32,7 @@
   .bulk-setup select{width:100%!important;min-width:0!important}
   .bulk-tabs{width:100%!important;display:grid!important;grid-template-columns:1fr 1fr!important}
   .bulk-tab{min-width:0!important;padding:10px 6px!important}
-  .bulk-camera{width:100%!important;max-width:100%!important;aspect-ratio:4/5!important;min-height:0!important}
+  .bulk-camera{width:100%!important;max-width:100%!important;aspect-ratio:16/8!important;min-height:0!important}
   #bulkVideo{width:100%!important;height:100%!important;object-fit:cover!important}
   .bulk-input-panel .action-row{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important}
   .bulk-input-panel .action-row button{width:100%!important;min-width:0!important;padding:11px 7px!important;font-size:12px!important}
