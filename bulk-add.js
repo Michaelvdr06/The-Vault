@@ -115,11 +115,11 @@
     });
     return out;
   }
-  function addCard(card,quantity=1,source='list'){
-    const key=norm(card.collector_number),existing=state.queue.get(key);
+  function addCard(card,quantity=1,source='list',foil=false){
+    const base=norm(card.collector_number),key=foil?`${base}:FOIL`:base,existing=state.queue.get(key);
     state.history.push({key,quantity});
     if(existing)existing.quantity+=quantity;
-    else state.queue.set(key,{key,game:'Magic: The Gathering',name:card.name,setName:card.set_name,cardNumber:card.collector_number,rarity:String(card.rarity||'rare').replace(/^./,x=>x.toUpperCase()),condition:'Near Mint',quantity,price:Number(card.prices?.eur||0)||0,foil:false,image:card.image_uris?.normal||card.card_faces?.find(x=>x.image_uris)?.image_uris?.normal||'',source});
+    else state.queue.set(key,{key,game:'Magic: The Gathering',name:card.name,setName:card.set_name,cardNumber:card.collector_number,rarity:String(card.rarity||'rare').replace(/^./,x=>x.toUpperCase()),condition:'Near Mint',quantity,price:Number(foil?card.prices?.eur_foil:card.prices?.eur)||0,foil,image:card.image_uris?.normal||card.card_faces?.find(x=>x.image_uris)?.image_uris?.normal||'',source});
   }
   function removeQuantity(key,quantity){
     const item=state.queue.get(key);if(!item)return;
@@ -276,50 +276,64 @@
     if(score<.78||ocrConfidence<18||!bestName)return{cards:[],score,ocrConfidence,line:bestLine};
     return{cards:state.cards.filter(card=>norm(card.name)===norm(bestName)).slice(0,8),score,ocrConfidence,line:bestLine};
   }
-  function scanReview(options,method){
+  function scanReview(options,method,detectedFoil=false,finishCertain=false){
     document.querySelector('.bulk-scan-review')?.remove();
     state.reviewOpen=true;
-    let selected=0;
+    let selected=0,foil=!!detectedFoil;
     const overlay=document.createElement('div');
     overlay.className='bulk-scan-review';
     overlay.innerHTML=`<section class="bulk-scan-dialog" role="dialog" aria-modal="true" aria-label="Scan controleren">
-      <p class="small-label">SCAN GEVONDEN</p>
+      <p class="small-label">METADATA GEVONDEN</p>
       <h3>Is dit jouw kaart?</h3>
-      <p class="bulk-scan-method">${method==='kaartnaam'&&options.length>1?'De naam klopt, maar kies de juiste uitvoering.':'Controleer de kaart voordat hij aan de lijst wordt toegevoegd.'}</p>
+      <p class="bulk-scan-method">Nummer en setcode zijn gelezen. Controleer alleen nog de kaart en finish.</p>
       <div class="bulk-candidate-list">${options.map((card,i)=>`<button class="bulk-candidate ${i===0?'selected':''}" data-candidate="${i}">
         <span class="bulk-candidate-image">${imageOfCard(card)?`<img src="${esc(imageOfCard(card))}" alt="">`:'MTG'}</span>
         <span><strong>${esc(card.name)}</strong><small>${esc(card.set_name)} · #${esc(card.collector_number)}</small></span>
       </button>`).join('')}</div>
+      <button class="bulk-finish-check ${foil?'foil':''}" data-scan-finish><span>FINISH ${finishCertain?'HERKEND':'CONTROLEREN'}</span><strong>${foil?'★ FOIL':'• NON-FOIL'}</strong><small>Tik om te wisselen</small></button>
       <div class="bulk-scan-actions"><button class="ghost-btn" data-scan-decline>Afwijzen</button><button class="primary-btn" data-scan-accept>Accepteren</button></div>
     </section>`;
     document.body.appendChild(overlay);
     overlay.querySelectorAll('[data-candidate]').forEach(btn=>btn.onclick=()=>{selected=Number(btn.dataset.candidate);overlay.querySelectorAll('.bulk-candidate').forEach(x=>x.classList.toggle('selected',x===btn))});
+    const finishBtn=overlay.querySelector('[data-scan-finish]');
+    finishBtn.onclick=()=>{foil=!foil;finishBtn.classList.toggle('foil',foil);finishBtn.querySelector('strong').textContent=foil?'★ FOIL':'• NON-FOIL'};
     const close=()=>{overlay.remove();state.busy=false;state.reviewOpen=false;$('#bulkCapture').disabled=!state.stream;scheduleAuto(650)};
-    overlay.querySelector('[data-scan-decline]').onclick=()=>{close();setStatus('bulkCameraStatus','Kaart afgewezen. Houd de volgende kaart in beeld.')};
+    overlay.querySelector('[data-scan-decline]').onclick=()=>{close();setStatus('bulkCameraStatus','Scan afgewezen. Houd de volgende metadataregel in beeld.')};
     overlay.querySelector('[data-scan-accept]').onclick=()=>{
-      const card=options[selected];addCard(card,1,'camera');render();cue(true);close();
-      setStatus('bulkCameraStatus',`✓ ${card.name} (#${card.collector_number}) geaccepteerd. Volgende kaart!`);
+      const card=options[selected];addCard(card,1,'camera',foil);render();cue(true);close();
+      setStatus('bulkCameraStatus',`✓ ${card.name} (#${card.collector_number}) · ${foil?'foil':'non-foil'} toegevoegd. Volgende!`);
     };
   }
   function imageOfCard(card){return card?.image_uris?.normal||card?.card_faces?.find(x=>x.image_uris)?.image_uris?.normal||''}
-  function preparedNumberCrop(source,x1,x2,y1,y2,threshold=false){
-    const box=cardBox(source),scale=Math.min(4,1800/Math.max(1,box.w*(x2-x1)));
-    const out=document.createElement('canvas');
-    out.width=Math.max(1,Math.round(box.w*(x2-x1)*scale));
-    out.height=Math.max(1,Math.round(box.h*(y2-y1)*scale));
-    const ctx=out.getContext('2d',{willReadFrequently:true});
-    ctx.drawImage(source,box.x+box.w*x1,box.y+box.h*y1,box.w*(x2-x1),box.h*(y2-y1),0,0,out.width,out.height);
-    const img=ctx.getImageData(0,0,out.width,out.height),d=img.data;
-    for(let i=0;i<d.length;i+=4){
-      const gray=.299*d[i]+.587*d[i+1]+.114*d[i+2];
-      let v=(gray-128)*2.15+128;if(threshold)v=v>145?255:0;
-      v=Math.max(0,Math.min(255,v));d[i]=d[i+1]=d[i+2]=v;
+  function cameraVisibleBox(source){
+    const video=$('#bulkVideo');
+    if(state.stream&&video?.clientWidth&&video?.clientHeight&&video.videoWidth===source.width){
+      const scale=Math.max(video.clientWidth/source.width,video.clientHeight/source.height);
+      const w=video.clientWidth/scale,h=video.clientHeight/scale;
+      return{x:(source.width-w)/2,y:(source.height-h)/2,w,h};
     }
+    return{x:0,y:0,w:source.width,h:source.height};
+  }
+  function preparedMetadataCrop(source,threshold=false,wide=false){
+    const view=cameraVisibleBox(source),x1=wide?.025:.07,x2=wide?.975:.93,y1=wide?.30:.36,y2=wide?.70:.64;
+    const scale=Math.min(4,2200/Math.max(1,view.w*(x2-x1))),out=document.createElement('canvas');
+    out.width=Math.max(1,Math.round(view.w*(x2-x1)*scale));out.height=Math.max(1,Math.round(view.h*(y2-y1)*scale));
+    const ctx=out.getContext('2d',{willReadFrequently:true});
+    ctx.drawImage(source,view.x+view.w*x1,view.y+view.h*y1,view.w*(x2-x1),view.h*(y2-y1),0,0,out.width,out.height);
+    const img=ctx.getImageData(0,0,out.width,out.height),d=img.data;
+    for(let i=0;i<d.length;i+=4){const g=.299*d[i]+.587*d[i+1]+.114*d[i+2];let v=(g-128)*2.05+128;if(threshold)v=v>145?255:0;v=Math.max(0,Math.min(255,v));d[i]=d[i+1]=d[i+2]=v}
     ctx.putImageData(img,0,0);return out;
   }
-  function strictNumberCandidates(text){
-    const raw=String(text||'').toUpperCase().replace(/[O]/g,'0').replace(/[IL|]/g,'1').replace(/S/g,'5').replace(/B/g,'8');
-    return [...new Set((raw.match(/\d{1,5}[A-Z]?/g)||[]).map(norm).filter(n=>n&&state.byNumber.has(n)))];
+  function parseMetadata(text){
+    const raw=String(text||'').toUpperCase().replace(/\s+/g,' ').trim();
+    const corrected=raw.replace(/O(?=\d)/g,'0').replace(/[IL|](?=\d)/g,'1');
+    const numbers=[...new Set((corrected.match(/\d{1,5}[A-Z]?/g)||[]).map(norm).filter(n=>state.byNumber.has(n)))];
+    const setCode=String(state.set?.code||'').toUpperCase();
+    const letterView=raw.replace(/0/g,'O').replace(/1/g,'I').replace(/[^A-Z]/g,'');
+    const setSeen=!!setCode&&letterView.includes(setCode);
+    const foil=/[*★✶✦✧]/.test(raw);
+    const regular=/[•·'’]/.test(raw);
+    return{raw,numbers,setSeen,foil,regular};
   }
   async function runOcr(image,parameters={}){
     if(!state.workerPromise)state.workerPromise=Tesseract.createWorker('eng');
