@@ -315,7 +315,7 @@
     return{x:0,y:0,w:source.width,h:source.height};
   }
   function preparedMetadataCrop(source,threshold=false,wide=false){
-    const view=cameraVisibleBox(source),x1=wide?.025:.07,x2=wide?.975:.93,y1=wide?.30:.36,y2=wide?.70:.64;
+    const view=cameraVisibleBox(source),x1=wide?.015:.05,x2=wide?.985:.95,y1=wide?.12:.22,y2=wide?.88:.78;
     const scale=Math.min(4,2200/Math.max(1,view.w*(x2-x1))),out=document.createElement('canvas');
     out.width=Math.max(1,Math.round(view.w*(x2-x1)*scale));out.height=Math.max(1,Math.round(view.h*(y2-y1)*scale));
     const ctx=out.getContext('2d',{willReadFrequently:true});
@@ -346,20 +346,27 @@
     if(!state.set)return setStatus('bulkCameraStatus','Kies eerst een Magic-set.');
     state.busy=true;$('#bulkCapture').disabled=true;setStatus('bulkCameraStatus','Metadata lezen: nummer · set · finish…');
     try{
-      const params={tessedit_pageseg_mode:'7',tessedit_char_whitelist:"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ*★.'• "};
-      const crops=[preparedMetadataCrop(source,false,false),preparedMetadataCrop(source,true,false),preparedMetadataCrop(source,false,true)];
+      const whitelist="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ*★.'• ";
+      const passes=[
+        {crop:preparedMetadataCrop(source,false,false),psm:'6'},
+        {crop:preparedMetadataCrop(source,true,false),psm:'6'},
+        {crop:preparedMetadataCrop(source,false,true),psm:'11'}
+      ];
       const reads=[];
-      for(const crop of crops)reads.push(parseMetadata((await runOcr(crop,params)).data?.text));
-      const valid=reads.filter(r=>r.setSeen&&r.numbers.length===1);
+      for(const pass of passes){
+        const result=await runOcr(pass.crop,{tessedit_pageseg_mode:pass.psm,tessedit_char_whitelist:whitelist,preserve_interword_spaces:'1'});
+        reads.push(parseMetadata(result.data?.text));
+      }
       const counts=new Map();
-      valid.forEach(r=>{const n=r.numbers[0];counts.set(n,(counts.get(n)||0)+1)});
+      reads.flatMap(r=>r.numbers).forEach(n=>counts.set(n,(counts.get(n)||0)+1));
+      const setVotes=reads.filter(r=>r.setSeen).length;
       const ranked=[...counts.entries()].sort((a,b)=>b[1]-a[1]),best=ranked[0];
-      const card=best?state.byNumber.get(best[0]):null;
+      const card=best&&setVotes?state.byNumber.get(best[0]):null;
       if(card){
-        const foilVotes=valid.filter(r=>r.numbers[0]===best[0]&&r.foil).length;
-        const regularVotes=valid.filter(r=>r.numbers[0]===best[0]&&r.regular).length;
+        const foilVotes=reads.filter(r=>r.foil).length;
+        const regularVotes=reads.filter(r=>r.regular).length;
         const detectedFoil=foilVotes>regularVotes,finishCertain=Math.max(foilVotes,regularVotes)>=1;
-        const strong=best[1]>=2,key=`${best[0]}:${detectedFoil?'F':'N'}`,now=Date.now();
+        const strong=(best[1]>=2&&setVotes>=1)||(best[1]>=1&&setVotes>=2),key=`${best[0]}:${detectedFoil?'F':'N'}`,now=Date.now();
         if(key===state.lastCandidate&&now-state.candidateAt<8000)state.candidateHits++;
         else{state.lastCandidate=key;state.candidateHits=1}
         state.candidateAt=now;
@@ -371,8 +378,8 @@
         setStatus('bulkCameraStatus',`${String(state.set.code).toUpperCase()} #${card.collector_number} gezien · bevestigen…`);
       }else{
         state.lastCandidate='';state.candidateHits=0;
-        const sawNumber=reads.some(r=>r.numbers.length),sawSet=reads.some(r=>r.setSeen);
-        setStatus('bulkCameraStatus',sawNumber&&!sawSet?`Nummer gezien, maar ${String(state.set.code).toUpperCase()} nog niet scherp.`:'Houd alleen “0061  HOB  ★  EN” groot binnen het horizontale vak.');
+        const sawNumber=reads.some(r=>r.numbers.length),sawSet=setVotes>0;
+        setStatus('bulkCameraStatus',sawNumber&&!sawSet?`Nummer gezien, maar ${String(state.set.code).toUpperCase()} nog niet scherp.`:'Houd beide regels “C 0001” en “HOB ★ EN” groot binnen het vak.');
       }
     }catch(err){console.warn('Bulk metadata scan failed',err);setStatus('bulkCameraStatus','Live macroscan herstelt automatisch · houd de metadataregel stil.')}
     state.busy=false;$('#bulkCapture').disabled=!state.stream;
