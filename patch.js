@@ -178,3 +178,18 @@
   const css=document.createElement('link');css.rel='stylesheet';css.href='theme.css?v=11';css.dataset.vaultTheme='1';document.head.appendChild(css);
 })();
 
+
+
+// Rapid bulk intake loads after the core collection functions.
+(() => {
+  if(!document.querySelector('link[data-vault-bulk]')){
+    const css=document.createElement('link');
+    css.rel='stylesheet'; css.href='bulk-add.css?v=1'; css.dataset.vaultBulk='1';
+    document.head.appendChild(css);
+  }
+  if(!document.querySelector('script[data-vault-bulk]')){
+    const js=document.createElement('script');
+    js.src='bulk-add.js?v=1'; js.dataset.vaultBulk='1';
+    document.body.appendChild(js);
+  }
+})();
