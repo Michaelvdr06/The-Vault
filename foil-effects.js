@@ -1,4 +1,4 @@
-// The Vault — smooth 3D tilt + highly reactive foil/glitter rendering
+// The Vault — vivid 3D tilt + strongly reactive holo/glitter rendering
 (() => {
   const cardEl = document.getElementById('tiltCard');
   const modal = document.getElementById('cardModal');
@@ -49,11 +49,11 @@
   }
 
   function animate(now=0){
-    const ease = dragging ? 0.22 : 0.12;
+    const ease = dragging ? 0.24 : 0.13;
     currentX += (targetX-currentX)*ease;
     currentY += (targetY-currentY)*ease;
-    currentMX += (targetMX-currentMX)*0.22;
-    currentMY += (targetMY-currentMY)*0.22;
+    currentMX += (targetMX-currentMX)*0.24;
+    currentMY += (targetMY-currentMY)*0.24;
 
     if(Math.abs(targetX-currentX)<0.01) currentX=targetX;
     if(Math.abs(targetY-currentY)<0.01) currentY=targetY;
@@ -65,39 +65,42 @@
     cardEl.style.setProperty('--mx',`${currentMX.toFixed(2)}%`);
     cardEl.style.setProperty('--my',`${currentMY.toFixed(2)}%`);
 
-    const foilAngle = 105 + currentX*5.2 - currentY*4.0;
-    const edgeX = (currentMX - 50) * -0.32;
-    const edgeY = (currentMY - 50) * -0.27;
-    const hue = Math.max(-38, Math.min(38, currentX*2.5 - currentY*1.8));
+    // Much larger movement range: the hue can travel through almost half the spectrum.
+    const foilAngle = 100 + currentX*7.2 - currentY*5.8;
+    const edgeX = (currentMX - 50) * -0.48;
+    const edgeY = (currentMY - 50) * -0.40;
+    const hue = Math.max(-105, Math.min(105, currentX*6.2 - currentY*4.7));
+    const prismX = Math.max(8, Math.min(92, 50 + (currentMX-50)*0.72 - currentY*0.65));
+    const prismY = Math.max(8, Math.min(92, 50 + (currentMY-50)*0.72 + currentX*0.55));
 
     cardEl.style.setProperty('--foil-angle',`${foilAngle.toFixed(1)}deg`);
     cardEl.style.setProperty('--edge-x',`${edgeX.toFixed(2)}%`);
     cardEl.style.setProperty('--edge-y',`${edgeY.toFixed(2)}%`);
     cardEl.style.setProperty('--holo-hue',`${hue.toFixed(1)}deg`);
+    cardEl.style.setProperty('--prism-x',`${prismX.toFixed(2)}%`);
+    cardEl.style.setProperty('--prism-y',`${prismY.toFixed(2)}%`);
 
-    const t = now * 0.0045;
-    const motion = Math.min(1, (Math.abs(currentX)+Math.abs(currentY))/20);
-    const sparklePulse = 0.42 + 0.42*Math.sin(t*1.7) + motion*0.30;
-    cardEl.style.setProperty('--sparkle-alpha',`${Math.max(.20,Math.min(.95,sparklePulse)).toFixed(2)}`);
+    const t = now * 0.0062;
+    const speed = Math.min(1, (Math.abs(currentX-targetX)+Math.abs(currentY-targetY))/8 + (Math.abs(currentX)+Math.abs(currentY))/25);
+    const sparklePulse = 0.34 + 0.30*Math.sin(t*2.1) + 0.22*Math.sin(t*4.7+1.2) + speed*0.42;
+    cardEl.style.setProperty('--sparkle-alpha',`${Math.max(.18,Math.min(1,sparklePulse)).toFixed(2)}`);
 
-    const s1x = currentMX + 12 + Math.sin(t)*7;
-    const s1y = currentMY - 14 + Math.cos(t*1.25)*6;
-    const s2x = currentMX - 15 + Math.cos(t*.83)*8;
-    const s2y = currentMY + 10 + Math.sin(t*1.31)*7;
-    const s3x = currentMX + 7 + Math.sin(t*.71+1.4)*10;
-    const s3y = currentMY + 17 + Math.cos(t*.92+0.7)*6;
-    const s4x = currentMX - 8 + Math.cos(t*.62+2.2)*9;
-    const s4y = currentMY - 18 + Math.sin(t*.88+1.1)*7;
-
-    const clamp = v => Math.max(4,Math.min(96,v));
-    cardEl.style.setProperty('--s1x',`${clamp(s1x).toFixed(2)}%`);
-    cardEl.style.setProperty('--s1y',`${clamp(s1y).toFixed(2)}%`);
-    cardEl.style.setProperty('--s2x',`${clamp(s2x).toFixed(2)}%`);
-    cardEl.style.setProperty('--s2y',`${clamp(s2y).toFixed(2)}%`);
-    cardEl.style.setProperty('--s3x',`${clamp(s3x).toFixed(2)}%`);
-    cardEl.style.setProperty('--s3y',`${clamp(s3y).toFixed(2)}%`);
-    cardEl.style.setProperty('--s4x',`${clamp(s4x).toFixed(2)}%`);
-    cardEl.style.setProperty('--s4y',`${clamp(s4y).toFixed(2)}%`);
+    // Eight glitter points all travel at different speeds/directions.
+    const clamp = v => Math.max(3,Math.min(97,v));
+    const pts = [
+      [currentMX + 15 + Math.sin(t)*12, currentMY - 15 + Math.cos(t*1.37)*9],
+      [currentMX - 18 + Math.cos(t*.91)*13, currentMY + 12 + Math.sin(t*1.53)*10],
+      [currentMX + 9 + Math.sin(t*.73+1.4)*15, currentMY + 19 + Math.cos(t*1.08+.7)*9],
+      [currentMX - 10 + Math.cos(t*.66+2.2)*14, currentMY - 20 + Math.sin(t*1.12+1.1)*10],
+      [50 + Math.sin(t*1.42+2.6)*34 + currentX*.6, 50 + Math.cos(t*.92+.4)*27 - currentY*.5],
+      [50 + Math.cos(t*1.17+.8)*31 - currentX*.55, 50 + Math.sin(t*1.64+1.9)*30 + currentY*.45],
+      [50 + Math.sin(t*.82+4.1)*25 + currentY*.4, 50 + Math.sin(t*1.91+.3)*34 + currentX*.35],
+      [50 + Math.cos(t*1.58+3.2)*29 - currentY*.35, 50 + Math.cos(t*.76+2.5)*32 - currentX*.4]
+    ];
+    pts.forEach((p,i)=>{
+      cardEl.style.setProperty(`--s${i+1}x`,`${clamp(p[0]).toFixed(2)}%`);
+      cardEl.style.setProperty(`--s${i+1}y`,`${clamp(p[1]).toFixed(2)}%`);
+    });
 
     raf=requestAnimationFrame(animate);
   }
@@ -106,8 +109,8 @@
     const r=cardEl.getBoundingClientRect();
     const x=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width));
     const y=Math.max(0,Math.min(1,(e.clientY-r.top)/r.height));
-    targetX=(x-.5)*27;
-    targetY=(.5-y)*27;
+    targetX=(x-.5)*31;
+    targetY=(.5-y)*31;
     targetMX=x*100;
     targetMY=y*100;
   }
@@ -150,12 +153,12 @@
 
   window.addEventListener('deviceorientation',e=>{
     if(dragging || modal.classList.contains('hidden') || e.beta==null || e.gamma==null) return;
-    const gx=Math.max(-18,Math.min(18,e.gamma));
-    const gy=Math.max(-18,Math.min(18,e.beta-45));
-    targetX=gx*.52;
-    targetY=-gy*.40;
-    targetMX=50+gx*2.05;
-    targetMY=50+gy*1.60;
+    const gx=Math.max(-20,Math.min(20,e.gamma));
+    const gy=Math.max(-20,Math.min(20,e.beta-45));
+    targetX=gx*.62;
+    targetY=-gy*.50;
+    targetMX=50+gx*2.25;
+    targetMY=50+gy*1.85;
   },{passive:true});
 
   cancelAnimationFrame(raf);
