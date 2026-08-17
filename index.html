@@ -11,7 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Cinzel:wght@600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css?v=10" />
   <link rel="stylesheet" href="foil-effects.css?v=14" />
-</head>
+  <link rel="stylesheet" href="vault.css?v=1">\n</head>
 <body>
   <div class="app-shell">
     <aside class="sidebar">
@@ -21,11 +21,11 @@
       </div>
       <nav class="nav-list">
         <button class="nav-item active" data-page="dashboard"><span>◈</span> Dashboard</button>
-        <button class="nav-item" data-page="collection"><span>▦</span> Mijn binder</button>
+        <button class="nav-item" data-page="collection"><span>▦</span> Mijn collectie</button>
         <button class="nav-item" data-page="add"><span>＋</span> Kaart toevoegen</button>
         <button class="nav-item" data-page="scanner"><span>⌁</span> Foto scannen</button>
       </nav>
-      <div class="sidebar-note version-card panel-soft"><p class="small-label">VAULT VERSION</p><strong>Arcane 2.9</strong><p>Vault Edition · 2026.08</p></div>
+      <div class="sidebar-note version-card panel-soft"><p class="small-label">VAULT VERSION</p><strong>Vault 3.0</strong><p>Inner Chamber · 2026.08</p></div>
     </aside>
     <main class="content">
       <header class="topbar">
@@ -34,7 +34,7 @@
       </header>
       <section class="page active" id="dashboard">
         <section class="hero-card">
-          <div class="hero-copy"><p class="kicker gold">YOUR MAGIC ARCHIVE</p><h2>Bouw jouw eigen <span>arcane collection</span>.</h2><p>Beheer je Magic: The Gathering-kaarten, printings, foils en marktwaarde in één donkere digitale binder.</p><div class="hero-actions"><button class="primary-btn" data-goto="add">Magic-kaart toevoegen</button><button class="ghost-btn" data-goto="collection">Open binder</button></div></div>
+          <div class="hero-copy"><p class="kicker gold">YOUR PRIVATE VAULT</p><h2>Bouw jouw eigen <span>arcane collection</span>.</h2><p>Bewaar je Magic: The Gathering-kaarten, printings, foils en marktwaarde in één beveiligde digitale kluis.</p><div class="hero-actions"><button class="primary-btn" data-goto="add">Magic-kaart toevoegen</button><button class="ghost-btn" data-goto="collection">Open de kluis</button></div></div>
           <div class="hero-side"><div class="hero-value"><span>Totale waarde</span><strong id="totalValue">€0,00</strong></div><div class="hero-mini-grid"><div><span>Uniek</span><strong id="uniqueCards">0</strong></div><div><span>Totaal</span><strong id="totalCards">0</strong></div></div></div>
         </section>
         <section class="stats-grid">
@@ -44,18 +44,18 @@
           <article class="stat-card"><span>Gem. waarde</span><strong id="avgValue">€0,00</strong><small>Per uniek item</small></article>
         </section>
         <section class="dashboard-grid">
-          <article class="panel"><div class="panel-header"><div><p class="small-label">RECENT</p><h3>Laatst toegevoegd</h3></div><button class="text-btn" data-goto="collection">Bekijk binder →</button></div><div id="recentCards" class="recent-grid"></div></article>
+          <article class="panel"><div class="panel-header"><div><p class="small-label">RECENT</p><h3>Laatst toegevoegd</h3></div><button class="text-btn" data-goto="collection">Bekijk collectie →</button></div><div id="recentCards" class="recent-grid"></div></article>
           <article class="panel"><div class="panel-header"><div><p class="small-label">FINISH BREAKDOWN</p><h3>Verdeling collectie</h3></div></div><div class="progress-block"><div class="progress-row"><div><span class="dot op"></span><b>Non-foil</b></div><strong id="opPercent">0%</strong></div><div class="bar"><div id="opBar" class="fill fill-op"></div></div><div class="progress-row"><div><span class="dot mtg"></span><b>Foil / premium</b></div><strong id="mtgPercent">0%</strong></div><div class="bar"><div id="mtgBar" class="fill fill-mtg"></div></div></div></article>
         </section>
       </section>
       <section class="page" id="collection">
         <div class="panel toolbar-panel"><div class="toolbar-row"><label class="search-field grow"><span>⌕</span><input id="searchInput" type="search" placeholder="Zoek Magic-kaart, set of collector number..." /></label><select id="gameFilter" aria-label="Game"><option value="Magic: The Gathering">Magic: The Gathering</option></select><select id="sortFilter"><option value="recent">Nieuwste eerst</option><option value="value">Hoogste waarde</option><option value="name">Naam A-Z</option></select></div><div class="collection-meta"><span id="resultCount">0 kaarten</span><button class="text-btn" id="hydrateImagesBtn">Ontbrekende afbeeldingen ophalen</button></div></div>
-        <div id="cardGrid" class="binder-grid"></div><div id="emptyState" class="empty-state hidden"><div class="empty-icon">◇</div><h3>Nog geen kaarten gevonden</h3><p>Voeg je eerste kaart toe of scan een foto om je binder te vullen.</p></div>
+        <div id="cardGrid" class="binder-grid"></div><div id="emptyState" class="empty-state hidden"><div class="empty-icon">◇</div><h3>De kluis is nog leeg</h3><p>Voeg je eerste kaart toe of scan een foto om je collectie te vullen.</p></div>
       </section>
       <section class="page" id="add">
         <div class="two-col-layout">
           <section class="panel"><div class="panel-header"><div><p class="small-label">SCRYFALL LOOKUP</p><h3>Zoek een Magic-kaart</h3></div></div><div class="lookup-card"><div class="lookup-grid"><label><span>Game</span><select id="lookupGame"><option value="Magic: The Gathering">Magic: The Gathering</option></select></label><label class="wide"><span>Kaartnaam</span><input id="lookupQuery" placeholder="Bijv. Sol Ring, Black Lotus of Lightning Bolt" /></label></div><div class="action-row"><button class="primary-btn" id="lookupBtn">Zoek Magic-kaart</button><p class="hint">Zoekt automatisch de beste printing en actuele kaartdata.</p></div><div id="lookupStatus" class="status-text muted">Nog niets gezocht.</div><div id="lookupResults" class="lookup-results"></div></div></section>
-          <aside class="panel preview-panel"><p class="small-label">PREVIEW</p><h3>Zo ziet hij in je binder</h3><div class="preview-binder-card" id="previewImageWrap"><div class="preview-placeholder">TCG</div></div><div class="preview-meta"><span id="previewGame">Game</span><h4 id="previewName">Nieuwe kaart</h4><p><span id="previewSet">Set</span> · <span id="previewNumber">000</span></p></div></aside>
+          <aside class="panel preview-panel"><p class="small-label">VAULT PREVIEW</p><h3>Zo staat hij in je collectie</h3><div class="preview-binder-card" id="previewImageWrap"><div class="preview-placeholder">TCG</div></div><div class="preview-meta"><span id="previewGame">Game</span><h4 id="previewName">Nieuwe kaart</h4><p><span id="previewSet">Set</span> · <span id="previewNumber">000</span></p></div></aside>
         </div>
         <section class="panel form-panel spacing-top"><div class="panel-header"><div><p class="small-label">MANUAL ENTRY</p><h3>Kaart toevoegen aan collectie</h3></div></div><form id="cardForm" class="card-form"><div class="form-grid">
           <label><span>Game</span><select id="game" required><option value="Magic: The Gathering">Magic: The Gathering</option></select></label>
@@ -72,9 +72,9 @@
   <div id="cardModal" class="card-modal hidden" aria-hidden="true"><button class="modal-backdrop" id="modalBackdrop" aria-label="Sluiten"></button><section class="card-modal-sheet" role="dialog" aria-modal="true" aria-labelledby="modalCardName"><div class="modal-topbar"><div><p class="small-label">CARD INSPECTOR</p><h3 id="modalCardName">Kaart</h3></div><button class="modal-close" id="modalCloseBtn" aria-label="Sluiten">×</button></div><div class="modal-grid"><div class="tilt-stage"><div class="tilt-card" id="tiltCard"><img id="modalCardImage" alt="Kaartafbeelding" /><div class="tilt-placeholder hidden" id="modalCardPlaceholder">TCG</div><div class="foil-layer" id="foilLayer"></div><div class="shine-layer"></div></div><p class="tilt-hint">Sleep over de kaart om hem te kantelen</p></div><div class="modal-details"><div class="detail-chip-row"><span class="game-chip mtg" id="modalGameChip">MAGIC</span><span class="foil-status" id="modalFoilStatus">NON-FOIL</span></div><div class="detail-list"><div><span>Set</span><strong id="modalSet">—</strong></div><div><span>Kaartnummer</span><strong id="modalNumber">—</strong></div><div><span>Rarity</span><strong id="modalRarity">—</strong></div><div><span>Conditie</span><strong id="modalCondition">—</strong></div><div><span>Aantal</span><strong id="modalQuantity">1</strong></div><div><span>Waarde</span><strong id="modalPrice">€0,00</strong></div></div><div class="modal-actions"><button class="primary-btn" id="toggleFoilBtn">Foil aanzetten</button><button class="ghost-btn danger-btn" id="modalDeleteBtn">Verwijderen</button></div><p class="modal-note">Bij foil-kaarten beweegt het holo-effect mee met je vinger.</p></div></div></section></div>
   <div id="toast" class="toast"></div>
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-  <script src="app.js?v=2"></script>
-  <script src="patch.js?v=18"></script>
+  <script src="app.js?v=3"></script>
+  <script src="patch.js?v=19"></script>
   <script src="foil-effects.js?v=5"></script>
-  <script src="binder-cinematic.js?v=7"></script>
+  <script src="vault-cinematic.js?v=1"></script>
 </body></html>
 
