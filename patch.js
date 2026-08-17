@@ -175,6 +175,6 @@
     const intro=scanner.querySelector('.intro-copy');if(intro)intro.textContent='Upload een duidelijke foto van een Magic-kaart. De scanner zoekt de naam via Scryfall en controleert ook op een mogelijk foil-effect.';
   }
   if(document.querySelector('link[data-vault-theme]')) return;
-  const css=document.createElement('link');css.rel='stylesheet';css.href='theme.css?v=9';css.dataset.vaultTheme='1';document.head.appendChild(css);
+  const css=document.createElement('link');css.rel='stylesheet';css.href='theme.css?v=10';css.dataset.vaultTheme='1';document.head.appendChild(css);
 })();
 
