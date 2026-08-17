@@ -3,7 +3,7 @@
   const $=(s,r=document)=>r.querySelector(s);
   const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
   const norm=s=>String(s??'').toUpperCase().trim().replace(/^0+(?=\d)/,'').replace(/[^A-Z0-9]/g,'');
-  const state={sets:[],set:null,cards:[],byNumber:new Map(),queue:new Map(),history:[],stream:null,busy:false};
+  const state={sets:[],set:null,cards:[],byNumber:new Map(),queue:new Map(),history:[],stream:null,busy:false,autoTimer:null,reviewOpen:false,lastCandidate:'',candidateHits:0,candidateAt:0};
 
   function ensureUI(){
     if($('#bulk')) return;
@@ -76,7 +76,7 @@
     $('#bulkResolve').onclick=resolveList;
     $('#bulkClearInput').onclick=()=>{$('#bulkNumbers').value='';$('#bulkListStatus').textContent='Invoer gewist.'};
     $('#bulkCameraStart').onclick=toggleCamera;
-    $('#bulkCapture').onclick=captureVideo;
+    $('#bulkCapture').onclick=()=>captureVideo(false);
     $('#bulkPhoto').onchange=e=>{const f=e.target.files?.[0];if(f)scanImageFile(f);e.target.value=''};
     $('#bulkUndo').onclick=undo;
     $('#bulkSave').onclick=saveAll;
@@ -149,23 +149,30 @@
   }
   function undo(){const h=state.history.pop();if(h){removeQuantity(h.key,h.quantity);render()}}
 
+  function scheduleAuto(delay=450){
+    clearTimeout(state.autoTimer);
+    if(!state.stream||state.busy||state.reviewOpen)return;
+    state.autoTimer=setTimeout(()=>captureVideo(true),delay);
+  }
   async function toggleCamera(){
     if(state.stream){stopCamera();return}
     if(!state.set)return setStatus('bulkCameraStatus','Kies eerst een Magic-set.');
     try{
-      state.stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:1920}},audio:false});
+      state.stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080}},audio:false});
       const v=$('#bulkVideo');v.srcObject=state.stream;await v.play();
       $('#bulkCameraEmpty').classList.add('hidden');$('#bulkCapture').disabled=false;$('#bulkCameraStart').textContent='Stop camera';
-      setStatus('bulkCameraStatus','Houd één kaart stil in beeld en druk op scannen.');
+      setStatus('bulkCameraStatus','Live herkenning actief · houd één kaart stil binnen de paarse omlijning.');
+      scheduleAuto(250);
     }catch{setStatus('bulkCameraStatus','Camera kon niet worden geopend. Gebruik eventueel “foto kiezen”.')}
   }
   function stopCamera(){
+    clearTimeout(state.autoTimer);state.autoTimer=null;state.lastCandidate='';state.candidateHits=0;
     state.stream?.getTracks().forEach(t=>t.stop());state.stream=null;$('#bulkVideo').srcObject=null;$('#bulkCameraEmpty').classList.remove('hidden');$('#bulkCapture').disabled=true;$('#bulkCameraStart').textContent='Start camera';
   }
-  async function captureVideo(){
-    const v=$('#bulkVideo'),c=$('#bulkCanvas');if(!v.videoWidth||state.busy)return;
+  async function captureVideo(automatic=false){
+    const v=$('#bulkVideo'),c=$('#bulkCanvas');if(!v.videoWidth||state.busy||state.reviewOpen)return;
     c.width=v.videoWidth;c.height=v.videoHeight;c.getContext('2d').drawImage(v,0,0);
-    await recognizeCanvas(c);
+    await recognizeCanvas(c,automatic);
   }
   async function scanImageFile(file){
     if(!state.set)return setStatus('bulkCameraStatus','Kies eerst een Magic-set.');
@@ -266,11 +273,12 @@
       const s=nameScore(line,card.name);
       if(s>score){score=s;bestName=card.name;bestLine=line}
     }
-    if(score<.86||ocrConfidence<45||!bestName)return{cards:[],score,ocrConfidence,line:bestLine};
+    if(score<.78||ocrConfidence<18||!bestName)return{cards:[],score,ocrConfidence,line:bestLine};
     return{cards:state.cards.filter(card=>norm(card.name)===norm(bestName)).slice(0,8),score,ocrConfidence,line:bestLine};
   }
   function scanReview(options,method){
     document.querySelector('.bulk-scan-review')?.remove();
+    state.reviewOpen=true;
     let selected=0;
     const overlay=document.createElement('div');
     overlay.className='bulk-scan-review';
@@ -286,7 +294,7 @@
     </section>`;
     document.body.appendChild(overlay);
     overlay.querySelectorAll('[data-candidate]').forEach(btn=>btn.onclick=()=>{selected=Number(btn.dataset.candidate);overlay.querySelectorAll('.bulk-candidate').forEach(x=>x.classList.toggle('selected',x===btn))});
-    const close=()=>{overlay.remove();state.busy=false;$('#bulkCapture').disabled=!state.stream};
+    const close=()=>{overlay.remove();state.busy=false;state.reviewOpen=false;$('#bulkCapture').disabled=!state.stream;scheduleAuto(650)};
     overlay.querySelector('[data-scan-decline]').onclick=()=>{close();setStatus('bulkCameraStatus','Kaart afgewezen. Houd de volgende kaart in beeld.')};
     overlay.querySelector('[data-scan-accept]').onclick=()=>{
       const card=options[selected];addCard(card,1,'camera');render();cue(true);close();
@@ -294,45 +302,53 @@
     };
   }
   function imageOfCard(card){return card?.image_uris?.normal||card?.card_faces?.find(x=>x.image_uris)?.image_uris?.normal||''}
-  async function recognizeCanvas(source){
-    if(state.busy||!window.Tesseract)return;
+  async function recognizeCanvas(source,automatic=false){
+    if(state.busy||state.reviewOpen||!window.Tesseract)return;
     if(!state.set)return setStatus('bulkCameraStatus','Kies eerst een Magic-set.');
-    state.busy=true;$('#bulkCapture').disabled=true;setStatus('bulkCameraStatus','Kaartframe controleren…');
+    state.busy=true;$('#bulkCapture').disabled=true;setStatus('bulkCameraStatus','Live scan · kaart controleren…');
     try{
       const visual=frameEvidence(source);
-      if(!visual.ok){
-        setStatus('bulkCameraStatus','Geen duidelijke kaart in het kader. Vul de paarse omlijning met één volledige kaart.');
-        cue(false);state.busy=false;$('#bulkCapture').disabled=!state.stream;return;
+      if((visual.variance<90&&visual.edgeRatio<.012)||visual.range<35){
+        setStatus('bulkCameraStatus','Live scan actief · wacht op een kaart in de omlijning.');
+        state.busy=false;$('#bulkCapture').disabled=!state.stream;scheduleAuto(500);return;
       }
       const lower=preparedCrop(source,.66,.995,false),lowerBW=preparedCrop(source,.61,.995,true);
-      setStatus('bulkCameraStatus','Collector number dubbel controleren…');
       const first=await Tesseract.recognize(lower,'eng',{tessedit_pageseg_mode:'6'});
       const second=await Tesseract.recognize(lowerBW,'eng',{tessedit_pageseg_mode:'6'});
       const n1=numberCandidates(first.data?.text),n2=numberCandidates(second.data?.text);
       const consensus=n1.filter(n=>n2.includes(n)&&state.byNumber.has(n));
       let found=consensus.length===1?state.byNumber.get(consensus[0]):null;
-      setStatus('bulkCameraStatus','Kaartnaam onafhankelijk controleren…');
-      const title=preparedCrop(source,.015,.245,false);
+      const title=preparedCrop(source,.01,.255,false);
       const titleResult=await Tesseract.recognize(title,'eng',{tessedit_pageseg_mode:'7'});
       const titleHit=cardsFromTitle(titleResult.data?.text,Number(titleResult.data?.confidence||0));
-      if(found&&titleHit.cards.length&&!titleHit.cards.some(c=>norm(c.name)===norm(found.name))){
-        found=null;
-      }
+      const titleAgrees=found&&titleHit.cards.some(c=>norm(c.name)===norm(found.name));
+      if(found&&titleHit.cards.length&&!titleAgrees)found=null;
       const numberConfidence=Math.min(Number(first.data?.confidence||0),Number(second.data?.confidence||0));
-      let options=[],method='';
-      if(found&&(numberConfidence>=38||titleHit.cards.some(c=>norm(c.name)===norm(found.name)))){
-        options=[found];method='dubbel bevestigd collector number';
-      }else if(titleHit.cards.length&&titleHit.score>=.9&&titleHit.ocrConfidence>=55){
-        options=titleHit.cards;method='hoogvertrouwen kaartnaam';
+      let options=[],method='',strong=false;
+      if(found&&numberConfidence>=28&&(titleAgrees||(visual.border>4&&visual.variance>160))){
+        options=[found];method='collector number + live frame';strong=true;
+      }else if(titleHit.cards.length&&titleHit.score>=.84&&titleHit.ocrConfidence>=28){
+        options=titleHit.cards;method='kaartnaam';strong=titleHit.score>=.9&&titleHit.ocrConfidence>=45;
       }
       if(options.length){
-        scanReview(options,method);
-        return;
+        const key=norm(options[0].name);
+        const now=Date.now();
+        if(key===state.lastCandidate&&now-state.candidateAt<9000)state.candidateHits++;
+        else{state.lastCandidate=key;state.candidateHits=1}
+        state.candidateAt=now;
+        if(strong||state.candidateHits>=2){
+          state.lastCandidate='';state.candidateHits=0;
+          scanReview(options,method);
+          return;
+        }
+        setStatus('bulkCameraStatus',`Mogelijke match: ${options[0].name} · nog één frame bevestigen…`);
+      }else{
+        state.lastCandidate='';state.candidateHits=0;
+        setStatus('bulkCameraStatus','Live scan actief · houd de kaartnaam scherp en stil in beeld.');
       }
-      cue(false);
-      setStatus('bulkCameraStatus','Scan afgewezen: onvoldoende zekerheid. Zorg voor scherpte, goed licht en een volledig gevulde omlijning.');
-    }catch(err){console.warn('Bulk scan failed',err);setStatus('bulkCameraStatus','Scan veilig afgebroken. Houd de kaart recht, stil en zonder reflectie in beeld.')}
+    }catch(err){console.warn('Bulk scan failed',err);setStatus('bulkCameraStatus','Live scan herstelt automatisch · houd de kaart stil in beeld.')}
     state.busy=false;$('#bulkCapture').disabled=!state.stream;
+    if(automatic||state.stream)scheduleAuto(420);
   }
   function cue(ok){
     try{const A=window.AudioContext||window.webkitAudioContext,a=new A(),o=a.createOscillator(),g=a.createGain();o.frequency.value=ok?880:220;g.gain.setValueAtTime(.06,a.currentTime);g.gain.exponentialRampToValueAtTime(.001,a.currentTime+.13);o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+.14)}catch{}
