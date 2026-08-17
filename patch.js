@@ -133,10 +133,10 @@
 
 (() => {
   if(!document.querySelector('link[data-vault-sets]')){
-    const css=document.createElement('link');css.rel='stylesheet';css.href='sets.css?v=1';css.dataset.vaultSets='1';document.head.appendChild(css);
+    const css=document.createElement('link');css.rel='stylesheet';css.href='sets.css?v=2';css.dataset.vaultSets='1';document.head.appendChild(css);
   }
   if(!document.querySelector('script[data-vault-sets]')){
-    const js=document.createElement('script');js.src='sets.js?v=1';js.dataset.vaultSets='1';js.defer=true;document.body.appendChild(js);
+    const js=document.createElement('script');js.src='sets.js?v=2';js.dataset.vaultSets='1';js.defer=true;document.body.appendChild(js);
   }
 })();
 
@@ -144,7 +144,7 @@
 (() => {
   if(document.querySelector('script[data-vault-scanner-v3]')) return;
   const js=document.createElement('script');
-  js.src='scanner-v3.js?v=4';
+  js.src='scanner-v3.js?v=5';
   js.dataset.vaultScannerV3='1';
   document.body.appendChild(js);
 })();
@@ -166,7 +166,13 @@
 
 // Load the cohesive black/red theme after every feature stylesheet.
 (() => {
+  const scanner=document.querySelector('#scanner');
+  if(scanner){
+    const label=scanner.querySelector('.small-label');if(label)label.textContent='MAGIC PHOTO IMPORT';
+    const title=scanner.querySelector('.panel h3');if(title)title.textContent='Magic-kaart herkennen';
+    const intro=scanner.querySelector('.intro-copy');if(intro)intro.textContent='Upload een duidelijke foto van een Magic-kaart. De scanner zoekt de naam via Scryfall en controleert ook op een mogelijk foil-effect.';
+  }
   if(document.querySelector('link[data-vault-theme]')) return;
-  const css=document.createElement('link');css.rel='stylesheet';css.href='theme.css?v=2';css.dataset.vaultTheme='1';document.head.appendChild(css);
+  const css=document.createElement('link');css.rel='stylesheet';css.href='theme.css?v=3';css.dataset.vaultTheme='1';document.head.appendChild(css);
 })();
 
