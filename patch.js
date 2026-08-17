@@ -184,12 +184,12 @@
 (() => {
   if(!document.querySelector('link[data-vault-bulk]')){
     const css=document.createElement('link');
-    css.rel='stylesheet'; css.href='bulk-add.css?v=2'; css.dataset.vaultBulk='1';
+    css.rel='stylesheet'; css.href='bulk-add.css?v=3'; css.dataset.vaultBulk='1';
     document.head.appendChild(css);
   }
   if(!document.querySelector('script[data-vault-bulk]')){
     const js=document.createElement('script');
-    js.src='bulk-add.js?v=3'; js.dataset.vaultBulk='1';
+    js.src='bulk-add.js?v=4'; js.dataset.vaultBulk='1';
     document.body.appendChild(js);
   }
 })();
