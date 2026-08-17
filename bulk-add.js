@@ -3,7 +3,7 @@
   const $=(s,r=document)=>r.querySelector(s);
   const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
   const norm=s=>String(s??'').toUpperCase().trim().replace(/^0+(?=\d)/,'').replace(/[^A-Z0-9]/g,'');
-  const state={sets:[],set:null,cards:[],byNumber:new Map(),queue:new Map(),history:[],stream:null,busy:false,autoTimer:null,reviewOpen:false,lastCandidate:'',candidateHits:0,candidateAt:0};
+  const state={sets:[],set:null,cards:[],byNumber:new Map(),queue:new Map(),history:[],stream:null,busy:false,autoTimer:null,reviewOpen:false,lastCandidate:'',candidateHits:0,candidateAt:0,workerPromise:null};
 
   function ensureUI(){
     if($('#bulk')) return;
@@ -302,6 +302,12 @@
     };
   }
   function imageOfCard(card){return card?.image_uris?.normal||card?.card_faces?.find(x=>x.image_uris)?.image_uris?.normal||''}
+  async function runOcr(image,parameters={}){
+    if(!state.workerPromise)state.workerPromise=Tesseract.createWorker('eng');
+    const worker=await state.workerPromise;
+    await worker.setParameters(parameters);
+    return worker.recognize(image);
+  }
   async function recognizeCanvas(source,automatic=false){
     if(state.busy||state.reviewOpen||!window.Tesseract)return;
     if(!state.set)return setStatus('bulkCameraStatus','Kies eerst een Magic-set.');
@@ -313,13 +319,13 @@
         state.busy=false;$('#bulkCapture').disabled=!state.stream;scheduleAuto(500);return;
       }
       const lower=preparedCrop(source,.66,.995,false),lowerBW=preparedCrop(source,.61,.995,true);
-      const first=await Tesseract.recognize(lower,'eng',{tessedit_pageseg_mode:'6'});
-      const second=await Tesseract.recognize(lowerBW,'eng',{tessedit_pageseg_mode:'6'});
+      const first=await runOcr(lower,{tessedit_pageseg_mode:'6'});
+      const second=await runOcr(lowerBW,{tessedit_pageseg_mode:'6'});
       const n1=numberCandidates(first.data?.text),n2=numberCandidates(second.data?.text);
       const consensus=n1.filter(n=>n2.includes(n)&&state.byNumber.has(n));
       let found=consensus.length===1?state.byNumber.get(consensus[0]):null;
       const title=preparedCrop(source,.01,.255,false);
-      const titleResult=await Tesseract.recognize(title,'eng',{tessedit_pageseg_mode:'7'});
+      const titleResult=await runOcr(title,{tessedit_pageseg_mode:'7'});
       const titleHit=cardsFromTitle(titleResult.data?.text,Number(titleResult.data?.confidence||0));
       const titleAgrees=found&&titleHit.cards.some(c=>norm(c.name)===norm(found.name));
       if(found&&titleHit.cards.length&&!titleAgrees)found=null;
