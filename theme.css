@@ -169,3 +169,22 @@ body{background:radial-gradient(circle at 85% -10%,rgba(72,49,132,.13),transpare
 #collection.active .binder-grid::before{left:calc(50% - 7px);top:18px;bottom:18px;width:14px;z-index:5;background:repeating-linear-gradient(to bottom,transparent 0 9%,#393640 9% 10.5%,#aaa6af 10.5% 12.5%,#29262e 12.5% 15%,transparent 15% 29%);filter:drop-shadow(0 2px 3px #000);opacity:.9}#collection.active .binder-grid::after{content:"";position:absolute;pointer-events:none;z-index:1;inset:10px;border-radius:18px;background:linear-gradient(90deg,rgba(255,255,255,.025),transparent 5%,transparent 44%,rgba(0,0,0,.32) 49%,rgba(0,0,0,.55) 50%,rgba(0,0,0,.32) 51%,transparent 56%,transparent 95%,rgba(255,255,255,.02));box-shadow:inset 0 0 32px rgba(0,0,0,.62)}
 #collection.active .binder-card{z-index:2;padding:8px;border-radius:10px;background:linear-gradient(145deg,rgba(37,35,42,.96),rgba(6,6,8,.99));border:1px solid rgba(222,216,235,.09);box-shadow:inset 0 0 0 2px rgba(0,0,0,.55),0 12px 24px rgba(0,0,0,.34);transition:transform .24s cubic-bezier(.2,.75,.2,1),border-color .24s,box-shadow .24s}#collection.active .binder-card:nth-child(6n+3){margin-right:16px}#collection.active .binder-card:nth-child(6n+4){margin-left:16px}#collection.active .binder-card:hover{z-index:8;transform:translateY(-8px) scale(1.025);border-color:rgba(162,141,225,.28);box-shadow:inset 0 0 0 2px rgba(0,0,0,.45),0 22px 38px rgba(0,0,0,.52),0 0 24px rgba(101,77,172,.11)}
 @media(max-width:1200px){#collection.active .binder-grid{grid-template-columns:repeat(4,minmax(0,1fr))}#collection.active .binder-card:nth-child(6n+3),#collection.active .binder-card:nth-child(6n+4){margin:0}}@media(max-width:760px){.bc-book{width:91vw}#collection.active .binder-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:11px;padding:24px 13px 28px 24px;border-radius:12px;background:linear-gradient(90deg,#020203 0 13px,#111015 13px 100%)}#collection.active .binder-grid::before{left:6px;width:8px}#collection.active .binder-grid::after{inset:5px;background:linear-gradient(120deg,rgba(255,255,255,.02),transparent 25%,rgba(0,0,0,.28))}#collection.active .binder-card:hover{transform:none}}
+
+
+/* Vault 4.11 — restrained high-fantasy finish */
+body{background:#020204}
+body::before{content:"";position:fixed;z-index:-2;inset:0;pointer-events:none;background:radial-gradient(circle at 18% 8%,rgba(76,49,128,.08),transparent 30%),radial-gradient(circle at 82% 92%,rgba(34,65,77,.055),transparent 34%)}
+.sidebar{background:linear-gradient(180deg,rgba(8,7,11,.99),rgba(3,3,5,.99));box-shadow:18px 0 65px rgba(0,0,0,.32),inset -1px 0 rgba(151,127,198,.09)}
+.brand-mark{position:relative;box-shadow:0 0 28px rgba(116,77,190,.25),inset 0 1px rgba(255,255,255,.14)}
+.brand-mark::after{content:"";position:absolute;inset:-5px;border:1px solid rgba(169,138,224,.12);border-radius:12px}
+.brand-title{letter-spacing:.2em;text-shadow:0 0 20px rgba(205,184,240,.2)}
+.nav-item{border:1px solid transparent}
+.nav-item.active{border-color:rgba(164,130,220,.2);background:linear-gradient(90deg,rgba(89,57,143,.25),rgba(35,25,51,.32));box-shadow:inset 3px 0 #8e67d1,0 8px 28px rgba(0,0,0,.2)}
+.topbar h1{font-family:Cinzel,serif;letter-spacing:-.025em;text-shadow:0 4px 26px rgba(0,0,0,.72)}
+.primary-btn{position:relative;overflow:hidden;background:linear-gradient(125deg,#6b4aaa,#442d70 62%,#2c1d48);border:1px solid rgba(221,203,255,.17);box-shadow:0 11px 27px rgba(65,39,111,.24),inset 0 1px rgba(255,255,255,.1)}
+.primary-btn::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(105deg,transparent 20%,rgba(255,255,255,.14) 46%,transparent 70%);transform:translateX(-130%);transition:transform .55s ease}
+.primary-btn:hover::after{transform:translateX(130%)}
+.panel{box-shadow:0 22px 58px rgba(0,0,0,.3),inset 0 1px rgba(255,255,255,.022)}
+input:focus,select:focus,textarea:focus{border-color:rgba(143,105,207,.66)!important;box-shadow:0 0 0 3px rgba(116,79,179,.12),0 0 24px rgba(91,57,150,.08)!important}
+.small-label,.kicker{letter-spacing:.17em}
+@media(prefers-reduced-motion:reduce){.primary-btn::after{display:none}}
