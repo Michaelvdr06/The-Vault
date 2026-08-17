@@ -343,9 +343,7 @@
     const setSeen=!!setCode&&letterView.includes(setCode);
     // A foil star is often read by OCR as X, M or K between the set code and EN.
     // Treat that exact metadata position as foil; never infer foil from a loose letter elsewhere.
-    const escapedSet=setCode.replace(/[.*+?^${}()|[\]\\]/g,'\\    const foil=/[*★✶✦✧]/.test(raw);
-    const regular=/[•·'’]/.test(raw);');
-    const starLookalike=!!setCode&&new RegExp(`(?:^|\\s)${escapedSet}\\s*[XMK]\\s*EN(?:\\s|$)`).test(raw);
+    const starLookalike=!!setCode&&new RegExp(`(?:^|\\s)${setCode}\\s*[XMK]\\s*EN(?:\\s|$)`).test(raw);
     const foil=/[*★✶✦✧]/.test(raw)||starLookalike;
     const regular=/[•·'’]/.test(raw)&&!starLookalike;
     return{raw,numbers,setSeen,foil,regular};
