@@ -1,0 +1,101 @@
+/* The Vault — realistic foil materials + smoother inspector */
+.tilt-card{
+  --foil-x:50%;
+  --foil-y:50%;
+  --foil-angle:115deg;
+  will-change:transform;
+  transition:none!important;
+  backface-visibility:hidden;
+  -webkit-backface-visibility:hidden;
+  transform:perspective(1100px) rotateX(var(--rx)) rotateY(var(--ry)) translateZ(0);
+}
+
+/* Existing generic layer becomes a subtle optical diffraction layer. */
+.tilt-card.is-foil .foil-layer{
+  opacity:.46!important;
+  mix-blend-mode:color-dodge;
+  background:
+    radial-gradient(circle at var(--mx) var(--my),rgba(255,255,255,.95) 0 2%,rgba(255,255,255,.36) 4%,transparent 15%),
+    linear-gradient(var(--foil-angle),
+      transparent 0%,
+      rgba(88,220,255,.05) 24%,
+      rgba(255,106,210,.20) 31%,
+      rgba(255,244,150,.24) 38%,
+      rgba(110,255,186,.16) 45%,
+      rgba(113,155,255,.12) 52%,
+      transparent 63%);
+  background-size:100% 100%,180% 180%;
+  background-position:center,calc(var(--mx) * .8) calc(var(--my) * .8);
+  filter:saturate(1.18) contrast(1.03);
+}
+
+/* Specular reflection: this is what makes it read as a glossy card instead of a rainbow overlay. */
+.tilt-card .shine-layer{
+  opacity:.34!important;
+  mix-blend-mode:screen;
+  background:
+    radial-gradient(ellipse 42% 30% at var(--mx) var(--my),rgba(255,255,255,.88) 0%,rgba(255,255,255,.32) 18%,rgba(255,255,255,.06) 42%,transparent 72%),
+    linear-gradient(var(--foil-angle),transparent 32%,rgba(255,255,255,.15) 43%,rgba(255,255,255,.62) 48%,rgba(255,255,255,.12) 54%,transparent 66%);
+  filter:blur(.15px);
+}
+
+/* Normal MTG-style rainbow foil: restrained diffraction with a moving bright band. */
+.tilt-card.is-foil.foil-standard .foil-layer{
+  opacity:.50!important;
+  background:
+    radial-gradient(circle at var(--mx) var(--my),rgba(255,255,255,.92) 0 2%,transparent 14%),
+    repeating-linear-gradient(calc(var(--foil-angle) + 8deg),
+      rgba(255,80,160,.16) 0 7%,
+      rgba(90,225,255,.17) 8% 15%,
+      rgba(120,255,180,.13) 16% 22%,
+      rgba(255,235,105,.15) 23% 29%,
+      rgba(155,115,255,.14) 30% 36%);
+  background-size:100% 100%,215% 215%;
+  background-position:center,calc(100% - var(--mx)) calc(100% - var(--my));
+}
+
+/* Etched foil is much less rainbow and more metallic/grainy. */
+.tilt-card.is-foil.foil-etched .foil-layer{
+  opacity:.32!important;
+  mix-blend-mode:screen;
+  background:
+    radial-gradient(circle at var(--mx) var(--my),rgba(255,248,220,.72) 0 3%,transparent 22%),
+    repeating-linear-gradient(125deg,rgba(255,255,255,.09) 0 1px,rgba(50,40,20,.04) 1px 3px),
+    linear-gradient(var(--foil-angle),transparent 15%,rgba(234,215,160,.24) 42%,rgba(255,255,255,.36) 50%,rgba(184,158,98,.18) 58%,transparent 82%);
+  filter:saturate(.65) contrast(1.12);
+}
+
+/* One Piece / unknown foil fallback: stronger prismatic surface than standard MTG foil. */
+.tilt-card.is-foil.foil-prismatic .foil-layer{
+  opacity:.58!important;
+  background:
+    radial-gradient(circle at var(--mx) var(--my),rgba(255,255,255,.98) 0 2%,transparent 15%),
+    conic-gradient(from calc(var(--foil-angle) - 80deg) at var(--mx) var(--my),rgba(255,90,160,.24),rgba(85,220,255,.24),rgba(120,255,170,.19),rgba(255,235,100,.22),rgba(150,110,255,.22),rgba(255,90,160,.24));
+  filter:saturate(1.12) contrast(1.04);
+}
+
+/* Tiny texture prevents the effect from looking like a flat CSS gradient. */
+.tilt-card.is-foil::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  border-radius:inherit;
+  opacity:.10;
+  mix-blend-mode:overlay;
+  background-image:
+    repeating-radial-gradient(circle at 20% 30%,rgba(255,255,255,.55) 0 .35px,transparent .55px 2px);
+  background-size:5px 5px;
+}
+
+/* Binder preview should be subtle; actual material is mainly visible in inspector. */
+.card-frame.foil-preview::after{
+  opacity:.13!important;
+  animation:binderFoil 7s ease-in-out infinite!important;
+  background:linear-gradient(118deg,transparent 22%,rgba(110,220,255,.38) 38%,rgba(255,170,220,.26) 47%,rgba(255,244,170,.30) 55%,transparent 72%)!important;
+  background-size:240% 240%!important;
+}
+
+@media (prefers-reduced-motion:reduce){
+  .tilt-card{transform:none!important}
+}
