@@ -16,337 +16,59 @@
     <aside class="sidebar">
       <div class="brand-block">
         <div class="brand-mark">V</div>
-        <div>
-          <div class="brand-title">THE VAULT</div>
-          <div class="brand-subtitle">Digital Binder</div>
-        </div>
+        <div><div class="brand-title">THE VAULT</div><div class="brand-subtitle">Digital Binder</div></div>
       </div>
-
       <nav class="nav-list">
         <button class="nav-item active" data-page="dashboard"><span>◈</span> Dashboard</button>
         <button class="nav-item" data-page="collection"><span>▦</span> Mijn binder</button>
         <button class="nav-item" data-page="add"><span>＋</span> Kaart toevoegen</button>
         <button class="nav-item" data-page="scanner"><span>⌁</span> Foto scannen</button>
       </nav>
-
-      <div class="sidebar-note panel-soft">
-        <p class="small-label">LIVE STACK</p>
-        <strong>GitHub Pages</strong>
-        <p>De app draait lokaal in je browser en slaat je collectie op op je toestel.</p>
-      </div>
+      <div class="sidebar-note panel-soft"><p class="small-label">LIVE STACK</p><strong>GitHub Pages</strong><p>De app draait lokaal in je browser en slaat je collectie op op je toestel.</p></div>
     </aside>
-
     <main class="content">
       <header class="topbar">
-        <div>
-          <p class="kicker">PERSONAL TCG ARCHIVE</p>
-          <h1 id="pageTitle">Dashboard</h1>
-        </div>
-        <div class="topbar-actions">
-          <button class="ghost-btn" id="openScannerBtn">Scan foto</button>
-          <button class="primary-btn" id="quickAddBtn">+ Kaart toevoegen</button>
-        </div>
+        <div><p class="kicker">PERSONAL TCG ARCHIVE</p><h1 id="pageTitle">Dashboard</h1></div>
+        <div class="topbar-actions"><button class="ghost-btn" id="openScannerBtn">Scan foto</button><button class="primary-btn" id="quickAddBtn">+ Kaart toevoegen</button></div>
       </header>
-
       <section class="page active" id="dashboard">
         <section class="hero-card">
-          <div class="hero-copy">
-            <p class="kicker gold">COLLECTION STATUS</p>
-            <h2>Jouw kaarten, maar dan als een <span>echte digitale binder</span>.</h2>
-            <p>
-              Voeg kaarten handmatig toe, laat Magic-kaarten automatisch ophalen, scan foto’s van kaarten,
-              en bekijk alles met echte afbeeldingen in één overzicht.
-            </p>
-            <div class="hero-actions">
-              <button class="primary-btn" data-goto="add">Nieuwe kaart</button>
-              <button class="ghost-btn" data-goto="collection">Open binder</button>
-            </div>
-          </div>
-          <div class="hero-side">
-            <div class="hero-value">
-              <span>Totale waarde</span>
-              <strong id="totalValue">€0,00</strong>
-            </div>
-            <div class="hero-mini-grid">
-              <div>
-                <span>Uniek</span>
-                <strong id="uniqueCards">0</strong>
-              </div>
-              <div>
-                <span>Totaal</span>
-                <strong id="totalCards">0</strong>
-              </div>
-            </div>
-          </div>
+          <div class="hero-copy"><p class="kicker gold">COLLECTION STATUS</p><h2>Jouw kaarten, maar dan als een <span>echte digitale binder</span>.</h2><p>Voeg kaarten handmatig toe, laat kaartdata automatisch ophalen en scan foto's van kaarten.</p><div class="hero-actions"><button class="primary-btn" data-goto="add">Nieuwe kaart</button><button class="ghost-btn" data-goto="collection">Open binder</button></div></div>
+          <div class="hero-side"><div class="hero-value"><span>Totale waarde</span><strong id="totalValue">€0,00</strong></div><div class="hero-mini-grid"><div><span>Uniek</span><strong id="uniqueCards">0</strong></div><div><span>Totaal</span><strong id="totalCards">0</strong></div></div></div>
         </section>
-
         <section class="stats-grid">
-          <article class="stat-card">
-            <span>One Piece kaarten</span>
-            <strong id="opCount">0</strong>
-            <small>Alle exemplaren</small>
-          </article>
-          <article class="stat-card">
-            <span>Magic kaarten</span>
-            <strong id="mtgCount">0</strong>
-            <small>Alle exemplaren</small>
-          </article>
-          <article class="stat-card">
-            <span>Foils</span>
-            <strong id="foilCount">0</strong>
-            <small>Glanzende kaarten</small>
-          </article>
-          <article class="stat-card">
-            <span>Gem. waarde</span>
-            <strong id="avgValue">€0,00</strong>
-            <small>Per uniek item</small>
-          </article>
+          <article class="stat-card"><span>One Piece kaarten</span><strong id="opCount">0</strong><small>Alle exemplaren</small></article>
+          <article class="stat-card"><span>Magic kaarten</span><strong id="mtgCount">0</strong><small>Alle exemplaren</small></article>
+          <article class="stat-card"><span>Foils</span><strong id="foilCount">0</strong><small>Glanzende kaarten</small></article>
+          <article class="stat-card"><span>Gem. waarde</span><strong id="avgValue">€0,00</strong><small>Per uniek item</small></article>
         </section>
-
         <section class="dashboard-grid">
-          <article class="panel">
-            <div class="panel-header">
-              <div>
-                <p class="small-label">RECENT</p>
-                <h3>Laatst toegevoegd</h3>
-              </div>
-              <button class="text-btn" data-goto="collection">Bekijk binder →</button>
-            </div>
-            <div id="recentCards" class="recent-grid"></div>
-          </article>
-
-          <article class="panel">
-            <div class="panel-header">
-              <div>
-                <p class="small-label">BREAKDOWN</p>
-                <h3>Verdeling collectie</h3>
-              </div>
-            </div>
-            <div class="progress-block">
-              <div class="progress-row">
-                <div><span class="dot op"></span><b>One Piece TCG</b></div>
-                <strong id="opPercent">0%</strong>
-              </div>
-              <div class="bar"><div id="opBar" class="fill fill-op"></div></div>
-
-              <div class="progress-row">
-                <div><span class="dot mtg"></span><b>Magic: The Gathering</b></div>
-                <strong id="mtgPercent">0%</strong>
-              </div>
-              <div class="bar"><div id="mtgBar" class="fill fill-mtg"></div></div>
-            </div>
-          </article>
+          <article class="panel"><div class="panel-header"><div><p class="small-label">RECENT</p><h3>Laatst toegevoegd</h3></div><button class="text-btn" data-goto="collection">Bekijk binder →</button></div><div id="recentCards" class="recent-grid"></div></article>
+          <article class="panel"><div class="panel-header"><div><p class="small-label">BREAKDOWN</p><h3>Verdeling collectie</h3></div></div><div class="progress-block"><div class="progress-row"><div><span class="dot op"></span><b>One Piece TCG</b></div><strong id="opPercent">0%</strong></div><div class="bar"><div id="opBar" class="fill fill-op"></div></div><div class="progress-row"><div><span class="dot mtg"></span><b>Magic: The Gathering</b></div><strong id="mtgPercent">0%</strong></div><div class="bar"><div id="mtgBar" class="fill fill-mtg"></div></div></div></article>
         </section>
       </section>
-
       <section class="page" id="collection">
-        <div class="panel toolbar-panel">
-          <div class="toolbar-row">
-            <label class="search-field grow">
-              <span>⌕</span>
-              <input id="searchInput" type="search" placeholder="Zoek op naam, set of kaartnummer..." />
-            </label>
-            <select id="gameFilter">
-              <option value="all">Alle games</option>
-              <option value="One Piece TCG">One Piece TCG</option>
-              <option value="Magic: The Gathering">Magic: The Gathering</option>
-            </select>
-            <select id="sortFilter">
-              <option value="recent">Nieuwste eerst</option>
-              <option value="value">Hoogste waarde</option>
-              <option value="name">Naam A-Z</option>
-            </select>
-          </div>
-          <div class="collection-meta">
-            <span id="resultCount">0 kaarten</span>
-            <button class="text-btn" id="hydrateImagesBtn">Ontbrekende afbeeldingen ophalen</button>
-          </div>
-        </div>
-
-        <div id="cardGrid" class="binder-grid"></div>
-        <div id="emptyState" class="empty-state hidden">
-          <div class="empty-icon">◇</div>
-          <h3>Nog geen kaarten gevonden</h3>
-          <p>Voeg je eerste kaart toe of scan een foto om je binder te vullen.</p>
-        </div>
+        <div class="panel toolbar-panel"><div class="toolbar-row"><label class="search-field grow"><span>⌕</span><input id="searchInput" type="search" placeholder="Zoek op naam, set of kaartnummer..." /></label><select id="gameFilter"><option value="all">Alle games</option><option value="One Piece TCG">One Piece TCG</option><option value="Magic: The Gathering">Magic: The Gathering</option></select><select id="sortFilter"><option value="recent">Nieuwste eerst</option><option value="value">Hoogste waarde</option><option value="name">Naam A-Z</option></select></div><div class="collection-meta"><span id="resultCount">0 kaarten</span><button class="text-btn" id="hydrateImagesBtn">Ontbrekende afbeeldingen ophalen</button></div></div>
+        <div id="cardGrid" class="binder-grid"></div><div id="emptyState" class="empty-state hidden"><div class="empty-icon">◇</div><h3>Nog geen kaarten gevonden</h3><p>Voeg je eerste kaart toe of scan een foto om je binder te vullen.</p></div>
       </section>
-
       <section class="page" id="add">
         <div class="two-col-layout">
-          <section class="panel">
-            <div class="panel-header">
-              <div>
-                <p class="small-label">AUTO FILL</p>
-                <h3>Zoek kaartdata op</h3>
-              </div>
-            </div>
-
-            <div class="lookup-card">
-              <div class="lookup-grid">
-                <label>
-                  <span>Game</span>
-                  <select id="lookupGame">
-                    <option value="Magic: The Gathering">Magic: The Gathering</option>
-                    <option value="One Piece TCG">One Piece TCG</option>
-                  </select>
-                </label>
-                <label class="wide">
-                  <span>Zoekterm</span>
-                  <input id="lookupQuery" placeholder="Bijv. Sol Ring of OP01-001" />
-                </label>
-              </div>
-              <div class="action-row">
-                <button class="primary-btn" id="lookupBtn">Zoek kaart</button>
-                <p class="hint">Magic werkt op naam. One Piece werkt het best met kaartcode zoals <b>OP01-001</b>.</p>
-              </div>
-              <div id="lookupStatus" class="status-text muted">Nog niets gezocht.</div>
-              <div id="lookupResults" class="lookup-results"></div>
-            </div>
-          </section>
-
-          <aside class="panel preview-panel">
-            <p class="small-label">PREVIEW</p>
-            <h3>Zo ziet hij in je binder</h3>
-            <div class="preview-binder-card" id="previewImageWrap">
-              <div class="preview-placeholder" id="previewPlaceholder">TCG</div>
-            </div>
-            <div class="preview-meta">
-              <span id="previewGame">Game</span>
-              <h4 id="previewName">Nieuwe kaart</h4>
-              <p><span id="previewSet">Set</span> · <span id="previewNumber">000</span></p>
-            </div>
-          </aside>
+          <section class="panel"><div class="panel-header"><div><p class="small-label">AUTO FILL</p><h3>Zoek kaartdata op</h3></div></div><div class="lookup-card"><div class="lookup-grid"><label><span>Game</span><select id="lookupGame"><option value="Magic: The Gathering">Magic: The Gathering</option><option value="One Piece TCG">One Piece TCG</option></select></label><label class="wide"><span>Zoekterm</span><input id="lookupQuery" placeholder="Bijv. Sol Ring of OP01-001" /></label></div><div class="action-row"><button class="primary-btn" id="lookupBtn">Zoek kaart</button><p class="hint">Magic werkt op naam. One Piece werkt het best met kaartcode.</p></div><div id="lookupStatus" class="status-text muted">Nog niets gezocht.</div><div id="lookupResults" class="lookup-results"></div></div></section>
+          <aside class="panel preview-panel"><p class="small-label">PREVIEW</p><h3>Zo ziet hij in je binder</h3><div class="preview-binder-card" id="previewImageWrap"><div class="preview-placeholder">TCG</div></div><div class="preview-meta"><span id="previewGame">Game</span><h4 id="previewName">Nieuwe kaart</h4><p><span id="previewSet">Set</span> · <span id="previewNumber">000</span></p></div></aside>
         </div>
-
-        <section class="panel form-panel spacing-top">
-          <div class="panel-header">
-            <div>
-              <p class="small-label">MANUAL ENTRY</p>
-              <h3>Kaart toevoegen aan collectie</h3>
-            </div>
-          </div>
-
-          <form id="cardForm" class="card-form">
-            <div class="form-grid">
-              <label>
-                <span>Game</span>
-                <select id="game" required>
-                  <option value="One Piece TCG">One Piece TCG</option>
-                  <option value="Magic: The Gathering">Magic: The Gathering</option>
-                </select>
-              </label>
-              <label>
-                <span>Naam</span>
-                <input id="name" required placeholder="Bijv. Monkey.D.Luffy" />
-              </label>
-              <label>
-                <span>Set</span>
-                <input id="setName" required placeholder="Bijv. OP05 / Dominaria" />
-              </label>
-              <label>
-                <span>Kaartnummer</span>
-                <input id="cardNumber" placeholder="Bijv. OP05-060 of 392" />
-              </label>
-              <label>
-                <span>Rarity</span>
-                <select id="rarity">
-                  <option>Common</option>
-                  <option>Uncommon</option>
-                  <option selected>Rare</option>
-                  <option>Super Rare</option>
-                  <option>Secret Rare</option>
-                  <option>Mythic</option>
-                </select>
-              </label>
-              <label>
-                <span>Conditie</span>
-                <select id="condition">
-                  <option selected>Near Mint</option>
-                  <option>Excellent</option>
-                  <option>Good</option>
-                  <option>Played</option>
-                </select>
-              </label>
-              <label>
-                <span>Aantal</span>
-                <input id="quantity" type="number" min="1" value="1" required />
-              </label>
-              <label>
-                <span>Waarde per kaart (€)</span>
-                <input id="price" type="number" step="0.01" min="0" value="0" />
-              </label>
-              <label class="wide">
-                <span>Afbeelding URL</span>
-                <input id="image" placeholder="https://..." />
-              </label>
-              <label class="wide upload-field">
-                <span>Of upload zelf een kaartfoto</span>
-                <input id="imageUpload" type="file" accept="image/*" />
-              </label>
-              <label class="wide check-row">
-                <input id="foil" type="checkbox" />
-                <span>Foil / glimmende variant</span>
-              </label>
-            </div>
-            <div class="action-row">
-              <button type="submit" class="primary-btn">Kaart opslaan</button>
-              <button type="button" id="resetFormBtn" class="ghost-btn">Form resetten</button>
-            </div>
-          </form>
-        </section>
+        <section class="panel form-panel spacing-top"><div class="panel-header"><div><p class="small-label">MANUAL ENTRY</p><h3>Kaart toevoegen aan collectie</h3></div></div><form id="cardForm" class="card-form"><div class="form-grid">
+          <label><span>Game</span><select id="game" required><option value="One Piece TCG">One Piece TCG</option><option value="Magic: The Gathering">Magic: The Gathering</option></select></label>
+          <label><span>Naam</span><input id="name" required placeholder="Bijv. Monkey.D.Luffy" /></label><label><span>Set</span><input id="setName" required /></label><label><span>Kaartnummer</span><input id="cardNumber" /></label>
+          <label><span>Rarity</span><select id="rarity"><option>Common</option><option>Uncommon</option><option selected>Rare</option><option>Super Rare</option><option>Secret Rare</option><option>Mythic</option></select></label><label><span>Conditie</span><select id="condition"><option selected>Near Mint</option><option>Excellent</option><option>Good</option><option>Played</option></select></label><label><span>Aantal</span><input id="quantity" type="number" min="1" value="1" /></label><label><span>Waarde per kaart (€)</span><input id="price" type="number" step="0.01" min="0" value="0" /></label><label class="wide"><span>Afbeelding URL</span><input id="image" /></label><label class="wide upload-field"><span>Of upload zelf een kaartfoto</span><input id="imageUpload" type="file" accept="image/*" /></label><label class="wide check-row"><input id="foil" type="checkbox" /><span>Foil / glimmende variant</span></label>
+        </div><div class="action-row"><button type="submit" class="primary-btn">Kaart opslaan</button><button type="button" id="resetFormBtn" class="ghost-btn">Form resetten</button></div></form></section>
       </section>
-
       <section class="page" id="scanner">
-        <div class="two-col-layout scanner-layout">
-          <section class="panel">
-            <div class="panel-header">
-              <div>
-                <p class="small-label">PHOTO IMPORT</p>
-                <h3>Kaarten uit een foto halen</h3>
-              </div>
-            </div>
-            <p class="muted intro-copy">
-              Upload een foto van een kaart of een kleine stapel kaarten. De scan draait in je browser,
-              leest tekst uit de afbeelding en probeert daar kaartcodes of kaartnamen uit te halen.
-            </p>
-            <div class="upload-zone" id="uploadZone">
-              <input id="scanImageInput" type="file" accept="image/*" />
-              <div class="upload-zone-inner">
-                <strong>Kies een foto</strong>
-                <p>Werkt het best met duidelijke, rechte foto’s van 1 tot 4 kaarten.</p>
-              </div>
-            </div>
-            <div id="scanPreview" class="scan-preview hidden"></div>
-            <div class="action-row spacing-top">
-              <button class="primary-btn" id="scanBtn">Scan kaarten</button>
-              <button class="ghost-btn" id="clearScanBtn">Wis scan</button>
-            </div>
-            <div id="scanStatus" class="status-text muted">Nog geen scan gestart.</div>
-          </section>
-
-          <aside class="panel">
-            <p class="small-label">OCR OUTPUT</p>
-            <h3>Gevonden tekst</h3>
-            <pre id="ocrText" class="ocr-box">Nog geen tekst gedetecteerd.</pre>
-          </aside>
-        </div>
-
-        <section class="panel spacing-top">
-          <div class="panel-header">
-            <div>
-              <p class="small-label">RESULTS</p>
-              <h3>Voorgestelde kaarten</h3>
-            </div>
-          </div>
-          <div id="scanResults" class="scan-results-grid"></div>
-        </section>
+        <div class="two-col-layout scanner-layout"><section class="panel"><div class="panel-header"><div><p class="small-label">PHOTO IMPORT</p><h3>Kaarten uit een foto halen</h3></div></div><p class="muted intro-copy">Upload een duidelijke foto. De scanner leest eerst de kaartnaam en controleert daarna de rest. Hij probeert ook een foil-effect te herkennen.</p><div class="upload-zone"><input id="scanImageInput" type="file" accept="image/*" /><div class="upload-zone-inner"><strong>Kies een foto</strong><p>Werkt het best met een rechte, beeldvullende kaart.</p></div></div><div id="scanPreview" class="scan-preview hidden"></div><div class="action-row spacing-top"><button class="primary-btn" id="scanBtn">Scan kaarten</button><button class="ghost-btn" id="clearScanBtn">Wis scan</button></div><div id="scanStatus" class="status-text muted">Nog geen scan gestart.</div></section><aside class="panel"><p class="small-label">OCR OUTPUT</p><h3>Gevonden tekst</h3><pre id="ocrText" class="ocr-box">Nog geen tekst gedetecteerd.</pre></aside></div>
+        <section class="panel spacing-top"><div class="panel-header"><div><p class="small-label">RESULTS</p><h3>Voorgestelde kaarten</h3></div></div><div id="scanResults" class="scan-results-grid"></div></section>
       </section>
     </main>
   </div>
-
+  <div id="cardModal" class="card-modal hidden" aria-hidden="true"><button class="modal-backdrop" id="modalBackdrop" aria-label="Sluiten"></button><section class="card-modal-sheet" role="dialog" aria-modal="true" aria-labelledby="modalCardName"><div class="modal-topbar"><div><p class="small-label">CARD INSPECTOR</p><h3 id="modalCardName">Kaart</h3></div><button class="modal-close" id="modalCloseBtn" aria-label="Sluiten">×</button></div><div class="modal-grid"><div class="tilt-stage"><div class="tilt-card" id="tiltCard"><img id="modalCardImage" alt="Kaartafbeelding" /><div class="tilt-placeholder hidden" id="modalCardPlaceholder">TCG</div><div class="foil-layer" id="foilLayer"></div><div class="shine-layer"></div></div><p class="tilt-hint">Sleep over de kaart om hem te kantelen</p></div><div class="modal-details"><div class="detail-chip-row"><span class="game-chip mtg" id="modalGameChip">MAGIC</span><span class="foil-status" id="modalFoilStatus">NON-FOIL</span></div><div class="detail-list"><div><span>Set</span><strong id="modalSet">—</strong></div><div><span>Kaartnummer</span><strong id="modalNumber">—</strong></div><div><span>Rarity</span><strong id="modalRarity">—</strong></div><div><span>Conditie</span><strong id="modalCondition">—</strong></div><div><span>Aantal</span><strong id="modalQuantity">1</strong></div><div><span>Waarde</span><strong id="modalPrice">€0,00</strong></div></div><div class="modal-actions"><button class="primary-btn" id="toggleFoilBtn">Foil aanzetten</button><button class="ghost-btn danger-btn" id="modalDeleteBtn">Verwijderen</button></div><p class="modal-note">Bij foil-kaarten beweegt het holo-effect mee met je vinger.</p></div></div></section></div>
   <div id="toast" class="toast"></div>
-
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-  <script src="app.js"></script>
-</body>
-</html>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script><script src="app.js"></script>
+</body></html>
