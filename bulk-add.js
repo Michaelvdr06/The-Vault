@@ -39,7 +39,7 @@
               <video id="bulkVideo" playsinline muted></video>
               <canvas id="bulkCanvas" hidden></canvas>
               <div class="bulk-camera-empty" id="bulkCameraEmpty"><span>⌁</span><strong>Camera staat uit</strong><small>Leg één kaart recht en beeldvullend in beeld.</small></div>
-              <div class="bulk-scan-line"></div>
+              <div class="bulk-scan-line"></div><div class="bulk-number-target"><span>RICHT HIER OP 0061</span></div>
             </div>
             <div class="action-row"><button class="primary-btn" id="bulkCameraStart">Start camera</button><button class="ghost-btn" id="bulkCapture" disabled>Scan huidige kaart</button></div>
             <label class="bulk-upload"><span>Of gebruik een foto</span><input id="bulkPhoto" type="file" accept="image/*" capture="environment"></label>
@@ -161,7 +161,7 @@
       state.stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080}},audio:false});
       const v=$('#bulkVideo');v.srcObject=state.stream;await v.play();
       $('#bulkCameraEmpty').classList.add('hidden');$('#bulkCapture').disabled=false;$('#bulkCameraStart').textContent='Stop camera';
-      setStatus('bulkCameraStatus','Live herkenning actief · houd één kaart stil binnen de paarse omlijning.');
+      setStatus('bulkCameraStatus','Live nummerscan actief · houd het collector number linksonder in het nummervak.');
       scheduleAuto(250);
     }catch{setStatus('bulkCameraStatus','Camera kon niet worden geopend. Gebruik eventueel “foto kiezen”.')}
   }
@@ -302,6 +302,25 @@
     };
   }
   function imageOfCard(card){return card?.image_uris?.normal||card?.card_faces?.find(x=>x.image_uris)?.image_uris?.normal||''}
+  function preparedNumberCrop(source,x1,x2,y1,y2,threshold=false){
+    const box=cardBox(source),scale=Math.min(4,1800/Math.max(1,box.w*(x2-x1)));
+    const out=document.createElement('canvas');
+    out.width=Math.max(1,Math.round(box.w*(x2-x1)*scale));
+    out.height=Math.max(1,Math.round(box.h*(y2-y1)*scale));
+    const ctx=out.getContext('2d',{willReadFrequently:true});
+    ctx.drawImage(source,box.x+box.w*x1,box.y+box.h*y1,box.w*(x2-x1),box.h*(y2-y1),0,0,out.width,out.height);
+    const img=ctx.getImageData(0,0,out.width,out.height),d=img.data;
+    for(let i=0;i<d.length;i+=4){
+      const gray=.299*d[i]+.587*d[i+1]+.114*d[i+2];
+      let v=(gray-128)*2.15+128;if(threshold)v=v>145?255:0;
+      v=Math.max(0,Math.min(255,v));d[i]=d[i+1]=d[i+2]=v;
+    }
+    ctx.putImageData(img,0,0);return out;
+  }
+  function strictNumberCandidates(text){
+    const raw=String(text||'').toUpperCase().replace(/[O]/g,'0').replace(/[IL|]/g,'1').replace(/S/g,'5').replace(/B/g,'8');
+    return [...new Set((raw.match(/\d{1,5}[A-Z]?/g)||[]).map(norm).filter(n=>n&&state.byNumber.has(n)))];
+  }
   async function runOcr(image,parameters={}){
     if(!state.workerPromise)state.workerPromise=Tesseract.createWorker('eng');
     const worker=await state.workerPromise;
@@ -311,50 +330,45 @@
   async function recognizeCanvas(source,automatic=false){
     if(state.busy||state.reviewOpen||!window.Tesseract)return;
     if(!state.set)return setStatus('bulkCameraStatus','Kies eerst een Magic-set.');
-    state.busy=true;$('#bulkCapture').disabled=true;setStatus('bulkCameraStatus','Live scan · kaart controleren…');
+    state.busy=true;$('#bulkCapture').disabled=true;setStatus('bulkCameraStatus','Live scan · collector number lezen…');
     try{
       const visual=frameEvidence(source);
-      if((visual.variance<90&&visual.edgeRatio<.012)||visual.range<35){
-        setStatus('bulkCameraStatus','Live scan actief · wacht op een kaart in de omlijning.');
-        state.busy=false;$('#bulkCapture').disabled=!state.stream;scheduleAuto(500);return;
+      if((visual.variance<70&&visual.edgeRatio<.009)||visual.range<28){
+        setStatus('bulkCameraStatus','Live scan actief · plaats één kaart volledig in de omlijning.');
+        state.busy=false;$('#bulkCapture').disabled=!state.stream;scheduleAuto(420);return;
       }
-      const lower=preparedCrop(source,.66,.995,false),lowerBW=preparedCrop(source,.61,.995,true);
-      const first=await runOcr(lower,{tessedit_pageseg_mode:'6'});
-      const second=await runOcr(lowerBW,{tessedit_pageseg_mode:'6'});
-      const n1=numberCandidates(first.data?.text),n2=numberCandidates(second.data?.text);
-      const consensus=n1.filter(n=>n2.includes(n)&&state.byNumber.has(n));
-      let found=consensus.length===1?state.byNumber.get(consensus[0]):null;
-      const title=preparedCrop(source,.01,.255,false);
-      const titleResult=await runOcr(title,{tessedit_pageseg_mode:'7'});
-      const titleHit=cardsFromTitle(titleResult.data?.text,Number(titleResult.data?.confidence||0));
-      const titleAgrees=found&&titleHit.cards.some(c=>norm(c.name)===norm(found.name));
-      if(found&&titleHit.cards.length&&!titleAgrees)found=null;
-      const numberConfidence=Math.min(Number(first.data?.confidence||0),Number(second.data?.confidence||0));
-      let options=[],method='',strong=false;
-      if(found&&numberConfidence>=28&&(titleAgrees||(visual.border>4&&visual.variance>160))){
-        options=[found];method='collector number + live frame';strong=true;
-      }else if(titleHit.cards.length&&titleHit.score>=.84&&titleHit.ocrConfidence>=28){
-        options=titleHit.cards;method='kaartnaam';strong=titleHit.score>=.9&&titleHit.ocrConfidence>=45;
-      }
-      if(options.length){
-        const key=norm(options[0].name);
-        const now=Date.now();
-        if(key===state.lastCandidate&&now-state.candidateAt<9000)state.candidateHits++;
+      const params={tessedit_pageseg_mode:'7',tessedit_char_whitelist:'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ/'};
+      const crops=[
+        preparedNumberCrop(source,.015,.43,.845,.998,false),
+        preparedNumberCrop(source,.015,.43,.845,.998,true),
+        preparedNumberCrop(source,.0,.58,.79,.998,false)
+      ];
+      const results=[];
+      for(const crop of crops)results.push(await runOcr(crop,params));
+      const reads=results.map(r=>strictNumberCandidates(r.data?.text));
+      const counts=new Map();
+      reads.flat().forEach(n=>counts.set(n,(counts.get(n)||0)+1));
+      const ranked=[...counts.entries()].sort((a,b)=>b[1]-a[1]);
+      const best=ranked[0],card=best?state.byNumber.get(best[0]):null;
+      if(card){
+        const strong=best[1]>=2;
+        const key=norm(card.collector_number),now=Date.now();
+        if(key===state.lastCandidate&&now-state.candidateAt<8000)state.candidateHits++;
         else{state.lastCandidate=key;state.candidateHits=1}
         state.candidateAt=now;
         if(strong||state.candidateHits>=2){
           state.lastCandidate='';state.candidateHits=0;
-          scanReview(options,method);
+          scanReview([card],'collector number');
           return;
         }
-        setStatus('bulkCameraStatus',`Mogelijke match: ${options[0].name} · nog één frame bevestigen…`);
+        setStatus('bulkCameraStatus',`Nummer ${card.collector_number} gezien · automatisch bevestigen…`);
       }else{
         state.lastCandidate='';state.candidateHits=0;
-        setStatus('bulkCameraStatus','Live scan actief · houd de kaartnaam scherp en stil in beeld.');
+        setStatus('bulkCameraStatus','Live scan actief · houd het nummer linksonder in het paarse nummervak.');
       }
-    }catch(err){console.warn('Bulk scan failed',err);setStatus('bulkCameraStatus','Live scan herstelt automatisch · houd de kaart stil in beeld.')}
+    }catch(err){console.warn('Bulk number scan failed',err);setStatus('bulkCameraStatus','Live scan herstelt automatisch · houd het nummer stil in beeld.')}
     state.busy=false;$('#bulkCapture').disabled=!state.stream;
-    if(automatic||state.stream)scheduleAuto(420);
+    if(automatic||state.stream)scheduleAuto(360);
   }
   function cue(ok){
     try{const A=window.AudioContext||window.webkitAudioContext,a=new A(),o=a.createOscillator(),g=a.createGain();o.frequency.value=ok?880:220;g.gain.setValueAtTime(.06,a.currentTime);g.gain.exponentialRampToValueAtTime(.001,a.currentTime+.13);o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+.14)}catch{}
