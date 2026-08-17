@@ -233,20 +233,41 @@
   }
   function nameScore(a,b){
     a=String(a||'').toLowerCase().replace(/[^a-z0-9]/g,'');b=String(b||'').toLowerCase().replace(/[^a-z0-9]/g,'');
-    if(!a||!b)return 0;if(a===b||a.includes(b)||b.includes(a))return 1;
+    if(!a||!b)return 0;if(a===b)return 1;
+    const ratio=Math.min(a.length,b.length)/Math.max(a.length,b.length);
+    if(ratio<.72)return 0;
     return 1-editDistance(a,b)/Math.max(a.length,b.length);
   }
-  function cardsFromTitle(text){
-    const lines=String(text||'').split(/\n+/).map(x=>x.trim()).filter(x=>x.length>2&&x.length<60);
-    let bestName='',score=0;
+  function frameEvidence(source){
+    const box=cardBox(source),sample=document.createElement('canvas');
+    sample.width=180;sample.height=252;
+    const ctx=sample.getContext('2d',{willReadFrequently:true});
+    ctx.drawImage(source,box.x,box.y,box.w,box.h,0,0,sample.width,sample.height);
+    const d=ctx.getImageData(0,0,sample.width,sample.height).data,gray=new Float32Array(sample.width*sample.height);
+    let sum=0,min=255,max=0;
+    for(let p=0,i=0;i<d.length;i+=4,p++){const g=.299*d[i]+.587*d[i+1]+.114*d[i+2];gray[p]=g;sum+=g;min=Math.min(min,g);max=Math.max(max,g)}
+    const mean=sum/gray.length;let variance=0,edges=0,checks=0;
+    for(let y=1;y<sample.height;y+=2)for(let x=1;x<sample.width;x+=2){
+      const p=y*sample.width+x,g=gray[p];variance+=(g-mean)*(g-mean);
+      if(Math.abs(g-gray[p-1])>24||Math.abs(g-gray[p-sample.width])>24)edges++;checks++;
+    }
+    variance/=checks;const edgeRatio=edges/checks;
+    const outer=[],inner=[];
+    for(let x=8;x<sample.width-8;x+=8){outer.push(gray[5*sample.width+x],gray[(sample.height-6)*sample.width+x]);inner.push(gray[17*sample.width+x],gray[(sample.height-18)*sample.width+x])}
+    for(let y=8;y<sample.height-8;y+=8){outer.push(gray[y*sample.width+5],gray[y*sample.width+sample.width-6]);inner.push(gray[y*sample.width+17],gray[y*sample.width+sample.width-18])}
+    const avg=a=>a.reduce((n,v)=>n+v,0)/Math.max(1,a.length);
+    const border=Math.abs(avg(outer)-avg(inner));
+    return{ok:variance>300&&edgeRatio>.035&&(max-min)>75&&border>3.5,variance,edgeRatio,border,range:max-min};
+  }
+  function cardsFromTitle(text,ocrConfidence=0){
+    const lines=String(text||'').split(/\n+/).map(x=>x.trim()).filter(x=>x.length>3&&x.length<60&&/[A-Za-z]{3}/.test(x));
+    let bestName='',score=0,bestLine='';
     for(const line of lines)for(const card of state.cards){
       const s=nameScore(line,card.name);
-      if(s>score){score=s;bestName=card.name}
+      if(s>score){score=s;bestName=card.name;bestLine=line}
     }
-    if(score<.72||!bestName)return [];
-    // Title OCR identifies the card, but not its showcase/full-art treatment.
-    // Return every matching printing so the collector can choose in the popup.
-    return state.cards.filter(card=>norm(card.name)===norm(bestName)).slice(0,8);
+    if(score<.86||ocrConfidence<45||!bestName)return{cards:[],score,ocrConfidence,line:bestLine};
+    return{cards:state.cards.filter(card=>norm(card.name)===norm(bestName)).slice(0,8),score,ocrConfidence,line:bestLine};
   }
   function scanReview(options,method){
     document.querySelector('.bulk-scan-review')?.remove();
@@ -276,33 +297,41 @@
   async function recognizeCanvas(source){
     if(state.busy||!window.Tesseract)return;
     if(!state.set)return setStatus('bulkCameraStatus','Kies eerst een Magic-set.');
-    state.busy=true;$('#bulkCapture').disabled=true;setStatus('bulkCameraStatus','Collector number lezen…');
+    state.busy=true;$('#bulkCapture').disabled=true;setStatus('bulkCameraStatus','Kaartframe controleren…');
     try{
-      const lower=preparedCrop(source,.66,.995,false);
-      const numberResult=await Tesseract.recognize(lower,'eng',{tessedit_pageseg_mode:'6'});
-      const candidates=numberCandidates(numberResult.data?.text);
-      let found=cardFromNumbers(candidates),method='collector number';
-      if(!found){
-        setStatus('bulkCameraStatus','Nummer extra verscherpen…');
-        const lowerBW=preparedCrop(source,.61,.995,true);
-        const retry=await Tesseract.recognize(lowerBW,'eng',{tessedit_pageseg_mode:'6'});
-        candidates.push(...numberCandidates(retry.data?.text));
-        found=cardFromNumbers([...new Set(candidates)]);
+      const visual=frameEvidence(source);
+      if(!visual.ok){
+        setStatus('bulkCameraStatus','Geen duidelijke kaart in het kader. Vul de paarse omlijning met één volledige kaart.');
+        cue(false);state.busy=false;$('#bulkCapture').disabled=!state.stream;return;
       }
-      let options=found?[found]:[];
-      if(!options.length){
-        setStatus('bulkCameraStatus','Nummer onzeker · kaartnaam controleren…');
-        const title=preparedCrop(source,.015,.245,false);
-        const titleResult=await Tesseract.recognize(title,'eng',{tessedit_pageseg_mode:'7'});
-        options=cardsFromTitle(titleResult.data?.text);method='kaartnaam';
+      const lower=preparedCrop(source,.66,.995,false),lowerBW=preparedCrop(source,.61,.995,true);
+      setStatus('bulkCameraStatus','Collector number dubbel controleren…');
+      const first=await Tesseract.recognize(lower,'eng',{tessedit_pageseg_mode:'6'});
+      const second=await Tesseract.recognize(lowerBW,'eng',{tessedit_pageseg_mode:'6'});
+      const n1=numberCandidates(first.data?.text),n2=numberCandidates(second.data?.text);
+      const consensus=n1.filter(n=>n2.includes(n)&&state.byNumber.has(n));
+      let found=consensus.length===1?state.byNumber.get(consensus[0]):null;
+      setStatus('bulkCameraStatus','Kaartnaam onafhankelijk controleren…');
+      const title=preparedCrop(source,.015,.245,false);
+      const titleResult=await Tesseract.recognize(title,'eng',{tessedit_pageseg_mode:'7'});
+      const titleHit=cardsFromTitle(titleResult.data?.text,Number(titleResult.data?.confidence||0));
+      if(found&&titleHit.cards.length&&!titleHit.cards.some(c=>norm(c.name)===norm(found.name))){
+        found=null;
+      }
+      const numberConfidence=Math.min(Number(first.data?.confidence||0),Number(second.data?.confidence||0));
+      let options=[],method='';
+      if(found&&(numberConfidence>=38||titleHit.cards.some(c=>norm(c.name)===norm(found.name)))){
+        options=[found];method='dubbel bevestigd collector number';
+      }else if(titleHit.cards.length&&titleHit.score>=.9&&titleHit.ocrConfidence>=55){
+        options=titleHit.cards;method='hoogvertrouwen kaartnaam';
       }
       if(options.length){
         scanReview(options,method);
         return;
       }
       cue(false);
-      setStatus('bulkCameraStatus',`Geen zekere match${candidates.length?` (mogelijk nummer: ${[...new Set(candidates)].slice(0,5).join(', ')})`:''}. Vul de paarse omlijning volledig en tik opnieuw.`);
-    }catch(err){console.warn('Bulk scan failed',err);setStatus('bulkCameraStatus','Scannen mislukte. Houd de kaart recht, stil en zonder reflectie in beeld.')}
+      setStatus('bulkCameraStatus','Scan afgewezen: onvoldoende zekerheid. Zorg voor scherpte, goed licht en een volledig gevulde omlijning.');
+    }catch(err){console.warn('Bulk scan failed',err);setStatus('bulkCameraStatus','Scan veilig afgebroken. Houd de kaart recht, stil en zonder reflectie in beeld.')}
     state.busy=false;$('#bulkCapture').disabled=!state.stream;
   }
   function cue(ok){
