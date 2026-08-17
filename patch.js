@@ -140,11 +140,11 @@
   }
 })();
 
-// Scanner v3.1 owns the Scan button directly. v2 is no longer loaded to avoid duplicate OCR handlers on phones.
+// Scanner v3.2 owns the Scan button directly.
 (() => {
   if(document.querySelector('script[data-vault-scanner-v3]')) return;
   const js=document.createElement('script');
-  js.src='scanner-v3.js?v=2';
+  js.src='scanner-v3.js?v=3';
   js.dataset.vaultScannerV3='1';
   document.body.appendChild(js);
 })();
