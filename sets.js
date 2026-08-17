@@ -154,11 +154,25 @@
 
   function ownedMatch(item){
     try{
-      const pool=(typeof cards!=='undefined'?cards:[]).filter(c=>c.game===state.game);
-      const n=normNum(item.cardNumber);
-      let hit=pool.find(c=>n&&normNum(c.cardNumber)===n);
-      if(hit)return hit;
-      return pool.find(c=>normText(c.name)===normText(item.name)&&(normText(c.setName)===normText(item.setName)||normText(c.setName)===normText(state.set?.name)||normText(c.setName)===normText(state.set?.code)));
+      const sameSet=c=>{
+        const ownedSet=normText(c.setName);
+        return !!ownedSet&&(
+          ownedSet===normText(item.setName)||
+          ownedSet===normText(state.set?.name)||
+          ownedSet===normText(state.set?.code)
+        );
+      };
+      const pool=(typeof cards!=='undefined'?cards:[]).filter(c=>c.game===state.game&&sameSet(c));
+      const number=normNum(item.cardNumber);
+      if(number){
+        // A named card can have multiple regular, showcase and full-art printings.
+        // Never unlock sibling variants: a numbered checklist item requires the
+        // exact collector number from the same set.
+        return pool.find(c=>normNum(c.cardNumber)===number)||null;
+      }
+      // Legacy records without a collector number can only match checklist
+      // entries that also have no number.
+      return pool.find(c=>!normNum(c.cardNumber)&&normText(c.name)===normText(item.name))||null;
     }catch{return null}
   }
 
