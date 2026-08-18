@@ -132,9 +132,6 @@
 })();
 
 (() => {
-  if(!document.querySelector('link[data-vault-sets]')){
-    const css=document.createElement('link');css.rel='stylesheet';css.href='sets.css?v=2';css.dataset.vaultSets='1';document.head.appendChild(css);
-  }
   if(!document.querySelector('script[data-vault-sets]')){
     const js=document.createElement('script');js.src='sets.js?v=3';js.dataset.vaultSets='1';js.defer=true;document.body.appendChild(js);
   }
@@ -149,24 +146,15 @@
   document.body.appendChild(js);
 })();
 
-(() => {
-  if(document.querySelector('link[data-vault-mobile]')) return;
-  const css=document.createElement('link');css.rel='stylesheet';css.href='mobile.css?v=1';css.dataset.vaultMobile='1';document.head.appendChild(css);
-})();
-
 // Scanner presentation layer loads last: it formats OCR output and upgrades suggestion cards only.
 (() => {
-  if(!document.querySelector('link[data-vault-scanner-ui]')){
-    const css=document.createElement('link');css.rel='stylesheet';css.href='scanner-ui.css?v=1';css.dataset.vaultScannerUi='1';document.head.appendChild(css);
-  }
   if(!document.querySelector('script[data-vault-scanner-ui]')){
     const js=document.createElement('script');js.src='scanner-ui.js?v=1';js.dataset.vaultScannerUi='1';
     js.onload=()=>{const render=window.scanRender;if(typeof render==='function')window.scanRender=items=>render((Array.isArray(items)?items:[]).filter(c=>c.game==='Magic: The Gathering'))};
     document.body.appendChild(js);
   }
 })();
-
-// Load the cohesive black/red theme after every feature stylesheet.
+// Feature copy enhancement only; styles are declared once in index.html.
 (() => {
   const scanner=document.querySelector('#scanner');
   if(scanner){
@@ -174,33 +162,15 @@
     const title=scanner.querySelector('.panel h3');if(title)title.textContent='Magic-kaart herkennen';
     const intro=scanner.querySelector('.intro-copy');if(intro)intro.textContent='Upload een duidelijke foto van een Magic-kaart. De scanner zoekt de naam via Scryfall en controleert ook op een mogelijk foil-effect.';
   }
-  if(document.querySelector('link[data-vault-theme]')) return;
-  const css=document.createElement('link');css.rel='stylesheet';css.href='theme.css?v=13';css.dataset.vaultTheme='1';document.head.appendChild(css);
 })();
 
 
 
 // Rapid bulk intake loads after the core collection functions.
 (() => {
-  if(!document.querySelector('link[data-vault-bulk]')){
-    const css=document.createElement('link');
-    css.rel='stylesheet'; css.href='bulk-add.css?v=10'; css.dataset.vaultBulk='1';
-    document.head.appendChild(css);
-  }
   if(!document.querySelector('script[data-vault-bulk]')){
     const js=document.createElement('script');
     js.src='bulk-add.js?v=14'; js.dataset.vaultBulk='1';
     document.body.appendChild(js);
   }
-})();
-
-
-// Keep the six-destination mobile navigation compact.
-(() => {
-  if(document.querySelector('link[data-vault-mobile-hotfix]')) return;
-  const css=document.createElement('link');
-  css.rel='stylesheet';
-  css.href='mobile-hotfix.css?v=3';
-  css.dataset.vaultMobileHotfix='1';
-  document.head.appendChild(css);
 })();

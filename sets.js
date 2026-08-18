@@ -11,10 +11,9 @@
   function ensureUI(){
     if(q('#sets')) return;
     const navList=q('.nav-list');
-    const addBtn=q('.nav-item[data-page="add"]');
     const btn=document.createElement('button');
     btn.className='nav-item'; btn.dataset.page='sets'; btn.innerHTML='<span>▤</span> Sets';
-    navList?.insertBefore(btn,addBtn||null);
+    navList?.appendChild(btn);
 
     const section=document.createElement('section');
     section.className='page'; section.id='sets';
