@@ -10,7 +10,7 @@
     const navList=$('.nav-list'), scanner=$('.nav-item[data-page="scanner"]');
     const navBtn=document.createElement('button');
     navBtn.className='nav-item'; navBtn.dataset.page='bulk'; navBtn.innerHTML='<span>⊞</span> Bulk toevoegen';
-    const isMobile=window.matchMedia('(max-width: 767px)').matches;
+    const isMobile=window.matchMedia('(max-width: 1024px)').matches;
     const addNav=$('.nav-item[data-page="add"]'),scanNav=$('.nav-item[data-page="scanner"]');
     // The registration submenu is a desktop convenience. On phones it turned
     // the bottom dock into a multi-row panel, so mobile keeps only its five
