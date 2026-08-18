@@ -1,0 +1,29 @@
+/* The Vault — Mobile Final Polish */
+@media(max-width:760px){
+html,body{overflow-x:hidden!important;width:100%!important}
+.content{padding:18px 14px 120px!important;width:100%!important}
+.topbar{display:flex!important;flex-direction:column!important;align-items:flex-start!important;gap:12px!important}
+.topbar h1{font-size:26px!important}
+.hero-card,.dashboard-grid,.two-col-layout,.lookup-grid,.form-grid{display:grid!important;grid-template-columns:1fr!important}
+.hero-card{padding:20px!important}
+.hero-copy h2{font-size:28px!important}
+.stats-grid{grid-template-columns:1fr 1fr!important;gap:10px!important}
+.stat-card{padding:16px!important}
+.stat-card strong{font-size:22px!important}
+.panel{padding:16px!important;border-radius:18px!important}
+.binder-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px!important}
+.binder-card{min-width:0!important}
+.card-info h4{font-size:13px!important}
+.card-frame{border-radius:16px!important}
+.toolbar-row,.action-row,.hero-actions{display:grid!important;grid-template-columns:1fr!important;width:100%!important}
+button,.primary-btn,.ghost-btn{min-height:46px!important;width:100%!important}
+select,input,textarea{font-size:16px!important;width:100%!important}
+.scan-results-grid,.recent-grid{grid-template-columns:1fr!important}
+.lookup-result{grid-template-columns:58px 1fr!important}
+.lookup-result button{grid-column:1/-1}
+.card-modal-sheet{width:100%!important;max-height:94vh!important;border-radius:24px 24px 0 0!important}
+}
+@media(min-width:761px){
+.binder-grid{grid-template-columns:repeat(auto-fill,minmax(220px,1fr))!important}
+.content{max-width:1800px!important;margin:auto!important}
+}
