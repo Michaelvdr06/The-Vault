@@ -170,7 +170,7 @@
 (() => {
   if(!document.querySelector('script[data-vault-bulk]')){
     const js=document.createElement('script');
-    js.src='bulk-add.js?v=14'; js.dataset.vaultBulk='1';
+    js.src='bulk-add.js?v=15'; js.dataset.vaultBulk='1';
     document.body.appendChild(js);
   }
 })();

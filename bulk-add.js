@@ -10,9 +10,13 @@
     const navList=$('.nav-list'), scanner=$('.nav-item[data-page="scanner"]');
     const navBtn=document.createElement('button');
     navBtn.className='nav-item'; navBtn.dataset.page='bulk'; navBtn.innerHTML='<span>⊞</span> Bulk toevoegen';
-    navList?.insertBefore(navBtn,scanner||null);
+    const isMobile=window.matchMedia('(max-width: 767px)').matches;
     const addNav=$('.nav-item[data-page="add"]'),scanNav=$('.nav-item[data-page="scanner"]');
-    if(navList&&!$('.nav-register-group')){
+    // The registration submenu is a desktop convenience. On phones it turned
+    // the bottom dock into a multi-row panel, so mobile keeps only its five
+    // primary destinations.
+    if(navList&&!isMobile&&!$('.nav-register-group')){
+      navList.insertBefore(navBtn,scanner||null);
       const group=document.createElement('div');
       group.className='nav-register-group';
       group.innerHTML='<button class="nav-register-toggle" type="button" aria-expanded="false"><span class="nav-register-rune">✦</span><span>Kaarten registreren</span><span class="nav-register-chevron">⌄</span></button><div class="nav-register-menu"></div>';
