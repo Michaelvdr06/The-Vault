@@ -3,6 +3,12 @@
   if(document.querySelector('link[data-magic-theme]')) return;
   const css=document.createElement('link');
   css.rel='stylesheet';css.href='magic-theme.css?v=1';css.dataset.magicTheme='1';
+  css.onload=()=>{
+    if(document.querySelector('link[data-cardback-ui]')) return;
+    const ui=document.createElement('link');
+    ui.rel='stylesheet';ui.href='cardback-ui.css?v=1';ui.dataset.cardbackUi='1';
+    document.head.appendChild(ui);
+  };
   document.head.appendChild(css);
   document.addEventListener('pointerdown',event=>{
     const button=event.target.closest('button');
