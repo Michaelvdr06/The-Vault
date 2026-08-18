@@ -12,7 +12,7 @@
     if(q('#sets')) return;
     const navList=q('.nav-list');
     const btn=document.createElement('button');
-    btn.className='nav-item'; btn.dataset.page='sets'; btn.innerHTML='<span>▤</span> Sets';
+    btn.className='nav-item'; btn.dataset.page='sets'; btn.innerHTML='<span class="nav-icon">▤</span><span class="nav-label">Sets</span>';
     navList?.appendChild(btn);
 
     const section=document.createElement('section');
