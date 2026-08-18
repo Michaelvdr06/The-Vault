@@ -1,71 +1,37 @@
-/* The Vault — mobile layout hotfix */
-@media (max-width:760px){
-  html,body{max-width:100%;overflow-x:hidden}
-  .content{padding-bottom:calc(112px + env(safe-area-inset-bottom))!important}
-
-  /* Six navigation destinations must stay on one bottom bar. */
-  .sidebar{overflow:visible!important}
-  .nav-list{
-    display:grid!important;
-    grid-template-columns:repeat(6,minmax(0,1fr))!important;
-    gap:2px!important;
-    width:100%!important;
-  }
-  .nav-item{
-    min-width:0!important;
-    width:100%!important;
-    padding:7px 2px!important;
-    font-size:8.5px!important;
-    line-height:1.05!important;
-    overflow:hidden!important;
-  }
-  .nav-item span{font-size:16px!important}
-
-  /* Keep the bulk page inside the phone viewport. */
-  #bulk,.bulk-hero,.bulk-layout,.bulk-setup,.bulk-input-panel,.bulk-review{min-width:0!important;max-width:100%!important}
-  .bulk-hero{grid-template-columns:1fr!important;padding:18px!important;gap:12px!important}
-  .bulk-hero h2{font-size:25px!important;line-height:1.1!important}
-  .bulk-counter{justify-self:start!important}
-  .bulk-layout{grid-template-columns:1fr!important;gap:12px!important}
-  .bulk-setup{padding:14px!important}
-  .bulk-setup label{grid-template-columns:1fr!important;gap:7px!important}
-  .bulk-setup select{width:100%!important;min-width:0!important}
-  .bulk-tabs{width:100%!important;display:grid!important;grid-template-columns:1fr 1fr!important}
-  .bulk-tab{min-width:0!important;padding:10px 6px!important}
-  .bulk-camera{width:100%!important;max-width:100%!important;aspect-ratio:16/8!important;min-height:0!important}
-  #bulkVideo{width:100%!important;height:100%!important;object-fit:cover!important}
-  .bulk-input-panel .action-row{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important}
-  .bulk-input-panel .action-row button{width:100%!important;min-width:0!important;padding:11px 7px!important;font-size:12px!important}
-  .bulk-upload{display:block!important;width:100%!important;padding:12px!important}
-  .bulk-upload input{width:100%!important;max-width:100%!important;font-size:14px!important}
-
-  .bulk-review{padding:14px!important}
-  .bulk-review .panel-header{align-items:flex-start!important;gap:8px!important}
-  .bulk-review .panel-header h3{font-size:20px!important}
-  #bulkUndo{font-size:12px!important;white-space:nowrap!important}
-  .bulk-queue-item{
-    grid-template-columns:56px minmax(0,1fr) auto!important;
-    grid-template-areas:
-      "thumb copy qty"
-      "thumb foil remove"!important;
-    gap:8px 10px!important;
-    padding:10px!important;
-    min-width:0!important;
-  }
-  .bulk-thumb{grid-area:thumb!important;width:56px!important;min-width:56px!important}
-  .bulk-item-copy{grid-area:copy!important;min-width:0!important}
-  .bulk-item-copy strong,.bulk-item-copy span{overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}
-  .bulk-qty{grid-area:qty!important;align-self:center!important}
-  .bulk-foil{grid-area:foil!important;justify-self:start!important;min-height:38px!important}
-  .bulk-remove{grid-area:remove!important;justify-self:end!important;min-width:38px!important;width:38px!important;height:38px!important;min-height:38px!important}
-  .bulk-review-footer{display:grid!important;grid-template-columns:1fr!important;gap:10px!important;align-items:stretch!important}
-  #bulkSave{width:100%!important}
+/* The Vault — Final mobile responsive pass */
+@media(max-width:760px){
+html,body{width:100%;max-width:100%;overflow-x:hidden!important}
+.content{padding:16px 14px calc(120px + env(safe-area-inset-bottom))!important}
+.topbar{display:flex!important;flex-direction:column!important;align-items:flex-start!important;gap:12px!important}
+.topbar h1{font-size:26px!important}
+.hero-card,.dashboard-grid,.two-col-layout,.lookup-grid,.form-grid{display:grid!important;grid-template-columns:1fr!important}
+.hero-card{padding:20px!important;border-radius:20px!important}
+.hero-copy h2{font-size:28px!important;line-height:1.15!important}
+.stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}
+.stat-card{padding:15px!important}
+.stat-card strong{font-size:22px!important}
+.panel{padding:16px!important;border-radius:18px!important}
+.toolbar-row,.action-row,.hero-actions{display:grid!important;grid-template-columns:1fr!important;width:100%!important}
+button,.primary-btn,.ghost-btn{width:100%!important;min-height:46px!important}
+input,select,textarea{font-size:16px!important;width:100%!important}
+.binder-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px!important}
+.card-frame{border-radius:16px!important}
+.card-info h4{font-size:13px!important}
+.recent-grid,.scan-results-grid{grid-template-columns:1fr!important}
+.lookup-result{grid-template-columns:58px 1fr!important}
+.lookup-result button{grid-column:1/-1}
+.card-modal-sheet{width:100%!important;max-height:94vh!important;border-radius:24px 24px 0 0!important}
+.bulk-hero,.bulk-layout,.bulk-review{grid-template-columns:1fr!important;min-width:0!important}
+.bulk-camera,#bulkVideo{width:100%!important;max-width:100%!important}
+.bulk-input-panel .action-row{grid-template-columns:1fr 1fr!important}
 }
-
-@media (max-width:390px){
-  .nav-item{font-size:7.5px!important;padding-inline:1px!important}
-  .nav-item span{font-size:15px!important}
-  .bulk-hero h2{font-size:22px!important}
-  .bulk-queue-item{grid-template-columns:52px minmax(0,1fr) auto!important}
-  .bulk-thumb{width:52px!important;min-width:52px!important}
+@media(max-width:390px){
+.stats-grid{grid-template-columns:1fr!important}
+.nav-item{font-size:8px!important;padding:6px 2px!important}
+.nav-item span{font-size:15px!important}
+.binder-grid{gap:10px!important}
+}
+@media(min-width:761px){
+.content{max-width:1800px!important;margin:auto!important}
+.binder-grid{grid-template-columns:repeat(auto-fill,minmax(220px,1fr))!important}
 }
