@@ -174,3 +174,11 @@
     document.body.appendChild(js);
   }
 })();
+
+// Deck Lab is isolated from the collection and scanner flows.
+(() => {
+  if(document.querySelector('script[data-vault-deck-lab]')) return;
+  const js=document.createElement('script');
+  js.src='deck-lab.js?v=1'; js.dataset.vaultDeckLab='1';
+  document.body.appendChild(js);
+})();
