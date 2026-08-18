@@ -9,26 +9,10 @@
     if($('#bulk')) return;
     const navList=$('.nav-list'), scanner=$('.nav-item[data-page="scanner"]');
     const navBtn=document.createElement('button');
-    navBtn.className='nav-item'; navBtn.dataset.page='bulk'; navBtn.innerHTML='<span>⊞</span> Bulk toevoegen';
-    const isMobile=window.matchMedia('(max-width: 1024px)').matches;
-    const addNav=$('.nav-item[data-page="add"]'),scanNav=$('.nav-item[data-page="scanner"]');
-    // The registration submenu is a desktop convenience. On phones it turned
-    // the bottom dock into a multi-row panel, so mobile keeps only its five
-    // primary destinations.
-    if(navList&&!isMobile&&!$('.nav-register-group')){
-      navList.insertBefore(navBtn,scanner||null);
-      const group=document.createElement('div');
-      group.className='nav-register-group';
-      group.innerHTML='<button class="nav-register-toggle" type="button" aria-expanded="false"><span class="nav-register-rune">✦</span><span>Kaarten registreren</span><span class="nav-register-chevron">⌄</span></button><div class="nav-register-menu"></div>';
-      navList.insertBefore(group,addNav||navBtn);
-      const menu=group.querySelector('.nav-register-menu');
-      [addNav,navBtn,scanNav].filter(Boolean).forEach(item=>menu.appendChild(item));
-      const toggle=group.querySelector('.nav-register-toggle');
-      const sync=force=>{const open=force??!group.classList.contains('open');group.classList.toggle('open',open);toggle.setAttribute('aria-expanded',String(open))};
-      toggle.onclick=()=>sync();
-      menu.addEventListener('click',()=>sync(true));
-      if(menu.querySelector('.nav-item.active'))sync(true);
-    }
+    navBtn.className='nav-item'; navBtn.dataset.page='bulk'; navBtn.innerHTML='<span class="nav-icon">⊞</span><span class="nav-label">Bulk</span>';
+    // Keep every desktop destination at the same navigation level. The old
+    // submenu created a large, empty visual gap between Binder and Sets.
+    navList?.insertBefore(navBtn,scanner||null);
     const page=document.createElement('section');
     page.id='bulk'; page.className='page';
     page.innerHTML=`
