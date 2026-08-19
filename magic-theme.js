@@ -7,6 +7,12 @@
     if(document.querySelector('link[data-cardback-ui]')) return;
     const ui=document.createElement('link');
     ui.rel='stylesheet';ui.href='cardback-ui.css?v=1';ui.dataset.cardbackUi='1';
+    ui.onload=()=>{
+      if(document.querySelector('link[data-vault-ux]')) return;
+      const ux=document.createElement('link');
+      ux.rel='stylesheet';ux.href='ux-layout.css?v=1';ux.dataset.vaultUx='1';
+      document.head.appendChild(ux);
+    };
     document.head.appendChild(ui);
   };
   document.head.appendChild(css);

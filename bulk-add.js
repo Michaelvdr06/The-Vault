@@ -7,12 +7,6 @@
 
   function ensureUI(){
     if($('#bulk')) return;
-    const navList=$('.nav-list'), scanner=$('.nav-item[data-page="scanner"]');
-    const navBtn=document.createElement('button');
-    navBtn.className='nav-item'; navBtn.dataset.page='bulk'; navBtn.innerHTML='<span class="nav-icon">⊞</span><span class="nav-label">Bulk</span>';
-    // Keep every desktop destination at the same navigation level. The old
-    // submenu created a large, empty visual gap between Binder and Sets.
-    navList?.insertBefore(navBtn,scanner||null);
     const page=document.createElement('section');
     page.id='bulk'; page.className='page';
     page.innerHTML=`
@@ -56,7 +50,6 @@
         </section>
       </div>`;
     $('main.content')?.appendChild(page);
-    navBtn.onclick=()=>openPage();
     bind();
     loadSets();
   }

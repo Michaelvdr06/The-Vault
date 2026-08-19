@@ -27,12 +27,10 @@
         <div><div class="brand-title">THE VAULT</div><div class="brand-subtitle">Magic Archive</div></div>
       </div>
       <nav class="nav-list">
-        <button class="nav-item active" data-page="dashboard"><span class="nav-icon">◈</span><span class="nav-label">Home</span></button>
-        <button class="nav-item" data-page="collection"><span class="nav-icon">▦</span><span class="nav-label">Binder</span></button>
-        <button class="nav-item" data-page="add"><span class="nav-icon">＋</span><span class="nav-label">Toevoegen</span></button>
-        <button class="nav-item" data-page="scanner"><span class="nav-icon">⌁</span><span class="nav-label">Scanner</span></button>
+        <button class="nav-item active" data-page="dashboard"><span class="nav-icon">◈</span><span class="nav-label">Overzicht</span></button>
+        <button class="nav-item" data-page="collection"><span class="nav-icon">▦</span><span class="nav-label">Collectie</span></button>
       </nav>
-      <div class="sidebar-note version-card panel-soft"><p class="small-label">VAULT VERSION</p><strong>Vault 4.16.1</strong><p>Repository Cleanup · 2026.08</p></div>
+      <div class="sidebar-note version-card panel-soft"><p class="small-label">VAULT VERSION</p><strong>Vault 4.17.0</strong><p>UX Layout Revamp · 2026.08</p></div>
     </aside>
     <main class="content">
       <header class="topbar">
@@ -41,7 +39,7 @@
       </header>
       <section class="page active" id="dashboard">
         <section class="hero-card">
-          <div class="hero-copy"><p class="kicker gold">YOUR PRIVATE VAULT</p><h2>Bouw jouw eigen <span>arcane collection</span>.</h2><p>Bewaar je Magic: The Gathering-kaarten, printings, foils en marktwaarde in één beveiligde digitale kluis.</p><div class="hero-actions"><button class="primary-btn" data-goto="add">Magic-kaart toevoegen</button><button class="ghost-btn" data-goto="collection">Open de kluis</button></div></div>
+          <div class="hero-copy"><p class="kicker gold">YOUR PRIVATE VAULT</p><h2>Bouw jouw eigen <span>arcane collection</span>.</h2><p>Bewaar je Magic: The Gathering-kaarten, printings, foils en marktwaarde in één beveiligde digitale kluis.</p><div class="hero-actions"><button class="primary-btn" data-goto="add">Kaart toevoegen</button><button class="ghost-btn" data-goto="scanner">Scan een kaart</button></div></div>
           <div class="hero-side"><div class="hero-value"><span>Totale waarde</span><strong id="totalValue">€0,00</strong></div><div class="hero-mini-grid"><div><span>Uniek</span><strong id="uniqueCards">0</strong></div><div><span>Totaal</span><strong id="totalCards">0</strong></div></div></div>
         </section>
         <section class="stats-grid">
@@ -68,7 +66,7 @@
           <label><span>Game</span><select id="game" required><option value="Magic: The Gathering">Magic: The Gathering</option></select></label>
           <label><span>Naam</span><input id="name" required placeholder="Bijv. Monkey.D.Luffy" /></label><label><span>Set</span><input id="setName" required /></label><label><span>Kaartnummer</span><input id="cardNumber" /></label>
           <label><span>Rarity</span><select id="rarity"><option>Common</option><option>Uncommon</option><option selected>Rare</option><option>Super Rare</option><option>Secret Rare</option><option>Mythic</option></select></label><label><span>Conditie</span><select id="condition"><option selected>Near Mint</option><option>Excellent</option><option>Good</option><option>Played</option></select></label><label><span>Aantal</span><input id="quantity" type="number" min="1" value="1" /></label><label><span>Waarde per kaart (€)</span><input id="price" type="number" step="0.01" min="0" value="0" /></label><label class="wide"><span>Afbeelding URL</span><input id="image" /></label><label class="wide upload-field"><span>Of upload zelf een kaartfoto</span><input id="imageUpload" type="file" accept="image/*" /></label><label class="wide check-row"><input id="foil" type="checkbox" /><span>Foil / glimmende variant</span></label>
-        </div><div class="action-row"><button type="submit" class="primary-btn">Kaart opslaan</button><button type="button" id="resetFormBtn" class="ghost-btn">Form resetten</button></div></form></section>
+        </div><div class="action-row"><button type="submit" class="primary-btn">Kaart opslaan</button><button type="button" id="resetFormBtn" class="ghost-btn">Form resetten</button><button type="button" class="ghost-btn" data-goto="bulk">Bulk import</button></div></form></section>
       </section>
       <section class="page" id="scanner">
         <div class="two-col-layout scanner-layout"><section class="panel"><div class="panel-header"><div><p class="small-label">PHOTO IMPORT</p><h3>Kaarten uit een foto halen</h3></div></div><p class="muted intro-copy">Upload een duidelijke foto. De scanner leest eerst de kaartnaam en controleert daarna de rest. Hij probeert ook een foil-effect te herkennen.</p><div class="upload-zone"><input id="scanImageInput" type="file" accept="image/*" /><div class="upload-zone-inner"><strong>Kies een foto</strong><p>Werkt het best met een rechte, beeldvullende kaart.</p></div></div><div id="scanPreview" class="scan-preview hidden"></div><div class="action-row spacing-top"><button class="primary-btn" id="scanBtn">Scan kaarten</button><button class="ghost-btn" id="clearScanBtn">Wis scan</button></div><div id="scanStatus" class="status-text muted">Nog geen scan gestart.</div></section><aside class="panel"><p class="small-label">OCR OUTPUT</p><h3>Gevonden tekst</h3><pre id="ocrText" class="ocr-box">Nog geen tekst gedetecteerd.</pre></aside></div>
@@ -83,6 +81,6 @@
   <script src="patch.js?v=39"></script>
   <script src="foil-effects.js?v=6"></script>
   <script src="vault-scene.js?v=1"></script>
-  <script src="magic-theme.js?v=2"></script>
+  <script src="magic-theme.js?v=3"></script>
 </body></html>
 
