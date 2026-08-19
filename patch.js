@@ -182,3 +182,11 @@
   js.src='deck-lab.js?v=1'; js.dataset.vaultDeckLab='1';
   document.body.appendChild(js);
 })();
+
+// Arena Hub is local-first: users choose their own Arena log or JSON export.
+(() => {
+  if(document.querySelector('script[data-vault-arena]')) return;
+  const js=document.createElement('script');
+  js.src='arena-hub.js?v=1'; js.dataset.vaultArena='1';
+  document.body.appendChild(js);
+})();
