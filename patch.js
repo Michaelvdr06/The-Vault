@@ -187,6 +187,6 @@
 (() => {
   if(document.querySelector('script[data-vault-arena]')) return;
   const js=document.createElement('script');
-  js.src='arena-hub.js?v=1'; js.dataset.vaultArena='1';
+  js.src='arena-hub.js?v=2'; js.dataset.vaultArena='1';
   document.body.appendChild(js);
 })();
