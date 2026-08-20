@@ -23,6 +23,12 @@
             if(document.querySelector('link[data-form-polish]')) return;
             const forms=document.createElement('link');
             forms.rel='stylesheet';forms.href='form-polish.css?v=1';forms.dataset.formPolish='1';
+            forms.onload=()=>{
+              if(document.querySelector('link[data-collection-sleek]')) return;
+              const collection=document.createElement('link');
+              collection.rel='stylesheet';collection.href='collection-sleek.css?v=1';collection.dataset.collectionSleek='1';
+              document.head.appendChild(collection);
+            };
             document.head.appendChild(forms);
           };
           document.head.appendChild(refined);
