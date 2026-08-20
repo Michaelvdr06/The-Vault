@@ -5,5 +5,13 @@
   "display": "standalone",
   "background_color": "#070b14",
   "theme_color": "#0b1020",
-  "description": "Digitale kaartencollectie voor One Piece TCG en Magic: The Gathering."
+  "description": "Digitale kaartencollectie voor One Piece TCG en Magic: The Gathering.",
+  "icons": [
+    {
+      "src": "vault-magic-mark.png",
+      "sizes": "1254x1254",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
 }
