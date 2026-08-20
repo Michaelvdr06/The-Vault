@@ -15,6 +15,12 @@
         if(document.querySelector('link[data-cardback-reborn]')) return;
         const reborn=document.createElement('link');
         reborn.rel='stylesheet';reborn.href='cardback-reborn.css?v=1';reborn.dataset.cardbackReborn='1';
+        reborn.onload=()=>{
+          if(document.querySelector('link[data-cardback-refined]')) return;
+          const refined=document.createElement('link');
+          refined.rel='stylesheet';refined.href='cardback-refined.css?v=1';refined.dataset.cardbackRefined='1';
+          document.head.appendChild(refined);
+        };
         document.head.appendChild(reborn);
       };
       document.head.appendChild(ux);
