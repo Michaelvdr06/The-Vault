@@ -23,7 +23,7 @@
   <link rel="stylesheet" href="ux-layout.css?v=3" />
   <link rel="stylesheet" href="clean-vault.css?v=2" />
   <link rel="stylesheet" href="ui-hotfix.css?v=1" />
-  <link rel="stylesheet" href="collection-reveal.css?v=1" />
+  <link rel="stylesheet" href="collection-reveal.css?v=2" />
   <link rel="stylesheet" href="brand-polish.css?v=2" />
   <link rel="stylesheet" href="brand-asset.css?v=1" />
   <link rel="stylesheet" href="mtg-watermark.css?v=1" />
@@ -44,7 +44,7 @@
         <button class="nav-item active" data-page="dashboard"><span class="nav-icon">◈</span><span class="nav-label">Overzicht</span></button>
         <button class="nav-item" data-page="collection"><span class="nav-icon">▦</span><span class="nav-label">Collectie</span></button>
       </nav>
-      <div class="sidebar-note version-card panel-soft"><p class="small-label">VAULT VERSION</p><strong>Vault 4.24.10</strong><p>Foil Progress Polish · 2026.08</p></div>
+      <div class="sidebar-note version-card panel-soft"><p class="small-label">VAULT VERSION</p><strong>Vault 4.24.11</strong><p>Collection Reveal Polish · 2026.08</p></div>
     </aside>
     <main class="content">
       <header class="topbar">
@@ -91,9 +91,9 @@
   <div id="cardModal" class="card-modal hidden" aria-hidden="true"><button class="modal-backdrop" id="modalBackdrop" aria-label="Sluiten"></button><section class="card-modal-sheet" role="dialog" aria-modal="true" aria-labelledby="modalCardName"><div class="modal-topbar"><div><p class="small-label">CARD INSPECTOR</p><h3 id="modalCardName">Kaart</h3></div><button class="modal-close" id="modalCloseBtn" aria-label="Sluiten">×</button></div><div class="modal-grid"><div class="tilt-stage"><div class="tilt-card" id="tiltCard"><img id="modalCardImage" alt="Kaartafbeelding" /><div class="tilt-placeholder hidden" id="modalCardPlaceholder">TCG</div><div class="foil-layer" id="foilLayer"></div><div class="shine-layer"></div></div><p class="tilt-hint">Sleep over de kaart om hem te kantelen</p></div><div class="modal-details"><div class="detail-chip-row"><span class="game-chip mtg" id="modalGameChip">MAGIC</span><span class="foil-status" id="modalFoilStatus">NON-FOIL</span></div><div class="detail-list"><div><span>Set</span><strong id="modalSet">—</strong></div><div><span>Kaartnummer</span><strong id="modalNumber">—</strong></div><div><span>Rarity</span><strong id="modalRarity">—</strong></div><div><span>Conditie</span><strong id="modalCondition">—</strong></div><div><span>Aantal</span><strong id="modalQuantity">1</strong></div><div><span>Waarde</span><strong id="modalPrice">€0,00</strong></div></div><div class="modal-actions"><button class="primary-btn" id="toggleFoilBtn">Foil aanzetten</button><button class="ghost-btn danger-btn" id="modalDeleteBtn">Verwijderen</button></div><p class="modal-note">Bij foil-kaarten beweegt het holo-effect mee met je vinger.</p></div></div></section></div>
   <div id="toast" class="toast"></div>
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-  <script src="app.js?v=4"></script>
+  <script src="app.js?v=5"></script>
   <script src="patch.js?v=51"></script>
   <script src="foil-effects.js?v=6"></script>
-  <script src="collection-reveal.js?v=2"></script>
+  <script src="collection-reveal.js?v=3"></script>
 </body></html>
 
