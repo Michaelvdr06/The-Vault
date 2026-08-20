@@ -11,6 +11,12 @@
       if(document.querySelector('link[data-vault-ux]')) return;
       const ux=document.createElement('link');
       ux.rel='stylesheet';ux.href='ux-layout.css?v=2';ux.dataset.vaultUx='1';
+      ux.onload=()=>{
+        if(document.querySelector('link[data-cardback-reborn]')) return;
+        const reborn=document.createElement('link');
+        reborn.rel='stylesheet';reborn.href='cardback-reborn.css?v=1';reborn.dataset.cardbackReborn='1';
+        document.head.appendChild(reborn);
+      };
       document.head.appendChild(ux);
     };
     document.head.appendChild(ui);
