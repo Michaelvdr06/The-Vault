@@ -19,6 +19,12 @@
           if(document.querySelector('link[data-cardback-refined]')) return;
           const refined=document.createElement('link');
           refined.rel='stylesheet';refined.href='cardback-refined.css?v=1';refined.dataset.cardbackRefined='1';
+          refined.onload=()=>{
+            if(document.querySelector('link[data-form-polish]')) return;
+            const forms=document.createElement('link');
+            forms.rel='stylesheet';forms.href='form-polish.css?v=1';forms.dataset.formPolish='1';
+            document.head.appendChild(forms);
+          };
           document.head.appendChild(refined);
         };
         document.head.appendChild(reborn);
