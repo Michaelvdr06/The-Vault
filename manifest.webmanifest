@@ -8,7 +8,7 @@
   "description": "Digitale kaartencollectie voor One Piece TCG en Magic: The Gathering.",
   "icons": [
     {
-      "src": "vault-magic-mark.png",
+      "src": "vault-mark.png",
       "sizes": "1254x1254",
       "type": "image/png",
       "purpose": "any maskable"
