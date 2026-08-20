@@ -1,0 +1,2 @@
+// A small, one-shot collection reveal without blocking navigation or interaction.
+(()=>{const page=document.querySelector('#collection');if(!page)return;let timer;new MutationObserver(()=>{if(!page.classList.contains('active'))return;clearTimeout(timer);page.classList.remove('collection-arrive');void page.offsetWidth;page.classList.add('collection-arrive');timer=setTimeout(()=>page.classList.remove('collection-arrive'),800)}).observe(page,{attributes:true,attributeFilter:['class']});})();
