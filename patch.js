@@ -133,7 +133,7 @@
 
 (() => {
   if(!document.querySelector('script[data-vault-sets]')){
-    const js=document.createElement('script');js.src='sets.js?v=3';js.dataset.vaultSets='1';js.defer=true;document.body.appendChild(js);
+const js=document.createElement('script');js.src='sets.js?v=4';js.dataset.vaultSets='1';js.defer=true;document.body.appendChild(js);
   }
 })();
 
