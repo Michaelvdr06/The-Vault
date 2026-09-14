@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <meta name="theme-color" content="#08111f" />
+  <meta name="theme-color" content="#07131e" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Grand Line Vault" />
@@ -11,174 +11,123 @@
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="apple-touch-icon" href="vault-mark.png" />
   <link rel="icon" href="vault-mark.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Pirata+One&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css?v=20260914" />
+  <link rel="stylesheet" href="onepiece-theme.css?v=20260915" />
 </head>
 <body>
   <div class="app">
     <header class="topbar">
       <div class="brand-wrap">
         <div class="brand-mark">☠︎</div>
-        <div>
-          <div class="brand-overline">ONE PIECE TCG</div>
-          <div class="brand-title">Grand Line Vault</div>
-        </div>
+        <div><div class="brand-overline">ONE PIECE TCG</div><div class="brand-title">Grand Line Vault</div></div>
       </div>
-      <button class="icon-btn" id="refreshAllBtn" aria-label="Live data vernieuwen" title="Live data vernieuwen">↻</button>
+      <button class="icon-btn" id="refreshAllBtn" aria-label="Live data vernieuwen">↻</button>
     </header>
 
     <main>
       <section class="page active" data-page="home">
-        <section class="hero">
-          <span class="eyebrow">MICHAEL'S COLLECTION</span>
-          <h1>Jouw kaarten.<br><em>Jouw treasure.</em></h1>
-          <p>Een iPhone-first One Piece Card Game binder met live kaartdata en actueel nieuws.</p>
-          <div class="live-strip" id="liveStrip">
-            <span class="live-dot"></span>
-            <strong>Live data</strong>
-            <span id="liveStatus">verbinden…</span>
+        <section class="hero op-hero">
+          <span class="eyebrow">CAPTAIN'S COLLECTION</span>
+          <h1>Set sail for your<br><em>next treasure.</em></h1>
+          <p>Jouw One Piece Card Game binder, live kaartdatabase en TCG-nieuws in één iPhone-first companion.</p>
+          <div class="hero-actions">
+            <button class="primary-btn" data-nav="search">🧭 Kaart zoeken</button>
+            <button class="ghost-btn" data-nav="news">📰 Nieuws</button>
           </div>
+          <div class="live-strip"><span class="live-dot"></span><strong>Grand Line live</strong><span id="liveStatus">verbinden…</span></div>
         </section>
 
-        <section class="stats-grid">
-          <article><span>Kaarten</span><strong id="statTotal">0</strong><small><b id="statUnique">0</b> uniek</small></article>
+        <section class="stats-grid treasure-stats">
+          <article><span>Treasure</span><strong id="statTotal">0</strong><small><b id="statUnique">0</b> uniek</small></article>
           <article><span>Waarde</span><strong id="statValue">€0,00</strong><small>eigen waarde</small></article>
           <article><span>Sets</span><strong id="statSets">0</strong><small>in je binder</small></article>
-          <article><span>Favorieten</span><strong id="statFavs">0</strong><small>chase cards</small></article>
+          <article><span>Chase cards</span><strong id="statFavs">0</strong><small>favorieten</small></article>
         </section>
 
         <section class="section">
-          <div class="section-head">
-            <div><span class="eyebrow">BINDER</span><h2>Recent toegevoegd</h2></div>
-            <button class="text-btn" data-nav="collection">Alles bekijken →</button>
-          </div>
+          <div class="section-head"><div><span class="eyebrow">MY TREASURE</span><h2>Recent toegevoegd</h2></div><button class="text-btn" data-nav="collection">Binder →</button></div>
           <div class="card-row" id="recentCards"></div>
-          <div class="empty-inline" id="recentEmpty">Nog geen kaarten. Voeg je eerste kaart toe vanuit <b>Zoeken</b>.</div>
+          <div class="empty-inline" id="recentEmpty">Je treasure chest is nog leeg. Zoek je eerste kaart via <b>Zoeken</b>.</div>
         </section>
 
         <section class="section news-peek">
-          <div class="section-head">
-            <div><span class="eyebrow">LIVE FEED</span><h2>Laatste nieuws</h2></div>
-            <button class="text-btn" data-nav="news">Meer →</button>
-          </div>
+          <div class="section-head"><div><span class="eyebrow">WORLD ECONOMY JOURNAL</span><h2>Laatste nieuws</h2></div><button class="text-btn" data-nav="news">Alles →</button></div>
           <div id="homeNews" class="news-list compact"></div>
         </section>
       </section>
 
       <section class="page" data-page="search">
-        <div class="page-heading">
-          <span class="eyebrow">LIVE CARD DATABASE</span>
-          <h1>Kaart zoeken</h1>
-          <p>Zoek op naam, kaartcode of set. De database wordt rechtstreeks opnieuw opgehaald wanneer nodig.</p>
-        </div>
-
+        <div class="page-heading"><span class="eyebrow">CARD HUNT</span><h1>Vind je volgende kaart</h1><p>Zoek live op naam, kaartcode, rarity of set.</p></div>
         <form id="searchForm" class="search-panel">
-          <label class="search-box">
-            <span>⌕</span>
-            <input id="cardQuery" type="search" autocomplete="off" placeholder="Kaido, OP17-062, Robin…" />
-          </label>
+          <label class="search-box"><span>⌕</span><input id="cardQuery" type="search" autocomplete="off" placeholder="Kaido, OP17-062, Robin…" /></label>
           <div class="filter-row">
             <select id="setFilter" aria-label="Set filter"><option value="">Alle sets</option></select>
-            <select id="variantFilter" aria-label="Variant filter">
-              <option value="">Alle varianten</option>
-              <option value="base">Normaal</option>
-              <option value="alt">Alt / Parallel</option>
-            </select>
+            <select id="variantFilter" aria-label="Variant filter"><option value="">Alle varianten</option><option value="base">Normaal</option><option value="alt">Alt / Parallel</option></select>
             <button class="primary-btn" type="submit">Zoeken</button>
           </div>
         </form>
-
-        <div class="data-meta">
-          <span id="cardDbStatus">Kaartdatabase laden…</span>
-          <button class="text-btn" id="reloadCardsBtn">Live herladen</button>
-        </div>
+        <div class="data-meta"><span id="cardDbStatus">Kaartdatabase laden…</span><button class="text-btn" id="reloadCardsBtn">Live herladen</button></div>
         <div id="searchResults" class="card-grid"></div>
-        <div id="searchEmpty" class="empty-state hidden">Geen kaarten gevonden voor deze zoekopdracht.</div>
+        <div id="searchEmpty" class="empty-state hidden">Geen kaarten gevonden.</div>
       </section>
 
       <section class="page" data-page="collection">
-        <div class="page-heading">
-          <span class="eyebrow">MY BINDER</span>
-          <h1>Collectie</h1>
-          <p>Je collectie wordt lokaal op deze iPhone/browser opgeslagen.</p>
-        </div>
+        <div class="page-heading"><span class="eyebrow">TREASURE CHEST</span><h1>Mijn binder</h1><p>Jouw persoonlijke One Piece TCG-collectie op deze iPhone/browser.</p></div>
         <div class="collection-tools">
           <label class="search-box"><span>⌕</span><input id="collectionQuery" type="search" placeholder="Zoek in je binder…" /></label>
-          <select id="collectionSort" aria-label="Sorteer collectie">
-            <option value="recent">Nieuwste eerst</option>
-            <option value="name">Naam A–Z</option>
-            <option value="value">Hoogste waarde</option>
-            <option value="set">Set</option>
-          </select>
+          <select id="collectionSort"><option value="recent">Nieuwste eerst</option><option value="name">Naam A–Z</option><option value="value">Hoogste waarde</option><option value="set">Set</option></select>
         </div>
-        <div class="collection-actions">
-          <button class="ghost-btn" id="exportBtn">↓ Backup</button>
-          <button class="ghost-btn" id="importBtn">↑ Import</button>
-          <input id="importFile" type="file" accept="application/json" hidden />
-        </div>
+        <div class="collection-actions"><button class="ghost-btn" id="exportBtn">↓ Backup</button><button class="ghost-btn" id="importBtn">↑ Import</button><input id="importFile" type="file" accept="application/json" hidden /></div>
         <div id="collectionGrid" class="card-grid"></div>
         <div id="collectionEmpty" class="empty-state hidden">Je binder is nog leeg.</div>
       </section>
 
       <section class="page" data-page="news">
-        <div class="page-heading">
-          <span class="eyebrow">LIVE NEWS</span>
-          <h1>One Piece TCG nieuws</h1>
-          <p>Live headlines via Google News RSS, inclusief Bandai- en communitynieuws.</p>
-        </div>
-        <div class="news-controls">
-          <label class="search-box"><span>⌕</span><input id="newsQuery" type="search" placeholder="OP-18, manga, release…" /></label>
-          <button class="ghost-btn" id="reloadNewsBtn">↻ Vernieuwen</button>
-        </div>
+        <div class="page-heading"><span class="eyebrow">WORLD ECONOMY JOURNAL</span><h1>Grand Line News</h1><p>Lees One Piece TCG-updates hier in de app. De originele bron staat onderaan ieder verhaal.</p></div>
+        <div class="news-controls"><label class="search-box"><span>⌕</span><input id="newsQuery" type="search" placeholder="OP-18, manga, release, event…" /></label><button class="ghost-btn" id="reloadNewsBtn">↻ Vernieuwen</button></div>
+        <div class="news-tabs-ui"><button class="active" data-news-ui-filter="all">Alles</button><button data-news-ui-filter="op18">OP-18</button><button data-news-ui-filter="official">Official</button><button data-news-ui-filter="events">Events</button></div>
         <div class="data-meta"><span id="newsStatus">Nieuws laden…</span></div>
         <div id="newsList" class="news-list"></div>
       </section>
     </main>
 
     <nav class="bottom-nav" aria-label="Hoofdnavigatie">
-      <button class="active" data-nav="home"><span>⌂</span><small>Home</small></button>
-      <button data-nav="search"><span>⌕</span><small>Zoeken</small></button>
-      <button data-nav="collection"><span>▦</span><small>Binder</small></button>
-      <button data-nav="news"><span>◫</span><small>Nieuws</small></button>
+      <button class="active" data-nav="home"><span>🏴‍☠️</span><small>Home</small></button>
+      <button data-nav="search"><span>🧭</span><small>Zoeken</small></button>
+      <button data-nav="collection"><span>📚</span><small>Binder</small></button>
+      <button data-nav="news"><span>📰</span><small>Nieuws</small></button>
     </nav>
   </div>
 
   <div class="modal hidden" id="cardModal" aria-hidden="true">
     <button class="modal-backdrop" id="modalBackdrop" aria-label="Sluiten"></button>
     <section class="modal-sheet" role="dialog" aria-modal="true">
-      <div class="modal-grab"></div>
-      <button class="modal-close" id="modalClose">×</button>
-      <div class="modal-card-visual" id="tiltWrap">
-        <div class="tilt-card" id="tiltCard">
-          <img id="modalImage" alt="One Piece kaart" />
-          <div class="foil"></div>
-          <div class="shine"></div>
-        </div>
-      </div>
+      <div class="modal-grab"></div><button class="modal-close" id="modalClose">×</button>
+      <div class="modal-card-visual" id="tiltWrap"><div class="tilt-card" id="tiltCard"><img id="modalImage" alt="One Piece kaart" /><div class="foil"></div><div class="shine"></div></div></div>
       <div class="modal-copy">
         <div class="pill-row"><span id="modalCode" class="pill"></span><span id="modalRarity" class="pill"></span><span id="modalVariant" class="pill special hidden">ALT</span></div>
-        <h2 id="modalName">Kaart</h2>
-        <p id="modalMeta" class="muted"></p>
-        <p id="modalEffect" class="effect"></p>
-        <div class="owned-editor hidden" id="ownedEditor">
-          <div class="editor-grid">
-            <label>Aantal<input id="ownedQty" type="number" min="1" max="999" /></label>
-            <label>Waarde p/st (€)<input id="ownedValue" type="number" min="0" step="0.01" /></label>
-            <label>Conditie<select id="ownedCondition"><option>Near Mint</option><option>Excellent</option><option>Good</option><option>Played</option></select></label>
-            <label>Taal<select id="ownedLanguage"><option>English</option><option>Japanese</option><option>French</option><option>Chinese</option></select></label>
-          </div>
-          <label class="note-label">Notitie<textarea id="ownedNote" rows="2" placeholder="Bijv. zelf gepulled…"></textarea></label>
-        </div>
-        <div class="modal-actions">
-          <button class="primary-btn" id="modalPrimary">+ Voeg toe</button>
-          <button class="ghost-btn hidden" id="favoriteBtn">♡ Favoriet</button>
-          <button class="danger-btn hidden" id="deleteBtn">Verwijder</button>
-        </div>
+        <h2 id="modalName">Kaart</h2><p id="modalMeta" class="muted"></p><p id="modalEffect" class="effect"></p>
+        <div class="owned-editor hidden" id="ownedEditor"><div class="editor-grid"><label>Aantal<input id="ownedQty" type="number" min="1" max="999" /></label><label>Waarde p/st (€)<input id="ownedValue" type="number" min="0" step="0.01" /></label><label>Conditie<select id="ownedCondition"><option>Near Mint</option><option>Excellent</option><option>Good</option><option>Played</option></select></label><label>Taal<select id="ownedLanguage"><option>English</option><option>Japanese</option><option>French</option><option>Chinese</option></select></label></div><label class="note-label">Notitie<textarea id="ownedNote" rows="2" placeholder="Bijv. zelf gepulled…"></textarea></label></div>
+        <div class="modal-actions"><button class="primary-btn" id="modalPrimary">+ Voeg toe</button><button class="ghost-btn hidden" id="favoriteBtn">♡ Favoriet</button><button class="danger-btn hidden" id="deleteBtn">Verwijder</button></div>
         <a id="tcgPlayerLink" class="external-link" target="_blank" rel="noopener">Bekijk markt / listings ↗</a>
       </div>
     </section>
   </div>
 
+  <div id="newsReader" class="news-reader hidden" aria-hidden="true">
+    <button class="news-reader-backdrop" data-news-close></button>
+    <section class="news-reader-sheet" role="dialog" aria-modal="true">
+      <button class="news-reader-close" data-news-close>×</button>
+      <div class="news-reader-image" id="newsReaderImage"></div>
+      <div class="news-reader-content"><div class="news-reader-kicker" id="newsReaderKicker">WORLD ECONOMY JOURNAL</div><h2 id="newsReaderTitle">Nieuws</h2><p class="news-reader-summary" id="newsReaderSummary"></p><div class="news-source-box"><span>Bron</span><strong id="newsReaderSource"></strong></div><a id="newsReaderLink" class="primary-btn news-source-link" href="#" target="_blank" rel="noopener">Open originele bron ↗</a></div>
+    </section>
+  </div>
+
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <script src="app.js?v=20260914" defer></script>
+  <script src="news-ui.js?v=20260915" defer></script>
 </body>
 </html>
