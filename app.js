@@ -1,73 +1,253 @@
-const K="the-vault-cards-v3",K2="the-vault-cards-v2",K1="the-vault-cards-v1";
-const $=id=>document.getElementById(id), $$=q=>[...document.querySelectorAll(q)];
-const euro=new Intl.NumberFormat("nl-NL",{style:"currency",currency:"EUR"});
-const test=new Set(["one piece tcg|monkey.d.luffy|op05|op05-060","magic: the gathering|sol ring|commander masters|392","one piece tcg|roronoa zoro|op01|op01-025"]);
-const norm=c=>({id:c.id||crypto.randomUUID(),game:c.game||"Magic: The Gathering",name:c.name||"Onbekende kaart",setName:c.setName||"Onbekende set",cardNumber:c.cardNumber||"",rarity:c.rarity||"Rare",condition:c.condition||"Near Mint",quantity:+c.quantity||1,price:+c.price||0,foil:!!c.foil,image:c.image||"",addedAt:+c.addedAt||Date.now()});
-const isTest=c=>test.has([c.game,c.name,c.setName,c.cardNumber].join("|").toLowerCase());
-function load(){let raw=localStorage.getItem(K)||localStorage.getItem(K2)||localStorage.getItem(K1);let a=raw?JSON.parse(raw).map(norm).filter(c=>!isTest(c)):[];localStorage.setItem(K,JSON.stringify(a));localStorage.removeItem(K1);localStorage.removeItem(K2);return a}
-let cards=load(),scanFile=null,scanFoil=false,modalCardId=null;
-const save=()=>localStorage.setItem(K,JSON.stringify(cards));
-const esc=s=>String(s||"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
-const ini=s=>(s||"TCG").split(/[.\s-]+/).filter(Boolean).slice(0,3).map(x=>x[0]).join("").toUpperCase();
-function toast(t){let e=$("toast");e.textContent=t;e.classList.add("show");clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove("show"),1900)}
-function nav(p){const page=$(p);if(!page){console.warn(`Pagina ${p} is nog niet klaar.`);toast('Dit onderdeel wordt nog geladen. Probeer het direct opnieuw.');return false}$$('.page').forEach(x=>x.classList.remove('active'));$$('.nav-item').forEach(x=>x.classList.remove('active'));page.classList.add('active');document.querySelector(`.nav-item[data-page="${p}"]`)?.classList.add('active');$("pageTitle").textContent={dashboard:"Overzicht",collection:"Collectie",add:"Kaart toevoegen",scanner:"Kaart scannen",bulk:"Bulk import",sets:"Sets",decks:"Deck Lab",arena:"Arena"}[p]||"The Vault";if(p==='dashboard')dash();if(p==='collection')binder();window.scrollTo({top:0,behavior:'smooth'});return true}
-function dash(){let total=cards.reduce((s,c)=>s+c.quantity,0),op=cards.filter(c=>c.game==='One Piece TCG').reduce((s,c)=>s+c.quantity,0),mtg=cards.filter(c=>c.game==='Magic: The Gathering').reduce((s,c)=>s+c.quantity,0),val=cards.reduce((s,c)=>s+c.price*c.quantity,0);$("totalCards").textContent=total;$("uniqueCards").textContent=cards.length;$("opCount").textContent=op;$("mtgCount").textContent=mtg;$("foilCount").textContent=cards.filter(c=>c.foil).reduce((s,c)=>s+c.quantity,0);$("totalValue").textContent=euro.format(val);$("avgValue").textContent=euro.format(cards.length?val/cards.length:0);let a=total?Math.round(op/total*100):0,b=total?Math.round(mtg/total*100):0;$("opPercent").textContent=a+'%';$("mtgPercent").textContent=b+'%';$("opBar").style.width=a+'%';$("mtgBar").style.width=b+'%';$("recentCards").innerHTML=cards.slice().sort((a,b)=>b.addedAt-a.addedAt).slice(0,4).map(c=>`<article class="recent-card" data-open="${c.id}"><div class="recent-card-image">${c.image?`<img src="${esc(c.image)}" alt="${esc(c.name)}">`:`<div class="preview-placeholder">${ini(c.name)}</div>`}</div><div class="recent-card-body"><h4>${esc(c.name)}</h4><p>${esc(c.game)} · ${esc(c.setName)} · x${c.quantity}</p><strong>${euro.format(c.quantity*c.price)}</strong></div></article>`).join('')||'<p class="muted">Nog geen kaarten in je collectie.</p>';attachOpeners()}
-function binder(){let q=$("searchInput").value.trim().toLowerCase(),g=$("gameFilter").value,s=$("sortFilter").value,a=cards.filter(c=>([c.name,c.setName,c.cardNumber,c.rarity].join(' ').toLowerCase().includes(q))&&(g==='all'||c.game===g));a.sort((x,y)=>s==='value'?y.price*y.quantity-x.price*x.quantity:s==='name'?x.name.localeCompare(y.name):y.addedAt-x.addedAt);$("resultCount").textContent=`${a.length} unieke kaarten`;$("emptyState").classList.toggle('hidden',!!a.length);$("cardGrid").innerHTML=a.map((c,index)=>`<article class="binder-card" style="--collection-delay:${index%12}" data-open="${c.id}"><div class="card-frame ${c.foil?'foil-preview':''}">${c.image?`<img src="${esc(c.image)}" alt="${esc(c.name)}">`:`<div class="preview-placeholder">${ini(c.name)}</div>`}<div class="badge-row"><span class="game-chip ${c.game==='One Piece TCG'?'op':'mtg'}">${c.game==='One Piece TCG'?'ONE PIECE':'MAGIC'}</span><span class="badge">x${c.quantity}</span></div>${c.foil?'<span class="foil-chip" style="position:absolute;left:10px;bottom:10px">FOIL</span>':''}<div class="card-overlay"></div></div><div class="card-info"><h4>${esc(c.name)}</h4><p>${esc(c.setName)} · ${esc(c.cardNumber||'—')} · ${esc(c.rarity)}</p><div class="card-info-footer"><strong>${euro.format(c.price)}</strong><button class="delete-btn" data-del="${c.id}">Verwijder</button></div></div></article>`).join('');$$('[data-del]').forEach(b=>b.onclick=e=>{e.stopPropagation();removeCard(b.dataset.del)});attachOpeners()}
-function attachOpeners(){
-  $$('[data-open]').forEach(el=>{
-    el.setAttribute('role','button');
-    el.setAttribute('tabindex','0');
-    el.onclick=e=>{if(e.target.closest('[data-del]'))return;openCard(el.dataset.open)};
-    el.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openCard(el.dataset.open)}};
-  })
-}
-function removeCard(id){cards=cards.filter(c=>c.id!==id);save();dash();binder();closeCard();toast('Kaart verwijderd.')}
-function preview(){let n=$("name").value.trim()||'Nieuwe kaart',img=$("image").value.trim();$("previewGame").textContent=$("game").value;$("previewName").textContent=n;$("previewSet").textContent=$("setName").value.trim()||'Set';$("previewNumber").textContent=$("cardNumber").value.trim()||'000';$("previewImageWrap").innerHTML=img?`<img src="${esc(img)}" alt="${esc(n)}">`:`<div class="preview-placeholder">${ini(n)}</div>`}
-const readFile=f=>new Promise((r,j)=>{let x=new FileReader;x.onload=()=>r(x.result);x.onerror=j;x.readAsDataURL(f)});
-function add(c){cards.unshift(norm({...c,id:crypto.randomUUID(),addedAt:Date.now()}));save();dash();binder()}
-function fill(c){$("game").value=c.game;$("name").value=c.name;$("setName").value=c.setName;$("cardNumber").value=c.cardNumber;$("rarity").value=c.rarity||'Rare';$("condition").value=c.condition||'Near Mint';$("quantity").value=c.quantity||1;$("price").value=c.price||0;$("foil").checked=!!c.foil;$("image").value=c.image||'';preview();nav('add');toast(c.foil?'Kaartdata ingevuld · foil vermoed.':'Kaartdata ingevuld.')}
-async function magic(q){let r=await fetch(`https://api.scryfall.com/cards/named?fuzzy=${encodeURIComponent(q)}`),d=await r.json();if(!r.ok||d.object==='error')return[];let image=d.image_uris?.normal||d.card_faces?.find(x=>x.image_uris)?.image_uris?.normal||'';return[{game:'Magic: The Gathering',name:d.name,setName:d.set_name||d.set?.toUpperCase()||'',cardNumber:d.collector_number||'',rarity:(d.rarity||'rare').replace(/\b\w/g,x=>x.toUpperCase()),condition:'Near Mint',quantity:1,price:+(d.prices?.eur||d.prices?.usd||d.prices?.usd_foil||0),foil:false,image}]}
-const opCode=q=>{let m=String(q||'').toUpperCase().replace(/\s+/g,'').replace(/_/g,'-').match(/(OP|ST|P|EB|PRB|PR)0?\d{1,2}-\d{3}/);return m?m[0]:''};
-const pick=(o,ks)=>{for(let k of ks)if(o?.[k]!=null&&o[k]!=='')return o[k];return''};
-function oneNorm(raw,code){let d=Array.isArray(raw)?raw[0]:(raw.card||raw.data||raw);if(!d||typeof d!=='object')return null;let img=pick(d,['image','image_url','img','img_url','card_image','cardImage','photo_url']);if(!img){let st=[d];while(st.length&&!img){let o=st.pop();for(let[k,v]of Object.entries(o||{})){if(typeof v==='string'&&/(image|img|photo)/i.test(k)&&/^https?:/.test(v)){img=v;break}if(v&&typeof v==='object')st.push(v)}}}return{game:'One Piece TCG',name:pick(d,['name','card_name','cardName','english_name','title'])||code,setName:pick(d,['set_name','setName','set','set_id','deck_name'])||code.split('-')[0],cardNumber:pick(d,['card_id','cardId','id','code','number'])||code,rarity:String(pick(d,['rarity','card_rarity'])||'Rare').replace(/\b\w/g,x=>x.toUpperCase()),condition:'Near Mint',quantity:1,price:+(pick(d,['market_price','price','low_price','average_price'])||0),foil:false,image:img||''}}
-async function one(code){if(!code)return null;for(let u of [`https://optcgapi.com/api/sets/card/${code}/`,`https://optcgapi.com/api/decks/card/${code}/`,`https://optcgapi.com/api/promos/card/${code}/`])try{let r=await fetch(u);if(r.ok){let c=oneNorm(await r.json(),code);if(c)return c}}catch{}return null}
-async function lookup(){let q=$("lookupQuery").value.trim(),g=$("lookupGame").value,s=$("lookupStatus"),o=$("lookupResults");if(!q)return s.textContent='Voer eerst een zoekterm in.';s.textContent='Zoeken...';o.innerHTML='';try{let a=g==='Magic: The Gathering'?await magic(q):[(await one(opCode(q)))].filter(Boolean);s.textContent=a.length?`${a.length} resultaat gevonden.`:'Geen kaart gevonden.';o.innerHTML=a.map((c,i)=>`<article class="lookup-result"><div class="lookup-result-thumb">${c.image?`<img src="${esc(c.image)}">`:`<div class="preview-placeholder">${ini(c.name)}</div>`}</div><div><h4>${esc(c.name)}</h4><p>${esc(c.setName)} · ${esc(c.cardNumber||'—')}</p></div><button class="primary-btn" data-use="${i}">Gebruik</button></article>`).join('');$$('[data-use]').forEach(b=>b.onclick=()=>fill(a[+b.dataset.use]))}catch{ s.textContent='Zoeken mislukt. Probeer opnieuw.' }}
-async function hydrate(){let t=cards.filter(c=>!c.image).slice(0,12);if(!t.length)return toast('Alle kaarten hebben al een afbeelding.');$("hydrateImagesBtn").disabled=true;$("hydrateImagesBtn").textContent='Bezig...';for(let c of t)try{let f=c.game==='Magic: The Gathering'?(await magic(c.name))[0]:await one(opCode(c.cardNumber));if(f?.image)c.image=f.image}catch{}save();binder();dash();$("hydrateImagesBtn").disabled=false;$("hydrateImagesBtn").textContent='Ontbrekende afbeeldingen ophalen';toast('Afbeeldingen bijgewerkt.')}
-function clean(t){return String(t||'').replace(/[|\\]/g,'I').replace(/[^A-Za-z0-9À-ÿ'’.,:\- ]/g,' ').replace(/\s+/g,' ').trim().replace(/^[-:., ]+|[-:., ]+$/g,'')}
-function sim(a,b){a=a.toLowerCase().replace(/[^a-z0-9]/g,'');b=b.toLowerCase().replace(/[^a-z0-9]/g,'');if(!a||!b)return 0;if(a===b||a.includes(b)||b.includes(a))return 1;let d=Array.from({length:a.length+1},(_,i)=>[i]);for(let j=1;j<=b.length;j++)d[0][j]=j;for(let i=1;i<=a.length;i++)for(let j=1;j<=b.length;j++)d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a[i-1]===b[j-1]?0:1));return 1-d[a.length][b.length]/Math.max(a.length,b.length)}
-function loadImg(f){return new Promise((r,j)=>{let u=URL.createObjectURL(f),i=new Image;i.onload=()=>{URL.revokeObjectURL(u);r(i)};i.onerror=j;i.src=u})}
-function enhance(c,strong){let x=c.getContext('2d',{willReadFrequently:true}),z=x.getImageData(0,0,c.width,c.height),d=z.data,k=strong?1.9:1.4,th=strong?160:null;for(let i=0;i<d.length;i+=4){let g=.299*d[i]+.587*d[i+1]+.114*d[i+2],v=Math.max(0,Math.min(255,(g-128)*k+128));if(th!==null)v=v>th?255:0;d[i]=d[i+1]=d[i+2]=v}x.putImageData(z,0,0)}
-async function variants(f){let i=await loadImg(f),sc=Math.max(1,Math.min(3,1800/i.naturalWidth)),w=Math.round(i.naturalWidth*sc),h=Math.round(i.naturalHeight*sc),full=document.createElement('canvas');full.width=w;full.height=h;full.getContext('2d').drawImage(i,0,0,w,h);enhance(full,false);let title=document.createElement('canvas');title.width=w;title.height=Math.max(120,Math.round(h*.22));title.getContext('2d').drawImage(i,0,0,i.naturalWidth,Math.round(i.naturalHeight*.22),0,0,w,title.height);enhance(title,true);return{full,title,image:i}}
-function foilEstimate(img){let c=document.createElement('canvas'),max=280,sc=Math.min(1,max/img.naturalWidth);c.width=Math.max(1,Math.round(img.naturalWidth*sc));c.height=Math.max(1,Math.round(img.naturalHeight*sc));let x=c.getContext('2d',{willReadFrequently:true});x.drawImage(img,0,0,c.width,c.height);let d=x.getImageData(0,0,c.width,c.height).data,n=0,bright=0,vivid=0,hues=new Set;for(let i=0;i<d.length;i+=16){let r=d[i]/255,g=d[i+1]/255,b=d[i+2]/255,maxv=Math.max(r,g,b),minv=Math.min(r,g,b),delta=maxv-minv,s=maxv?delta/maxv:0;n++;if(maxv>.82&&s>.18)bright++;if(s>.5&&maxv>.42)vivid++;if(delta>.08){let h=maxv===r?((g-b)/delta)%6:maxv===g?(b-r)/delta+2:(r-g)/delta+4;h=(h*60+360)%360;hues.add(Math.round(h/30))}}let br=bright/n,vr=vivid/n,div=hues.size;return br>.035&&vr>.08&&div>=5}
-async function detect(text,title=''){let out=[],seen=new Set,up=text.toUpperCase().replace(/\s+/g,' '),codes=[...new Set((up.match(/(?:OP|ST|P|EB|PRB|PR)\s?0?\d{1,2}\s?[-–]\s?\d{3}/g)||[]).map(opCode))];for(let code of codes){let c=await one(code);if(c){out.push(c);seen.add(code)}}let lines=[title,...text.split(/\n+/)].map(clean).filter(x=>x.length>=3&&x.length<=45&&/[A-Za-z]/.test(x));for(let raw of [...new Set(lines)]){let q=raw.replace(/^\d+\s+/,'').replace(/\b(CREATURE|SORCERY|INSTANT|ARTIFACT|ENCHANTMENT|LAND|PLANESWALKER)\b.*$/i,'').replace(/\s+\d+\s*\/\s*\d+.*$/,'').trim();if(q.length<3)continue;try{let c=(await magic(q))[0];if(c&&sim(q,c.name)>=.66&&!seen.has(c.name.toLowerCase())){out.push(c);seen.add(c.name.toLowerCase());if(title&&sim(title,c.name)>=.72)break}}catch{}if(out.length>=8)break}return out.slice(0,8)}
-function scanRender(a){$("scanResults").innerHTML=a.map((c,i)=>`<article class="scan-result-card"><div class="scan-result-thumb">${c.image?`<img src="${esc(c.image)}">`:`<div class="preview-placeholder">${ini(c.name)}</div>`}</div><div><h4>${esc(c.name)}</h4><p>${esc(c.game)} · ${esc(c.setName)} · ${esc(c.cardNumber||'—')}</p>${c.foil?'<span class="scan-foil-suggestion">✦ FOIL VERMOED</span>':''}</div><div class="action-row"><button class="primary-btn" data-sfill="${i}">In formulier zetten</button><button class="ghost-btn" data-sadd="${i}">Direct toevoegen</button></div></article>`).join('');$$('[data-sfill]').forEach(b=>b.onclick=()=>fill(a[+b.dataset.sfill]));$$('[data-sadd]').forEach(b=>b.onclick=()=>{add(a[+b.dataset.sadd]);toast(a[+b.dataset.sadd].foil?'Foil-kaart toegevoegd.':'Kaart toegevoegd.')})}
-async function scan(){if(!scanFile)return $("scanStatus").textContent='Upload eerst een foto.';$("scanResults").innerHTML='';$("scanStatus").textContent='Kaartnaam bovenaan lezen...';$("ocrText").textContent='OCR draait...';try{let v=await variants(scanFile);scanFoil=foilEstimate(v.image);let titleRes=await Tesseract.recognize(v.title,'eng',{logger:m=>{if(m.status==='recognizing text')$("scanStatus").textContent=`Kaartnaam lezen… ${Math.round((m.progress||0)*100)}%`}});let title=clean(titleRes.data.text.split(/\n+/).filter(x=>clean(x).length>2)[0]||titleRes.data.text);$("scanStatus").textContent='Rest van de kaart controleren...';let fullRes=await Tesseract.recognize(v.full,'eng');let text=fullRes.data.text||'';$("ocrText").textContent=`Naamzone: ${title||'niet duidelijk'}\nFoil-indicatie: ${scanFoil?'mogelijk foil':'geen duidelijke foil'}\n\n${text.trim()||'Geen extra tekst gevonden.'}`;let a=await detect(text,title);a=a.map(c=>({...c,foil:scanFoil||c.foil}));if(!a.length){$("scanStatus").textContent='Geen kaart herkend. Probeer de kaart recht en beeldvullend te fotograferen.';return}scanRender(a);$("scanStatus").textContent=`${a.length} kaart${a.length===1?'':'en'} gevonden${scanFoil?' · foil-effect vermoed':''}.`}catch(e){console.error(e);$("scanStatus").textContent='Scannen mislukt. Probeer een scherpere foto.';$("ocrText").textContent='Scannen mislukt.'}}
-function scanImage(f){if(!f)return;scanFile=f;readFile(f).then(u=>{$("scanPreview").classList.remove('hidden');$("scanPreview").innerHTML=`<img src="${esc(u)}" alt="Scan preview">`;$("scanStatus").textContent='Foto geladen. Klaar om te scannen.'})}
-function clearScan(){scanFile=null;scanFoil=false;$("scanImageInput").value='';$("scanPreview").innerHTML='';$("scanPreview").classList.add('hidden');$("scanResults").innerHTML='';$("ocrText").textContent='Nog geen tekst gedetecteerd.';$("scanStatus").textContent='Nog geen scan gestart.'}
-function openCard(id){let c=cards.find(x=>x.id===id);if(!c)return;modalCardId=id;$("modalCardName").textContent=c.name;$("modalSet").textContent=c.setName||'—';$("modalNumber").textContent=c.cardNumber||'—';$("modalRarity").textContent=c.rarity||'—';$("modalCondition").textContent=c.condition||'—';$("modalQuantity").textContent=c.quantity;$("modalPrice").textContent=euro.format(c.price);let chip=$("modalGameChip");chip.textContent=c.game==='One Piece TCG'?'ONE PIECE':'MAGIC';chip.className=`game-chip ${c.game==='One Piece TCG'?'op':'mtg'}`;let img=$("modalCardImage"),ph=$("modalCardPlaceholder");if(c.image){img.src=c.image;img.classList.remove('hidden');ph.classList.add('hidden')}else{img.removeAttribute('src');img.classList.add('hidden');ph.textContent=ini(c.name);ph.classList.remove('hidden')}applyModalFoil(c.foil);resetTilt();$("cardModal").classList.remove('hidden');$("cardModal").setAttribute('aria-hidden','false');document.body.style.overflow='hidden'}
-function applyModalFoil(on){let card=$("tiltCard"),status=$("modalFoilStatus"),btn=$("toggleFoilBtn");card.classList.toggle('is-foil',on);status.textContent=on?'FOIL / HOLO':'NON-FOIL';status.classList.toggle('active',on);btn.textContent=on?'Foil uitzetten':'Foil aanzetten'}
-function closeCard(){$("cardModal").classList.add('hidden');$("cardModal").setAttribute('aria-hidden','true');document.body.style.overflow='';modalCardId=null;resetTilt()}
-function resetTilt(){let c=$("tiltCard");c.style.setProperty('--rx','0deg');c.style.setProperty('--ry','0deg');c.style.setProperty('--mx','50%');c.style.setProperty('--my','50%')}
-function tiltMove(e){let c=$("tiltCard"),r=c.getBoundingClientRect(),x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;if(x<0||x>1||y<0||y>1)return;c.style.setProperty('--ry',`${(x-.5)*18}deg`);c.style.setProperty('--rx',`${(.5-y)*18}deg`);c.style.setProperty('--mx',`${x*100}%`);c.style.setProperty('--my',`${y*100}%`)}
-// Arcane 2.0 keeps legacy records intact while presenting an MTG-only collection.
-dash=function(){let pool=cards.filter(c=>c.game==='Magic: The Gathering'),total=pool.reduce((s,c)=>s+c.quantity,0),foil=pool.filter(c=>c.foil).reduce((s,c)=>s+c.quantity,0),sets=new Set(pool.map(c=>c.setName).filter(Boolean)).size,val=pool.reduce((s,c)=>s+c.price*c.quantity,0);$("totalCards").textContent=total;$("uniqueCards").textContent=pool.length;$("opCount").textContent=sets;$("mtgCount").textContent=total;$("foilCount").textContent=foil;$("totalValue").textContent=euro.format(val);$("avgValue").textContent=euro.format(pool.length?val/pool.length:0);let premium=total?Math.round(foil/total*100):0,regular=100-premium;$("opPercent").textContent=regular+'%';$("mtgPercent").textContent=premium+'%';$("opBar").style.width=regular+'%';$("mtgBar").style.width=premium+'%';$("recentCards").innerHTML=pool.slice().sort((a,b)=>b.addedAt-a.addedAt).slice(0,4).map(c=>`<article class="recent-card" data-open="${c.id}"><div class="recent-card-image">${c.image?`<img src="${esc(c.image)}" alt="${esc(c.name)}">`:`<div class="preview-placeholder">${ini(c.name)}</div>`}</div><div class="recent-card-body"><h4>${esc(c.name)}</h4><p>${esc(c.setName)} · x${c.quantity}</p><strong>${euro.format(c.quantity*c.price)}</strong></div></article>`).join('')||'<p class="muted">Nog geen Magic-kaarten in je collectie.</p>';attachOpeners()};
-binder=function(){let q=$("searchInput").value.trim().toLowerCase(),s=$("sortFilter").value,a=cards.filter(c=>c.game==='Magic: The Gathering'&&[c.name,c.setName,c.cardNumber,c.rarity].join(' ').toLowerCase().includes(q));a.sort((x,y)=>s==='value'?y.price*y.quantity-x.price*x.quantity:s==='name'?x.name.localeCompare(y.name):y.addedAt-x.addedAt);$("resultCount").textContent=`${a.length} unieke Magic-kaarten`;$("emptyState").classList.toggle('hidden',!!a.length);$("cardGrid").innerHTML=a.map((c,index)=>`<article class="binder-card" style="--collection-delay:${index%12}" data-open="${c.id}"><div class="card-frame ${c.foil?'foil-preview':''}">${c.image?`<img src="${esc(c.image)}" alt="${esc(c.name)}">`:`<div class="preview-placeholder">${ini(c.name)}</div>`}<div class="badge-row"><span class="game-chip mtg">MAGIC</span><span class="badge">x${c.quantity}</span></div>${c.foil?'<span class="foil-chip" style="position:absolute;left:10px;bottom:10px">FOIL</span>':''}<div class="card-overlay"></div></div><div class="card-info"><h4>${esc(c.name)}</h4><p>${esc(c.setName)} · ${esc(c.cardNumber||'—')} · ${esc(c.rarity)}</p><div class="card-info-footer"><strong>${euro.format(c.price)}</strong><button class="delete-btn" data-del="${c.id}">Verwijder</button></div></div></article>`).join('');$$('[data-del]').forEach(b=>b.onclick=e=>{e.stopPropagation();removeCard(b.dataset.del)});attachOpeners()};
-lookup=async function(){let q=$("lookupQuery").value.trim(),s=$("lookupStatus"),o=$("lookupResults");if(!q)return s.textContent='Voer eerst een kaartnaam in.';s.textContent='Scryfall doorzoeken...';o.innerHTML='';try{let a=await magic(q);s.textContent=a.length?`${a.length} Magic-kaart gevonden.`:'Geen Magic-kaart gevonden.';o.innerHTML=a.map((c,i)=>`<article class="lookup-result"><div class="lookup-result-thumb">${c.image?`<img src="${esc(c.image)}">`:`<div class="preview-placeholder">${ini(c.name)}</div>`}</div><div><h4>${esc(c.name)}</h4><p>${esc(c.setName)} · ${esc(c.cardNumber||'—')}</p></div><button class="primary-btn" data-use="${i}">Gebruik</button></article>`).join('');$$('[data-use]').forEach(b=>b.onclick=()=>fill(a[+b.dataset.use]))}catch{s.textContent='Scryfall-zoekopdracht mislukt. Probeer opnieuw.'}};
-hydrate=async function(){let t=cards.filter(c=>c.game==='Magic: The Gathering'&&!c.image).slice(0,12);if(!t.length)return toast('Alle Magic-kaarten hebben al een afbeelding.');$("hydrateImagesBtn").disabled=true;$("hydrateImagesBtn").textContent='Bezig...';for(let c of t)try{let f=(await magic(c.name))[0];if(f?.image)c.image=f.image}catch{}save();binder();dash();$("hydrateImagesBtn").disabled=false;$("hydrateImagesBtn").textContent='Ontbrekende afbeeldingen ophalen';toast('Magic-afbeeldingen bijgewerkt.')};
-function init(){$$('.nav-item').forEach(b=>b.onclick=()=>nav(b.dataset.page));$$('[data-goto]').forEach(b=>b.onclick=()=>nav(b.dataset.goto));$("quickAddBtn").onclick=()=>nav('add');$("openScannerBtn").onclick=()=>nav('scanner');$("lookupBtn").onclick=lookup;$("hydrateImagesBtn").onclick=hydrate;['searchInput','gameFilter','sortFilter'].forEach(id=>$(id).oninput=binder);['game','name','setName','cardNumber','image'].forEach(id=>$(id).oninput=preview);$("imageUpload").onchange=e=>{let f=e.target.files?.[0];if(f)readFile(f).then(u=>{$("image").value=u;preview()})};$("resetFormBtn").onclick=()=>{$("cardForm").reset();$("quantity").value=1;$("price").value=0;preview()};$("cardForm").onsubmit=e=>{e.preventDefault();add({game:$("game").value,name:$("name").value.trim(),setName:$("setName").value.trim(),cardNumber:$("cardNumber").value.trim(),rarity:$("rarity").value,condition:$("condition").value,quantity:Math.max(1,+$("quantity").value||1),price:Math.max(0,+$("price").value||0),foil:$("foil").checked,image:$("image").value.trim()});$("cardForm").reset();$("quantity").value=1;$("price").value=0;preview();toast('Kaart veilig opgeslagen in je collectie.');nav('collection')};$("scanImageInput").onchange=e=>scanImage(e.target.files?.[0]);$("scanBtn").onclick=scan;$("clearScanBtn").onclick=clearScan;$("modalCloseBtn").onclick=closeCard;$("modalBackdrop").onclick=closeCard;$("modalDeleteBtn").onclick=()=>modalCardId&&removeCard(modalCardId);$("toggleFoilBtn").onclick=()=>{let c=cards.find(x=>x.id===modalCardId);if(!c)return;c.foil=!c.foil;save();applyModalFoil(c.foil);dash();binder();toast(c.foil?'Foil-effect aangezet.':'Foil-effect uitgezet.')};let tc=$("tiltCard");tc.addEventListener('pointermove',tiltMove);tc.addEventListener('pointerleave',resetTilt);tc.addEventListener('pointerup',resetTilt);document.addEventListener('keydown',e=>{if(e.key==='Escape')closeCard()});
-  document.addEventListener('pointerup',e=>{
-    const card=e.target.closest('[data-open]');
-    if(!card||e.target.closest('[data-del]')||e.target.closest('button'))return;
-    if(e.pointerType==='touch')openCard(card.dataset.open);
-  },{passive:true});
-  preview();dash();binder()}
-init();
+(() => {
+  const CARD_DB_URL = 'https://raw.githubusercontent.com/nemesis312/OnePieceTCGEngCardList/main/CardDb.json';
+  const GOOGLE_FEEDS = [
+    'https://news.google.com/rss/search?q=%22One%20Piece%20Card%20Game%22%20OR%20OPTCG&hl=en&gl=US&ceid=US:en',
+    'https://news.google.com/rss/search?q=site%3Aen.onepiece-cardgame.com%2Fnews%20%22ONE%20PIECE%20CARD%20GAME%22&hl=en&gl=US&ceid=US:en'
+  ];
+  const RSS2JSON = 'https://api.rss2json.com/v1/api.json?rss_url=';
+  const STORE_KEY = 'grand-line-vault.collection.v2';
+  const CARD_CACHE_KEY = 'grand-line-vault.card-cache.v1';
+  const CARD_CACHE_TIME = 'grand-line-vault.card-cache-time.v1';
+  const CACHE_MAX_AGE = 6 * 60 * 60 * 1000;
 
-// Central action bridge: static and newly rendered controls always navigate.
-document.addEventListener('click',e=>{
-  const goto=e.target.closest('[data-goto]');
-  if(goto){e.preventDefault();nav(goto.dataset.goto);return}
-  if(e.target.closest('#quickAddBtn')){e.preventDefault();nav('add');return}
-  if(e.target.closest('#openScannerBtn')){e.preventDefault();nav('scanner')}
-});
+  const $ = (s) => document.querySelector(s);
+  const $$ = (s) => [...document.querySelectorAll(s)];
+  const state = { cards: [], collection: [], news: [], selected: null, selectedOwnedKey: null, cardsFetchedAt: 0 };
 
+  function esc(v=''){ return String(v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function money(v){ return new Intl.NumberFormat('nl-NL',{style:'currency',currency:'EUR'}).format(Number(v)||0); }
+  function normalizeCode(v=''){ return String(v).replace(/^#/,'').trim().toUpperCase(); }
+  function setCode(card){ const m=normalizeCode(card.CardNum).match(/^([A-Z]+\d{2})-/); return m?m[1]:''; }
+  function variantId(card){ return `${normalizeCode(card.CardNum)}|${card.Img || ''}`; }
+  function isAlt(card){ return !!card.Alt || /alt|parallel|manga/i.test(String(card.Rarity||'')); }
+  function rarity(card){ return String(card.Rarity||'').replace('-Alt','') || '—'; }
+  function typeLine(card){ return [card['Card Type'], card['Primary color'], card['Secondary color']].filter(Boolean).join(' · '); }
+  function types(card){ return Object.keys(card).filter(k=>/^Type \d+$/i.test(k)).map(k=>card[k]).filter(Boolean).join(' / '); }
+  function notify(text){ const el=$('#toast'); el.textContent=text; el.classList.add('show'); clearTimeout(notify.t); notify.t=setTimeout(()=>el.classList.remove('show'),2200); }
+  function saveCollection(){ localStorage.setItem(STORE_KEY, JSON.stringify(state.collection)); renderStats(); renderCollection(); renderRecent(); }
+
+  function loadCollection(){
+    try { state.collection = JSON.parse(localStorage.getItem(STORE_KEY) || '[]'); if(!Array.isArray(state.collection)) state.collection=[]; } catch { state.collection=[]; }
+  }
+
+  function nav(page){
+    $$('.page').forEach(p=>p.classList.toggle('active',p.dataset.page===page));
+    $$('.bottom-nav button').forEach(b=>b.classList.toggle('active',b.dataset.nav===page));
+    window.scrollTo({top:0,behavior:'smooth'});
+    if(page==='collection') renderCollection();
+    if(page==='news' && !state.news.length) loadNews(false);
+  }
+
+  function mapCard(raw){
+    return {
+      ...raw,
+      _code: normalizeCode(raw.CardNum),
+      _set: setCode(raw),
+      _alt: isAlt(raw),
+      _variant: variantId(raw)
+    };
+  }
+
+  async function loadCards(force=false){
+    const status=$('#cardDbStatus');
+    status.textContent='Live kaartdatabase laden…';
+    try {
+      if(!force){
+        const t=Number(localStorage.getItem(CARD_CACHE_TIME)||0);
+        const cached=localStorage.getItem(CARD_CACHE_KEY);
+        if(cached && Date.now()-t < CACHE_MAX_AGE){
+          const parsed=JSON.parse(cached);
+          if(Array.isArray(parsed)&&parsed.length){ state.cards=parsed; state.cardsFetchedAt=t; afterCardsLoaded('cache'); refreshCardsBackground(); return; }
+        }
+      }
+      const res=await fetch(`${CARD_DB_URL}?t=${Date.now()}`,{cache:'no-store'});
+      if(!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json=await res.json();
+      const rows=Array.isArray(json)?json:(json.Cards||[]);
+      state.cards=rows.map(mapCard).filter(c=>c._code && c.Name && c.Img);
+      state.cardsFetchedAt=Date.now();
+      try { localStorage.setItem(CARD_CACHE_KEY, JSON.stringify(state.cards)); localStorage.setItem(CARD_CACHE_TIME,String(state.cardsFetchedAt)); } catch {}
+      afterCardsLoaded('live');
+    } catch(err){
+      status.textContent=`Live database niet bereikbaar (${err.message}).`;
+      $('#liveStatus').textContent='kaartbron offline';
+      const cached=localStorage.getItem(CARD_CACHE_KEY);
+      if(cached){ try{state.cards=JSON.parse(cached);afterCardsLoaded('oude cache');}catch{} }
+    }
+  }
+
+  async function refreshCardsBackground(){
+    try{
+      const res=await fetch(`${CARD_DB_URL}?t=${Date.now()}`,{cache:'no-store'});
+      if(!res.ok) return;
+      const json=await res.json(); const rows=Array.isArray(json)?json:(json.Cards||[]);
+      const fresh=rows.map(mapCard).filter(c=>c._code&&c.Name&&c.Img);
+      if(fresh.length){ state.cards=fresh; state.cardsFetchedAt=Date.now(); try{localStorage.setItem(CARD_CACHE_KEY,JSON.stringify(fresh));localStorage.setItem(CARD_CACHE_TIME,String(state.cardsFetchedAt));}catch{} afterCardsLoaded('live'); }
+    }catch{}
+  }
+
+  function afterCardsLoaded(source){
+    const sets=[...new Set(state.cards.map(c=>c._set).filter(Boolean))].sort((a,b)=>b.localeCompare(a,undefined,{numeric:true}));
+    const current=$('#setFilter').value;
+    $('#setFilter').innerHTML='<option value="">Alle sets</option>'+sets.map(s=>`<option value="${esc(s)}">${esc(s)}</option>`).join('');
+    if(sets.includes(current)) $('#setFilter').value=current;
+    const time=state.cardsFetchedAt?new Date(state.cardsFetchedAt).toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit'}):'';
+    $('#cardDbStatus').textContent=`${state.cards.length.toLocaleString('nl-NL')} printings · ${source}${time?' · '+time:''}`;
+    $('#liveStatus').textContent=`${state.cards.length.toLocaleString('nl-NL')} kaarten beschikbaar`;
+    renderSearch();
+  }
+
+  function cardButton(card, mini=false, owned=null){
+    const alt=card._alt ?? isAlt(card);
+    const code=card._code ?? normalizeCode(card.CardNum);
+    return `<button class="${mini?'mini-card':'tcg-card'}" data-card="${esc(card._variant || variantId(card))}"${owned?` data-owned="${esc(owned.key)}"`:''}>
+      <div style="position:relative"><img loading="lazy" src="${esc(card.Img)}" alt="${esc(card.Name)}" onerror="this.style.opacity=.25">
+      ${mini?'':`<div class="badges"><span class="badge">${esc(rarity(card))}</span>${alt?'<span class="badge alt">ALT</span>':''}</div>`}</div>
+      <strong>${esc(card.Name)}</strong><small>${esc(code)}${owned?` · ×${owned.quantity}`:''}</small>
+    </button>`;
+  }
+
+  function renderSearch(){
+    if(!state.cards.length) return;
+    const q=$('#cardQuery').value.trim().toLowerCase();
+    const set=$('#setFilter').value;
+    const variant=$('#variantFilter').value;
+    let rows=state.cards.filter(c=>{
+      if(set&&c._set!==set) return false;
+      if(variant==='base'&&c._alt) return false;
+      if(variant==='alt'&&!c._alt) return false;
+      if(!q) return true;
+      return [c.Name,c._code,c._set,c.Rarity,c['Card Type'],types(c)].join(' ').toLowerCase().includes(q);
+    });
+    rows=rows.slice(0,q||set||variant?120:40);
+    $('#searchResults').innerHTML=rows.map(c=>cardButton(c)).join('');
+    $('#searchEmpty').classList.toggle('hidden',!!rows.length);
+    bindCardButtons($('#searchResults'));
+  }
+
+  function renderStats(){
+    const total=state.collection.reduce((s,c)=>s+(Number(c.quantity)||1),0);
+    const value=state.collection.reduce((s,c)=>s+(Number(c.customValue)||0)*(Number(c.quantity)||1),0);
+    $('#statTotal').textContent=total; $('#statUnique').textContent=state.collection.length; $('#statValue').textContent=money(value);
+    $('#statSets').textContent=new Set(state.collection.map(c=>c.card._set || setCode(c.card)).filter(Boolean)).size;
+    $('#statFavs').textContent=state.collection.filter(c=>c.favorite).length;
+  }
+
+  function sortedCollection(){
+    const q=$('#collectionQuery').value.trim().toLowerCase(); const sort=$('#collectionSort').value;
+    let rows=state.collection.filter(o=>!q||[o.card.Name,o.card._code,o.card._set,o.card.Rarity].join(' ').toLowerCase().includes(q));
+    rows=[...rows];
+    if(sort==='name') rows.sort((a,b)=>a.card.Name.localeCompare(b.card.Name));
+    else if(sort==='value') rows.sort((a,b)=>(b.customValue||0)-(a.customValue||0));
+    else if(sort==='set') rows.sort((a,b)=>(a.card._set||'').localeCompare(b.card._set||'',undefined,{numeric:true}));
+    else rows.sort((a,b)=>new Date(b.addedAt)-new Date(a.addedAt));
+    return rows;
+  }
+
+  function renderCollection(){
+    const rows=sortedCollection();
+    $('#collectionGrid').innerHTML=rows.map(o=>cardButton(o.card,false,o)).join('');
+    $('#collectionEmpty').classList.toggle('hidden',!!rows.length);
+    bindCardButtons($('#collectionGrid'));
+  }
+
+  function renderRecent(){
+    const rows=[...state.collection].sort((a,b)=>new Date(b.addedAt)-new Date(a.addedAt)).slice(0,5);
+    $('#recentCards').innerHTML=rows.map(o=>cardButton(o.card,true,o)).join('');
+    $('#recentEmpty').style.display=rows.length?'none':'block';
+    bindCardButtons($('#recentCards'));
+  }
+
+  function bindCardButtons(root){
+    root.querySelectorAll('[data-card]').forEach(btn=>btn.addEventListener('click',()=>{
+      const ownedKey=btn.dataset.owned||null;
+      let card=null;
+      if(ownedKey){ const owned=state.collection.find(o=>o.key===ownedKey); card=owned?.card||null; }
+      if(!card) card=state.cards.find(c=>(c._variant||variantId(c))===btn.dataset.card);
+      if(card) openCard(card,ownedKey);
+    }));
+  }
+
+  function openCard(card,ownedKey=null){
+    state.selected=card; state.selectedOwnedKey=ownedKey;
+    $('#modalImage').src=card.Img||''; $('#modalImage').alt=card.Name||'One Piece kaart';
+    $('#modalCode').textContent=card._code||normalizeCode(card.CardNum); $('#modalRarity').textContent=rarity(card); $('#modalName').textContent=card.Name||'Kaart';
+    $('#modalVariant').classList.toggle('hidden',!isAlt(card)); $('#tiltCard').classList.toggle('is-alt',isAlt(card));
+    $('#modalMeta').textContent=[typeLine(card), types(card)].filter(Boolean).join(' · ');
+    $('#modalEffect').textContent=card.Effect||card.Trigger||'Geen effecttekst beschikbaar.';
+    $('#tcgPlayerLink').href=card.TcgPlayer||`https://www.google.com/search?q=${encodeURIComponent((card.Name||'')+' '+normalizeCode(card.CardNum)+' One Piece card price')}`;
+    const owned=ownedKey?state.collection.find(o=>o.key===ownedKey):null;
+    $('#ownedEditor').classList.toggle('hidden',!owned); $('#favoriteBtn').classList.toggle('hidden',!owned); $('#deleteBtn').classList.toggle('hidden',!owned);
+    $('#modalPrimary').textContent=owned?'Opslaan':'+ Voeg toe';
+    if(owned){ $('#ownedQty').value=owned.quantity; $('#ownedValue').value=owned.customValue||''; $('#ownedCondition').value=owned.condition||'Near Mint'; $('#ownedLanguage').value=owned.language||'English'; $('#ownedNote').value=owned.note||''; $('#favoriteBtn').textContent=owned.favorite?'♥ Favoriet':'♡ Favoriet'; }
+    $('#cardModal').classList.remove('hidden'); $('#cardModal').setAttribute('aria-hidden','false'); document.body.style.overflow='hidden';
+  }
+
+  function closeModal(){ $('#cardModal').classList.add('hidden'); $('#cardModal').setAttribute('aria-hidden','true'); document.body.style.overflow=''; state.selected=null; state.selectedOwnedKey=null; }
+
+  function addSelected(){
+    const card=state.selected; if(!card) return;
+    const existing=state.collection.find(o=>o.card._variant===card._variant);
+    if(existing){ existing.quantity=(Number(existing.quantity)||1)+1; notify('Aantal verhoogd'); }
+    else state.collection.unshift({key:`${card._variant}-${Date.now()}`,card,quantity:1,customValue:0,condition:'Near Mint',language:'English',note:'',favorite:false,addedAt:new Date().toISOString()});
+    saveCollection(); closeModal();
+  }
+
+  function saveOwned(){
+    const o=state.collection.find(x=>x.key===state.selectedOwnedKey); if(!o) return;
+    o.quantity=Math.max(1,Math.min(999,Number($('#ownedQty').value)||1)); o.customValue=Math.max(0,Number($('#ownedValue').value)||0); o.condition=$('#ownedCondition').value; o.language=$('#ownedLanguage').value; o.note=$('#ownedNote').value.trim();
+    saveCollection(); notify('Kaart bijgewerkt'); closeModal();
+  }
+
+  function deleteOwned(){ const key=state.selectedOwnedKey; if(!key) return; if(!confirm('Deze kaart uit je binder verwijderen?')) return; state.collection=state.collection.filter(o=>o.key!==key); saveCollection(); closeModal(); notify('Kaart verwijderd'); }
+  function toggleFavorite(){ const o=state.collection.find(x=>x.key===state.selectedOwnedKey); if(!o)return; o.favorite=!o.favorite; saveCollection(); $('#favoriteBtn').textContent=o.favorite?'♥ Favoriet':'♡ Favoriet'; }
+
+  async function loadNews(force=false){
+    $('#newsStatus').textContent='Live nieuws ophalen…';
+    const feeds=GOOGLE_FEEDS.map(feed=>`${RSS2JSON}${encodeURIComponent(feed)}${force?`&_=${Date.now()}`:''}`);
+    try{
+      const settled=await Promise.allSettled(feeds.map(u=>fetch(u,{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error(r.status);return r.json();})));
+      let items=[];
+      for(const result of settled){ if(result.status==='fulfilled'&&result.value.status==='ok') items.push(...(result.value.items||[])); }
+      const seen=new Set();
+      state.news=items.map(i=>({title:i.title||'',link:i.link||'',date:i.pubDate||'',source:(i.author||'').trim()||extractPublisher(i.title),description:i.description||''}))
+        .filter(i=>i.title&&i.link).filter(i=>{const k=i.title.toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();if(seen.has(k))return false;seen.add(k);return true;})
+        .sort((a,b)=>Date.parse(b.date)-Date.parse(a.date)).slice(0,30);
+      renderNews(); const now=new Date().toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit'}); $('#newsStatus').textContent=`${state.news.length} live headlines · bijgewerkt ${now}`; $('#liveStatus').textContent=state.cards.length?`${state.cards.length.toLocaleString('nl-NL')} kaarten · nieuws live`:'nieuws live';
+    }catch(err){ $('#newsStatus').textContent='Nieuwsbron tijdelijk niet bereikbaar.'; }
+  }
+
+  function extractPublisher(title=''){ const parts=title.split(' - '); return parts.length>1?parts.at(-1):'Google News'; }
+  function cleanTitle(title=''){ const parts=title.split(' - '); return parts.length>1?parts.slice(0,-1).join(' - '):title; }
+  function fmtDate(v){ const d=new Date(v); return Number.isNaN(d.getTime())?v:d.toLocaleDateString('nl-NL',{day:'numeric',month:'short',year:'numeric'}); }
+  function newsHtml(i){ const title=cleanTitle(i.title); const op18=/\bOP[- ]?18\b/i.test(title+' '+i.description); return `<a class="news-item ${op18?'op18':''}" href="${esc(i.link)}" target="_blank" rel="noopener"><div class="news-meta"><span>${op18?'OP-18 · ':''}${esc(fmtDate(i.date))}</span><span>•</span><span>${esc(i.source)}</span></div><h3>${esc(title)}</h3></a>`; }
+  function renderNews(){ const q=$('#newsQuery').value.trim().toLowerCase(); const rows=state.news.filter(i=>!q||(i.title+' '+i.source+' '+i.description).toLowerCase().includes(q)); $('#newsList').innerHTML=rows.map(newsHtml).join('')||'<div class="empty-state">Geen nieuws gevonden.</div>'; $('#homeNews').innerHTML=state.news.slice(0,4).map(newsHtml).join(''); }
+
+  function exportCollection(){ const blob=new Blob([JSON.stringify({app:'Grand Line Vault',version:2,exportedAt:new Date().toISOString(),collection:state.collection},null,2)],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a');a.href=url;a.download=`grand-line-vault-${new Date().toISOString().slice(0,10)}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),500); }
+  async function importCollection(file){ try{const data=JSON.parse(await file.text());const rows=Array.isArray(data)?data:data.collection;if(!Array.isArray(rows))throw new Error();state.collection=rows;saveCollection();notify('Backup geïmporteerd');}catch{notify('Ongeldige backup');} }
+
+  function setupTilt(){
+    const wrap=$('#tiltWrap'), card=$('#tiltCard');
+    function move(e){ const r=wrap.getBoundingClientRect(); const p=e.touches?e.touches[0]:e; const x=Math.max(0,Math.min(1,(p.clientX-r.left)/r.width)),y=Math.max(0,Math.min(1,(p.clientY-r.top)/r.height)); card.style.setProperty('--mx',`${x*100}%`);card.style.setProperty('--my',`${y*100}%`);card.style.transform=`rotateY(${(x-.5)*12}deg) rotateX(${(.5-y)*12}deg)`; }
+    function reset(){card.style.transform='';}
+    wrap.addEventListener('pointermove',move);wrap.addEventListener('pointerleave',reset);wrap.addEventListener('touchmove',move,{passive:true});wrap.addEventListener('touchend',reset);
+  }
+
+  function bind(){
+    $$('[data-nav]').forEach(b=>b.addEventListener('click',()=>nav(b.dataset.nav)));
+    $('#searchForm').addEventListener('submit',e=>{e.preventDefault();renderSearch();});
+    $('#cardQuery').addEventListener('input',()=>{ if($('#cardQuery').value.length>=2||!$('#cardQuery').value) renderSearch(); });
+    $('#setFilter').addEventListener('change',renderSearch); $('#variantFilter').addEventListener('change',renderSearch);
+    $('#reloadCardsBtn').addEventListener('click',()=>loadCards(true));
+    $('#collectionQuery').addEventListener('input',renderCollection); $('#collectionSort').addEventListener('change',renderCollection);
+    $('#exportBtn').addEventListener('click',exportCollection); $('#importBtn').addEventListener('click',()=>$('#importFile').click()); $('#importFile').addEventListener('change',e=>{if(e.target.files[0])importCollection(e.target.files[0]);e.target.value='';});
+    $('#reloadNewsBtn').addEventListener('click',()=>loadNews(true)); $('#newsQuery').addEventListener('input',renderNews);
+    $('#refreshAllBtn').addEventListener('click',()=>{loadCards(true);loadNews(true);notify('Live data wordt vernieuwd');});
+    $('#modalBackdrop').addEventListener('click',closeModal); $('#modalClose').addEventListener('click',closeModal);
+    $('#modalPrimary').addEventListener('click',()=>state.selectedOwnedKey?saveOwned():addSelected()); $('#deleteBtn').addEventListener('click',deleteOwned); $('#favoriteBtn').addEventListener('click',toggleFavorite);
+    document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#cardModal').classList.contains('hidden'))closeModal();});
+  }
+
+  loadCollection(); bind(); renderStats(); renderCollection(); renderRecent(); setupTilt(); loadCards(false); loadNews(false);
+  if('serviceWorker' in navigator){ window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{})); }
+})();

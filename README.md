@@ -1,28 +1,14 @@
-# The Vault — GitHub Pages Edition
+# Grand Line Vault — One Piece TCG
 
-Een gestylede digitale binder voor:
-- One Piece TCG
-- Magic: The Gathering
+Persoonlijke iPhone-first One Piece Card Game binder, gehost op GitHub Pages.
 
-## Wat deze versie kan
+## Live data
+- Kaartdatabase: live JSON uit `nemesis312/OnePieceTCGEngCardList`, met Bandai-kaartafbeeldingen.
+- Nieuws: live Google News RSS via rss2json, inclusief algemene OPTCG headlines en Bandai-nieuws.
+- De app bewaart een tijdelijke kaartcache voor snelheid en vernieuwt die automatisch op de achtergrond.
 
-- Mooier dashboard en binder layout
-- Kaarten met echte afbeeldingen in het overzicht
-- Kaartdata automatisch ophalen voor Magic via Scryfall
-- One Piece kaart opzoeken via kaartcode zoals `OP01-001`
-- Zelf een kaartfoto uploaden
-- Foto scannen met OCR via Tesseract.js
-- Probeert kaartcodes en kaartnamen uit een foto te halen
-- Opslag in localStorage op je apparaat
+## Collectie
+Je eigen binder wordt lokaal in de browser/iPhone opgeslagen. Gebruik **Backup** om een JSON-backup te downloaden.
 
-## Belangrijke notitie
-
-De fotoscan werkt als een eerste slimme versie. Het werkt het best met:
-- scherpe foto's
-- weinig glare
-- 1 tot 4 kaarten tegelijk
-- goed zichtbare kaartcodes of namen
-
-## Live
-
-GitHub Pages draait vanaf de `main` branch.
+## GitHub Pages
+Deze repository wordt vanaf `main` gepubliceerd. De vorige Magic-versie staat veilig op branch `backup-magic-vault-2026-09-14`.

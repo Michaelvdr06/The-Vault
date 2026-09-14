@@ -1,99 +1,184 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="nl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#050505" />
-  <title>The Vault — Magic Collection</title>
-  <link rel="icon" type="image/png" href="vault-mark.png?v=2" />
-  <link rel="apple-touch-icon" href="vault-mark.png?v=2" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#08111f" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Grand Line Vault" />
+  <title>Grand Line Vault — One Piece TCG</title>
   <link rel="manifest" href="manifest.webmanifest" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Cinzel:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=11" />
-  <link rel="stylesheet" href="foil-effects.css?v=15" />
-  <link rel="stylesheet" href="sets.css?v=3" />
-  <link rel="stylesheet" href="scanner-ui.css?v=2" />
-  <link rel="stylesheet" href="bulk-add.css?v=11" />
-  <link rel="stylesheet" href="deck-lab.css?v=1" />
-  <link rel="stylesheet" href="arena-hub.css?v=2" />
-  <link rel="stylesheet" href="theme.css?v=14" />
-  <link rel="stylesheet" href="responsive.css?v=4" />
-  <link rel="stylesheet" href="ux-layout.css?v=3" />
-  <link rel="stylesheet" href="clean-vault.css?v=2" />
-  <link rel="stylesheet" href="ui-hotfix.css?v=1" />
-  <link rel="stylesheet" href="collection-reveal.css?v=3" />
-  <link rel="stylesheet" href="brand-polish.css?v=2" />
-  <link rel="stylesheet" href="brand-asset.css?v=1" />
-  <link rel="stylesheet" href="mtg-watermark.css?v=1" />
-  <link rel="stylesheet" href="mtg-watermark-polish.css?v=1" />
-  <link rel="stylesheet" href="set-cards-polish.css?v=2" />
-  <link rel="stylesheet" href="shadow-safety.css?v=1" />
-  <link rel="stylesheet" href="set-ownership.css?v=2" />
-  <link rel="stylesheet" href="readability-audit.css?v=10" />
+  <link rel="apple-touch-icon" href="vault-mark.png" />
+  <link rel="icon" href="vault-mark.png" />
+  <link rel="stylesheet" href="styles.css?v=20260914" />
 </head>
 <body>
-  <div class="app-shell">
-    <aside class="sidebar">
-      <div class="brand-block">
-        <div class="brand-mark"><img src="vault-mark.png?v=2" alt="The Vault emblem" /></div>
-        <div><div class="brand-title">THE VAULT</div><div class="brand-subtitle">Magic Archive</div></div>
-      </div>
-      <nav class="nav-list">
-        <button class="nav-item active" data-page="dashboard"><span class="nav-icon">◈</span><span class="nav-label">Overzicht</span></button>
-        <button class="nav-item" data-page="collection"><span class="nav-icon">▦</span><span class="nav-label">Collectie</span></button>
-      </nav>
-      <div class="sidebar-note version-card panel-soft"><p class="small-label">VAULT VERSION</p><strong>Vault 4.24.12</strong><p>Collection Shadow Timing · 2026.08</p></div>
-    </aside>
-    <main class="content">
-      <header class="topbar">
-        <div><p class="kicker">PERSONAL TCG ARCHIVE</p><h1 id="pageTitle">Dashboard</h1></div>
-        <div class="topbar-actions"><button class="ghost-btn" id="openScannerBtn">Scan foto</button><button class="primary-btn" id="quickAddBtn">+ Kaart toevoegen</button></div>
-      </header>
-      <section class="page active" id="dashboard">
-        <section class="hero-card">
-          <div class="hero-copy"><p class="kicker gold">YOUR PRIVATE VAULT</p><h2>Bouw jouw eigen <span>arcane collection</span>.</h2><p>Bewaar je Magic: The Gathering-kaarten, printings, foils en marktwaarde in één beveiligde digitale kluis.</p><div class="hero-actions"><button class="primary-btn" data-goto="add">Kaart toevoegen</button><button class="ghost-btn" data-goto="scanner">Scan een kaart</button></div></div>
-          <div class="hero-side"><div class="hero-value"><span>Totale waarde</span><strong id="totalValue">€0,00</strong></div><div class="hero-mini-grid"><div><span>Uniek</span><strong id="uniqueCards">0</strong></div><div><span>Totaal</span><strong id="totalCards">0</strong></div></div></div>
-        </section>
-        <section class="stats-grid">
-          <article class="stat-card"><span>Magic sets</span><strong id="opCount">0</strong><small>Unieke uitbreidingen</small></article>
-          <article class="stat-card"><span>Magic kaarten</span><strong id="mtgCount">0</strong><small>Alle exemplaren</small></article>
-          <article class="stat-card"><span>Foils</span><strong id="foilCount">0</strong><small>Glanzende kaarten</small></article>
-          <article class="stat-card"><span>Gem. waarde</span><strong id="avgValue">€0,00</strong><small>Per uniek item</small></article>
-        </section>
-        <section class="dashboard-grid">
-          <article class="panel"><div class="panel-header"><div><p class="small-label">RECENT</p><h3>Laatst toegevoegd</h3></div><button class="text-btn" data-goto="collection">Bekijk collectie →</button></div><div id="recentCards" class="recent-grid"></div></article>
-          <article class="panel"><div class="panel-header"><div><p class="small-label">FINISH BREAKDOWN</p><h3>Verdeling collectie</h3></div></div><div class="progress-block"><div class="progress-row"><div><span class="dot op"></span><b>Non-foil</b></div><strong id="opPercent">0%</strong></div><div class="bar"><div id="opBar" class="fill fill-op"></div></div><div class="progress-row"><div><span class="dot mtg"></span><b>Foil / premium</b></div><strong id="mtgPercent">0%</strong></div><div class="bar"><div id="mtgBar" class="fill fill-mtg"></div></div></div></article>
-        </section>
-      </section>
-      <section class="page" id="collection">
-        <div class="panel toolbar-panel"><div class="toolbar-row"><label class="search-field grow"><span>⌕</span><input id="searchInput" type="search" placeholder="Zoek Magic-kaart, set of collector number..." /></label><select id="gameFilter" aria-label="Game"><option value="Magic: The Gathering">Magic: The Gathering</option></select><select id="sortFilter"><option value="recent">Nieuwste eerst</option><option value="value">Hoogste waarde</option><option value="name">Naam A-Z</option></select></div><div class="collection-meta"><span id="resultCount">0 kaarten</span><button class="text-btn" id="hydrateImagesBtn">Ontbrekende afbeeldingen ophalen</button></div></div>
-        <div id="cardGrid" class="binder-grid"></div><div id="emptyState" class="empty-state hidden"><div class="empty-icon">◇</div><h3>De kluis is nog leeg</h3><p>Voeg je eerste kaart toe of scan een foto om je collectie te vullen.</p></div>
-      </section>
-      <section class="page" id="add">
-        <div class="two-col-layout">
-          <section class="panel"><div class="panel-header"><div><p class="small-label">SCRYFALL LOOKUP</p><h3>Zoek een Magic-kaart</h3></div></div><div class="lookup-card"><div class="lookup-grid"><label><span>Game</span><select id="lookupGame"><option value="Magic: The Gathering">Magic: The Gathering</option></select></label><label class="wide"><span>Kaartnaam</span><input id="lookupQuery" placeholder="Bijv. Sol Ring, Black Lotus of Lightning Bolt" /></label></div><div class="action-row"><button class="primary-btn" id="lookupBtn">Zoek Magic-kaart</button><p class="hint">Zoekt automatisch de beste printing en actuele kaartdata.</p></div><div id="lookupStatus" class="status-text muted">Nog niets gezocht.</div><div id="lookupResults" class="lookup-results"></div></div></section>
-          <aside class="panel preview-panel"><p class="small-label">VAULT PREVIEW</p><h3>Zo staat hij in je collectie</h3><div class="preview-binder-card" id="previewImageWrap"><div class="preview-placeholder">TCG</div></div><div class="preview-meta"><span id="previewGame">Game</span><h4 id="previewName">Nieuwe kaart</h4><p><span id="previewSet">Set</span> · <span id="previewNumber">000</span></p></div></aside>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand-wrap">
+        <div class="brand-mark">☠︎</div>
+        <div>
+          <div class="brand-overline">ONE PIECE TCG</div>
+          <div class="brand-title">Grand Line Vault</div>
         </div>
-        <section class="panel form-panel spacing-top"><div class="panel-header"><div><p class="small-label">MANUAL ENTRY</p><h3>Kaart toevoegen aan collectie</h3></div></div><form id="cardForm" class="card-form"><div class="form-grid">
-          <label><span>Game</span><select id="game" required><option value="Magic: The Gathering">Magic: The Gathering</option></select></label>
-          <label><span>Naam</span><input id="name" required placeholder="Bijv. Monkey.D.Luffy" /></label><label><span>Set</span><input id="setName" required /></label><label><span>Kaartnummer</span><input id="cardNumber" /></label>
-          <label><span>Rarity</span><select id="rarity"><option>Common</option><option>Uncommon</option><option selected>Rare</option><option>Super Rare</option><option>Secret Rare</option><option>Mythic</option></select></label><label><span>Conditie</span><select id="condition"><option selected>Near Mint</option><option>Excellent</option><option>Good</option><option>Played</option></select></label><label><span>Aantal</span><input id="quantity" type="number" min="1" value="1" /></label><label><span>Waarde per kaart (€)</span><input id="price" type="number" step="0.01" min="0" value="0" /></label><label class="wide"><span>Afbeelding URL</span><input id="image" /></label><label class="wide upload-field"><span>Of upload zelf een kaartfoto</span><input id="imageUpload" type="file" accept="image/*" /></label><label class="wide check-row"><input id="foil" type="checkbox" /><span>Foil / glimmende variant</span></label>
-        </div><div class="action-row"><button type="submit" class="primary-btn">Kaart opslaan</button><button type="button" id="resetFormBtn" class="ghost-btn">Form resetten</button><button type="button" class="ghost-btn" data-goto="bulk">Bulk import</button></div></form></section>
+      </div>
+      <button class="icon-btn" id="refreshAllBtn" aria-label="Live data vernieuwen" title="Live data vernieuwen">↻</button>
+    </header>
+
+    <main>
+      <section class="page active" data-page="home">
+        <section class="hero">
+          <span class="eyebrow">MICHAEL'S COLLECTION</span>
+          <h1>Jouw kaarten.<br><em>Jouw treasure.</em></h1>
+          <p>Een iPhone-first One Piece Card Game binder met live kaartdata en actueel nieuws.</p>
+          <div class="live-strip" id="liveStrip">
+            <span class="live-dot"></span>
+            <strong>Live data</strong>
+            <span id="liveStatus">verbinden…</span>
+          </div>
+        </section>
+
+        <section class="stats-grid">
+          <article><span>Kaarten</span><strong id="statTotal">0</strong><small><b id="statUnique">0</b> uniek</small></article>
+          <article><span>Waarde</span><strong id="statValue">€0,00</strong><small>eigen waarde</small></article>
+          <article><span>Sets</span><strong id="statSets">0</strong><small>in je binder</small></article>
+          <article><span>Favorieten</span><strong id="statFavs">0</strong><small>chase cards</small></article>
+        </section>
+
+        <section class="section">
+          <div class="section-head">
+            <div><span class="eyebrow">BINDER</span><h2>Recent toegevoegd</h2></div>
+            <button class="text-btn" data-nav="collection">Alles bekijken →</button>
+          </div>
+          <div class="card-row" id="recentCards"></div>
+          <div class="empty-inline" id="recentEmpty">Nog geen kaarten. Voeg je eerste kaart toe vanuit <b>Zoeken</b>.</div>
+        </section>
+
+        <section class="section news-peek">
+          <div class="section-head">
+            <div><span class="eyebrow">LIVE FEED</span><h2>Laatste nieuws</h2></div>
+            <button class="text-btn" data-nav="news">Meer →</button>
+          </div>
+          <div id="homeNews" class="news-list compact"></div>
+        </section>
       </section>
-      <section class="page" id="scanner">
-        <div class="two-col-layout scanner-layout"><section class="panel"><div class="panel-header"><div><p class="small-label">PHOTO IMPORT</p><h3>Kaarten uit een foto halen</h3></div></div><p class="muted intro-copy">Upload een duidelijke foto. De scanner leest eerst de kaartnaam en controleert daarna de rest. Hij probeert ook een foil-effect te herkennen.</p><div class="upload-zone"><input id="scanImageInput" type="file" accept="image/*" /><div class="upload-zone-inner"><strong>Kies een foto</strong><p>Werkt het best met een rechte, beeldvullende kaart.</p></div></div><div id="scanPreview" class="scan-preview hidden"></div><div class="action-row spacing-top"><button class="primary-btn" id="scanBtn">Scan kaarten</button><button class="ghost-btn" id="clearScanBtn">Wis scan</button></div><div id="scanStatus" class="status-text muted">Nog geen scan gestart.</div></section><aside class="panel"><p class="small-label">OCR OUTPUT</p><h3>Gevonden tekst</h3><pre id="ocrText" class="ocr-box">Nog geen tekst gedetecteerd.</pre></aside></div>
-        <section class="panel spacing-top"><div class="panel-header"><div><p class="small-label">RESULTS</p><h3>Voorgestelde kaarten</h3></div></div><div id="scanResults" class="scan-results-grid"></div></section>
+
+      <section class="page" data-page="search">
+        <div class="page-heading">
+          <span class="eyebrow">LIVE CARD DATABASE</span>
+          <h1>Kaart zoeken</h1>
+          <p>Zoek op naam, kaartcode of set. De database wordt rechtstreeks opnieuw opgehaald wanneer nodig.</p>
+        </div>
+
+        <form id="searchForm" class="search-panel">
+          <label class="search-box">
+            <span>⌕</span>
+            <input id="cardQuery" type="search" autocomplete="off" placeholder="Kaido, OP17-062, Robin…" />
+          </label>
+          <div class="filter-row">
+            <select id="setFilter" aria-label="Set filter"><option value="">Alle sets</option></select>
+            <select id="variantFilter" aria-label="Variant filter">
+              <option value="">Alle varianten</option>
+              <option value="base">Normaal</option>
+              <option value="alt">Alt / Parallel</option>
+            </select>
+            <button class="primary-btn" type="submit">Zoeken</button>
+          </div>
+        </form>
+
+        <div class="data-meta">
+          <span id="cardDbStatus">Kaartdatabase laden…</span>
+          <button class="text-btn" id="reloadCardsBtn">Live herladen</button>
+        </div>
+        <div id="searchResults" class="card-grid"></div>
+        <div id="searchEmpty" class="empty-state hidden">Geen kaarten gevonden voor deze zoekopdracht.</div>
+      </section>
+
+      <section class="page" data-page="collection">
+        <div class="page-heading">
+          <span class="eyebrow">MY BINDER</span>
+          <h1>Collectie</h1>
+          <p>Je collectie wordt lokaal op deze iPhone/browser opgeslagen.</p>
+        </div>
+        <div class="collection-tools">
+          <label class="search-box"><span>⌕</span><input id="collectionQuery" type="search" placeholder="Zoek in je binder…" /></label>
+          <select id="collectionSort" aria-label="Sorteer collectie">
+            <option value="recent">Nieuwste eerst</option>
+            <option value="name">Naam A–Z</option>
+            <option value="value">Hoogste waarde</option>
+            <option value="set">Set</option>
+          </select>
+        </div>
+        <div class="collection-actions">
+          <button class="ghost-btn" id="exportBtn">↓ Backup</button>
+          <button class="ghost-btn" id="importBtn">↑ Import</button>
+          <input id="importFile" type="file" accept="application/json" hidden />
+        </div>
+        <div id="collectionGrid" class="card-grid"></div>
+        <div id="collectionEmpty" class="empty-state hidden">Je binder is nog leeg.</div>
+      </section>
+
+      <section class="page" data-page="news">
+        <div class="page-heading">
+          <span class="eyebrow">LIVE NEWS</span>
+          <h1>One Piece TCG nieuws</h1>
+          <p>Live headlines via Google News RSS, inclusief Bandai- en communitynieuws.</p>
+        </div>
+        <div class="news-controls">
+          <label class="search-box"><span>⌕</span><input id="newsQuery" type="search" placeholder="OP-18, manga, release…" /></label>
+          <button class="ghost-btn" id="reloadNewsBtn">↻ Vernieuwen</button>
+        </div>
+        <div class="data-meta"><span id="newsStatus">Nieuws laden…</span></div>
+        <div id="newsList" class="news-list"></div>
       </section>
     </main>
-  </div>
-  <div id="cardModal" class="card-modal hidden" aria-hidden="true"><button class="modal-backdrop" id="modalBackdrop" aria-label="Sluiten"></button><section class="card-modal-sheet" role="dialog" aria-modal="true" aria-labelledby="modalCardName"><div class="modal-topbar"><div><p class="small-label">CARD INSPECTOR</p><h3 id="modalCardName">Kaart</h3></div><button class="modal-close" id="modalCloseBtn" aria-label="Sluiten">×</button></div><div class="modal-grid"><div class="tilt-stage"><div class="tilt-card" id="tiltCard"><img id="modalCardImage" alt="Kaartafbeelding" /><div class="tilt-placeholder hidden" id="modalCardPlaceholder">TCG</div><div class="foil-layer" id="foilLayer"></div><div class="shine-layer"></div></div><p class="tilt-hint">Sleep over de kaart om hem te kantelen</p></div><div class="modal-details"><div class="detail-chip-row"><span class="game-chip mtg" id="modalGameChip">MAGIC</span><span class="foil-status" id="modalFoilStatus">NON-FOIL</span></div><div class="detail-list"><div><span>Set</span><strong id="modalSet">—</strong></div><div><span>Kaartnummer</span><strong id="modalNumber">—</strong></div><div><span>Rarity</span><strong id="modalRarity">—</strong></div><div><span>Conditie</span><strong id="modalCondition">—</strong></div><div><span>Aantal</span><strong id="modalQuantity">1</strong></div><div><span>Waarde</span><strong id="modalPrice">€0,00</strong></div></div><div class="modal-actions"><button class="primary-btn" id="toggleFoilBtn">Foil aanzetten</button><button class="ghost-btn danger-btn" id="modalDeleteBtn">Verwijderen</button></div><p class="modal-note">Bij foil-kaarten beweegt het holo-effect mee met je vinger.</p></div></div></section></div>
-  <div id="toast" class="toast"></div>
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-  <script src="app.js?v=5"></script>
-  <script src="patch.js?v=51"></script>
-  <script src="foil-effects.js?v=6"></script>
-  <script src="collection-reveal.js?v=3"></script>
-</body></html>
 
+    <nav class="bottom-nav" aria-label="Hoofdnavigatie">
+      <button class="active" data-nav="home"><span>⌂</span><small>Home</small></button>
+      <button data-nav="search"><span>⌕</span><small>Zoeken</small></button>
+      <button data-nav="collection"><span>▦</span><small>Binder</small></button>
+      <button data-nav="news"><span>◫</span><small>Nieuws</small></button>
+    </nav>
+  </div>
+
+  <div class="modal hidden" id="cardModal" aria-hidden="true">
+    <button class="modal-backdrop" id="modalBackdrop" aria-label="Sluiten"></button>
+    <section class="modal-sheet" role="dialog" aria-modal="true">
+      <div class="modal-grab"></div>
+      <button class="modal-close" id="modalClose">×</button>
+      <div class="modal-card-visual" id="tiltWrap">
+        <div class="tilt-card" id="tiltCard">
+          <img id="modalImage" alt="One Piece kaart" />
+          <div class="foil"></div>
+          <div class="shine"></div>
+        </div>
+      </div>
+      <div class="modal-copy">
+        <div class="pill-row"><span id="modalCode" class="pill"></span><span id="modalRarity" class="pill"></span><span id="modalVariant" class="pill special hidden">ALT</span></div>
+        <h2 id="modalName">Kaart</h2>
+        <p id="modalMeta" class="muted"></p>
+        <p id="modalEffect" class="effect"></p>
+        <div class="owned-editor hidden" id="ownedEditor">
+          <div class="editor-grid">
+            <label>Aantal<input id="ownedQty" type="number" min="1" max="999" /></label>
+            <label>Waarde p/st (€)<input id="ownedValue" type="number" min="0" step="0.01" /></label>
+            <label>Conditie<select id="ownedCondition"><option>Near Mint</option><option>Excellent</option><option>Good</option><option>Played</option></select></label>
+            <label>Taal<select id="ownedLanguage"><option>English</option><option>Japanese</option><option>French</option><option>Chinese</option></select></label>
+          </div>
+          <label class="note-label">Notitie<textarea id="ownedNote" rows="2" placeholder="Bijv. zelf gepulled…"></textarea></label>
+        </div>
+        <div class="modal-actions">
+          <button class="primary-btn" id="modalPrimary">+ Voeg toe</button>
+          <button class="ghost-btn hidden" id="favoriteBtn">♡ Favoriet</button>
+          <button class="danger-btn hidden" id="deleteBtn">Verwijder</button>
+        </div>
+        <a id="tcgPlayerLink" class="external-link" target="_blank" rel="noopener">Bekijk markt / listings ↗</a>
+      </div>
+    </section>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="app.js?v=20260914" defer></script>
+</body>
+</html>
