@@ -16,7 +16,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Pirata+One&family=Rye&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css?v=20260914" />
   <link rel="stylesheet" href="onepiece-theme.css?v=20260915g" />
-  <link rel="stylesheet" href="desktop-polish.css?v=20260915h" />
+  <link rel="stylesheet" href="desktop-polish.css?v=20260915i" />
+  <link rel="stylesheet" href="clean-theme.css?v=20260915j" />
 </head>
 <body>
   <div class="ocean-map" aria-hidden="true"></div>
@@ -27,7 +28,7 @@
       <div class="brand-wrap">
         <div class="brand-mark pirate-mark"><span>☠</span></div>
         <div>
-          <div class="brand-overline">PERSONAL GRAND LINE ARCHIVE</div>
+          <div class="brand-overline">ONE PIECE TCG COLLECTION</div>
           <div class="brand-title">Grand Line Vault</div>
         </div>
       </div>
@@ -41,36 +42,36 @@
           <div class="hero-vignette" aria-hidden="true"></div>
           <div class="hero-paper">
             <div class="hero-stamp">GRAND LINE<br>ARCHIVE</div>
-            <span class="eyebrow">CAPTAIN'S COLLECTION • PRIVATE FILE</span>
-            <h1>Your treasure.<br><em>Your crew.</em></h1>
-            <p>Een One Piece TCG companion gebouwd als een mix van bounty board, treasure log en World Economy Journal.</p>
+            <span class="eyebrow">YOUR PERSONAL COLLECTION</span>
+            <h1>Your cards.<br><em>Your Grand Line.</em></h1>
+            <p>Houd je persoonlijke One Piece TCG-collectie bij, ontdek kaarten en volg het belangrijkste nieuws op één plek.</p>
             <div class="hero-actions">
-              <button class="primary-btn ticket-btn" data-nav="search"><span>🧭</span> Start Card Hunt</button>
-              <button class="ghost-btn ticket-btn" data-nav="news"><span>📰</span> Morgans News</button>
+              <button class="primary-btn ticket-btn" data-nav="search"><span>🧭</span> Kaart zoeken</button>
+              <button class="ghost-btn ticket-btn" data-nav="news"><span>📰</span> TCG Nieuws</button>
             </div>
             <div class="live-strip newspaper-status"><span class="live-dot"></span><strong>Grand Line signal</strong><span id="liveStatus">verbinden…</span></div>
           </div>
         </section>
 
         <section class="bounty-ledger">
-          <div class="ledger-title"><span>BOUNTY LEDGER</span><small>personal collection registry</small></div>
+          <div class="ledger-title"><span>COLLECTION OVERVIEW</span><small>your collection at a glance</small></div>
           <div class="stats-grid treasure-stats">
-            <article><span>CARDS LOGGED</span><strong id="statTotal">0</strong><small><b id="statUnique">0</b> unique</small></article>
-            <article><span>VAULT VALUE</span><strong id="statValue">€0,00</strong><small>your own estimate</small></article>
-            <article><span>ISLANDS / SETS</span><strong id="statSets">0</strong><small>sets collected</small></article>
-            <article><span>CHASE BOUNTIES</span><strong id="statFavs">0</strong><small>favorites</small></article>
+            <article><span>CARDS</span><strong id="statTotal">0</strong><small><b id="statUnique">0</b> unique</small></article>
+            <article><span>COLLECTION VALUE</span><strong id="statValue">€0,00</strong><small>your own estimate</small></article>
+            <article><span>SETS</span><strong id="statSets">0</strong><small>sets collected</small></article>
+            <article><span>FAVORITES</span><strong id="statFavs">0</strong><small>favorites</small></article>
           </div>
         </section>
 
         <section class="section wanted-shelf">
           <div class="section-head wanted-heading">
-            <div><span class="eyebrow">WANTED ARCHIVE</span><h2>Recent treasure</h2><p>De nieuwste kaarten uit je persoonlijke bounty wall.</p></div>
-            <button class="text-btn stamp-link" data-nav="collection">OPEN ARCHIVE →</button>
+            <div><span class="eyebrow">YOUR COLLECTION</span><h2>Recent toegevoegd</h2><p>Je laatst toegevoegde kaarten.</p></div>
+            <button class="text-btn stamp-link" data-nav="collection">VIEW COLLECTION →</button>
           </div>
           <div class="wanted-board">
             <div class="wanted-board-photo" aria-hidden="true"></div>
             <div class="card-row" id="recentCards"></div>
-            <div class="empty-inline" id="recentEmpty">NO BOUNTIES POSTED YET — zoek je eerste kaart via <b>Card Hunt</b>.</div>
+            <div class="empty-inline" id="recentEmpty">Je collectie is nog leeg — zoek je eerste kaart via <b>Kaart zoeken</b>.</div>
           </div>
         </section>
 
@@ -87,19 +88,14 @@
             </div>
           </div>
         </section>
-
-        <section class="crew-strip" aria-label="Pirate crew emblems">
-          <div class="crew-copy"><span>CREW SIGNALS</span><b>Jolly Roger registry</b></div>
-          <div class="crew-art" aria-hidden="true"></div>
-        </section>
       </section>
 
       <section class="page" data-page="search">
         <section class="page-banner map-banner">
           <div class="banner-compass">✦</div>
-          <span class="eyebrow">TREASURE MAP • CARD HUNT</span>
-          <h1>Hunt the Grand Line</h1>
-          <p>Zoek kaarten op naam, card code, rarity of set. Elke hit wordt direct uit de live card database gehaald.</p>
+          <span class="eyebrow">CARD DATABASE</span>
+          <h1>Kaarten zoeken</h1>
+          <p>Zoek live op naam, kaartcode, rarity of set en voeg kaarten direct toe aan je collectie.</p>
         </section>
 
         <section class="search-scroll paper-panel">
@@ -115,33 +111,31 @@
           <div class="data-meta ink-meta"><span id="cardDbStatus">Kaartdatabase laden…</span><button class="text-btn ink-link" id="reloadCardsBtn">↻ Live herladen</button></div>
         </section>
 
-        <div class="search-results-head"><span>DISCOVERED TREASURE</span><small>tap a card for dossier view</small></div>
+        <div class="search-results-head"><span>SEARCH RESULTS</span><small>klik voor details</small></div>
         <div id="searchResults" class="card-grid treasure-grid"></div>
         <div id="searchEmpty" class="empty-state hidden">Geen kaarten gevonden op deze route.</div>
       </section>
 
       <section class="page" data-page="collection">
         <section class="page-banner wanted-banner">
-          <div class="wanted-banner-bg" aria-hidden="true"></div>
           <div class="wanted-banner-copy">
-            <span class="eyebrow ink">MARINE NOTICE • PRIVATE ARCHIVE</span>
-            <h1>WANTED<br>ARCHIVE</h1>
-            <p>Elke kaart in je collectie wordt behandeld als een bounty dossier.</p>
+            <span class="eyebrow ink">PERSONAL COLLECTION</span>
+            <h1>Mijn collectie</h1>
+            <p>Beheer je One Piece TCG-collectie, aantallen, conditie, favorieten en je eigen geschatte waarde.</p>
           </div>
-          <div class="beli-seal"><span>฿</span><small>BOUNTY<br>REGISTRY</small></div>
         </section>
 
         <section class="collection-desk paper-panel">
           <div class="collection-tools">
-            <label class="search-box parchment-search"><span>⌕</span><input id="collectionQuery" type="search" placeholder="Zoek een bounty…" /></label>
+            <label class="search-box parchment-search"><span>⌕</span><input id="collectionQuery" type="search" placeholder="Zoek in je collectie…" /></label>
             <select id="collectionSort"><option value="recent">Nieuwste eerst</option><option value="name">Naam A–Z</option><option value="value">Hoogste waarde</option><option value="set">Set</option></select>
           </div>
           <div class="collection-actions"><button class="ghost-btn paper-button" id="exportBtn">↓ Export Log</button><button class="ghost-btn paper-button" id="importBtn">↑ Import Log</button><input id="importFile" type="file" accept="application/json" hidden /></div>
         </section>
 
-        <div class="binder-label"><span>DEAD OR ALIVE</span><b>Your personal collection</b><small>click any bounty for full dossier</small></div>
+        <div class="binder-label"><span>COLLECTION CARD</span><b>Mijn kaarten</b><small>klik een kaart voor details</small></div>
         <div id="collectionGrid" class="card-grid wanted-grid"></div>
-        <div id="collectionEmpty" class="empty-state hidden">Je wanted wall is nog leeg.</div>
+        <div id="collectionEmpty" class="empty-state hidden">Je collectie is nog leeg.</div>
       </section>
 
       <section class="page" data-page="news">
@@ -171,9 +165,9 @@
     </main>
 
     <nav class="bottom-nav log-pose-nav" aria-label="Hoofdnavigatie">
-      <button class="active" data-nav="home"><span class="nav-icon">☠</span><small>VAULT</small></button>
-      <button data-nav="search"><span class="nav-icon">✦</span><small>HUNT</small></button>
-      <button data-nav="collection"><span class="nav-icon">฿</span><small>WANTED</small></button>
+      <button class="active" data-nav="home"><span class="nav-icon">☠</span><small>HOME</small></button>
+      <button data-nav="search"><span class="nav-icon">⌕</span><small>SEARCH</small></button>
+      <button data-nav="collection"><span class="nav-icon">▦</span><small>COLLECTION</small></button>
       <button data-nav="news"><span class="nav-icon">▤</span><small>NEWS</small></button>
     </nav>
   </div>
@@ -182,15 +176,15 @@
     <button class="modal-backdrop dossier-backdrop" id="modalBackdrop" aria-label="Sluiten"></button>
     <section class="modal-sheet dossier-sheet" role="dialog" aria-modal="true">
       <div class="modal-grab"></div><button class="modal-close dossier-close" id="modalClose">×</button>
-      <div class="dossier-label">TREASURE DOSSIER • MARINE ARCHIVE COPY</div>
+      <div class="dossier-label">CARD DETAILS</div>
       <div class="modal-card-visual" id="tiltWrap"><div class="tilt-card" id="tiltCard"><img id="modalImage" alt="One Piece kaart" /><div class="foil"></div><div class="shine"></div></div></div>
       <div class="modal-copy dossier-copy">
-        <div class="bounty-line"><span>DEAD OR ALIVE</span><b>฿ <span id="dossierBeli">COLLECTOR</span></b></div>
+        <div class="bounty-line"><span>COLLECTION CARD</span><b>฿ <span id="dossierBeli">OWNED</span></b></div>
         <div class="pill-row"><span id="modalCode" class="pill"></span><span id="modalRarity" class="pill"></span><span id="modalVariant" class="pill special hidden">ALT</span></div>
         <h2 id="modalName">Kaart</h2><p id="modalMeta" class="muted"></p><p id="modalEffect" class="effect"></p>
         <div class="owned-editor hidden" id="ownedEditor"><div class="editor-grid"><label>Aantal<input id="ownedQty" type="number" min="1" max="999" /></label><label>Waarde p/st (€)<input id="ownedValue" type="number" min="0" step="0.01" /></label><label>Conditie<select id="ownedCondition"><option>Near Mint</option><option>Excellent</option><option>Good</option><option>Played</option></select></label><label>Taal<select id="ownedLanguage"><option>English</option><option>Japanese</option><option>French</option><option>Chinese</option></select></label></div><label class="note-label">Captain's note<textarea id="ownedNote" rows="2" placeholder="Bijv. zelf gepulled…"></textarea></label></div>
-        <div class="modal-actions"><button class="primary-btn" id="modalPrimary">+ Add to Vault</button><button class="ghost-btn hidden" id="favoriteBtn">♡ Chase</button><button class="danger-btn hidden" id="deleteBtn">Remove</button></div>
-        <a id="tcgPlayerLink" class="external-link" target="_blank" rel="noopener">Market intelligence ↗</a>
+        <div class="modal-actions"><button class="primary-btn" id="modalPrimary">+ Add to collection</button><button class="ghost-btn hidden" id="favoriteBtn">♡ Favorite</button><button class="danger-btn hidden" id="deleteBtn">Delete</button></div>
+        <a id="tcgPlayerLink" class="external-link" target="_blank" rel="noopener">Market / listings ↗</a>
       </div>
     </section>
   </div>
@@ -208,5 +202,6 @@
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <script src="app.js?v=20260914" defer></script>
   <script src="news-ui.js?v=20260915h" defer></script>
+  <script src="image-polish.js?v=20260915i" defer></script>
 </body>
 </html>
