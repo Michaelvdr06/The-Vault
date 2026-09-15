@@ -1,0 +1,133 @@
+/* Desktop + HD visual pass */
+:root{--content-max:1480px;--paper-shadow:0 30px 70px rgba(0,0,0,.32)}
+
+/* HD network assets */
+.hero-art{
+  background-image:url('https://m.media-amazon.com/images/S/pv-target-images/5c05de636f596cb157698cde7923ce19e8473211228abb1cea24a12baaaa8074.jpg')!important;
+  background-position:center 34%!important;
+  background-size:cover!important;
+  filter:saturate(1.07) contrast(1.02)!important;
+}
+.wanted-board,
+.wanted-board-photo,
+.wanted-banner-bg{
+  background-image:url('https://wallpapercave.com/wp/wp10885749.jpg')!important;
+}
+.morgans-portrait,
+.morgans-news-photo{
+  background-image:url('https://i.postimg.cc/fRGtzjnP/picsart-23-02-20-21-37-52-331.jpg')!important;
+  background-position:center 16%!important;
+}
+.jolly-watermark{
+  background-image:url('https://clipart-library.com/2023/437-4372322_anime-clipart-one-piece-one-piece-logo-transparent.png')!important;
+  background-size:contain!important;
+  background-repeat:no-repeat!important;
+}
+.crew-art{
+  background-image:url('https://clipart-library.com/2023/437-4372322_anime-clipart-one-piece-one-piece-logo-transparent.png')!important;
+  background-size:contain!important;
+  background-repeat:no-repeat!important;
+  background-position:center!important;
+}
+
+/* Header brand: use actual high-res SVG logo from Wikimedia Commons */
+.brand-wrap{gap:16px!important}
+.brand-wrap::before{
+  content:"";
+  display:block;
+  width:148px;
+  height:54px;
+  flex:0 0 148px;
+  background:url('https://commons.wikimedia.org/wiki/Special:Redirect/file/One_piece_logo.svg') center/contain no-repeat;
+  filter:drop-shadow(0 4px 8px rgba(0,0,0,.35));
+}
+.brand-mark{display:none!important}
+
+/* Full-width desktop shell */
+.app{max-width:var(--content-max)!important;width:min(var(--content-max),calc(100% - 40px))!important}
+.ship-header{padding-left:28px!important;padding-right:28px!important;border-radius:0 0 12px 12px}
+.page{padding:28px 0 18px!important}
+
+/* Home hero becomes true desktop editorial composition */
+.op-hero{min-height:700px!important;border-radius:14px!important}
+.hero-paper{margin:72px 0 54px 58px!important;width:min(560px,44%)!important;padding:38px 38px 32px!important;box-shadow:14px 16px 0 rgba(42,25,13,.18),var(--paper-shadow)!important}
+.hero-paper h1{font-size:clamp(52px,5vw,84px)!important}
+.hero-paper p{font-size:15px!important;max-width:470px!important}
+.hero-vignette{background:linear-gradient(90deg,rgba(4,15,23,.94) 0,rgba(4,15,23,.72) 32%,rgba(4,15,23,.08) 67%,rgba(4,15,23,.2) 100%),linear-gradient(0deg,rgba(4,15,23,.72) 0,transparent 45%)!important}
+
+/* Stats are compact desktop ledger cards */
+.bounty-ledger{padding:18px 18px 20px!important}
+.stats-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:14px!important}
+.treasure-stats article{padding:18px!important}
+.treasure-stats strong{font-size:28px!important}
+
+/* Two-column desktop home content */
+@media(min-width:1100px){
+  .wanted-shelf{margin-top:34px!important}
+  .wanted-board{min-height:300px!important;padding:26px 24px!important}
+  .card-row{grid-auto-columns:190px!important;gap:20px!important;overflow-x:auto!important}
+  .morgans-layout{grid-template-columns:340px minmax(0,1fr)!important;min-height:520px!important}
+  .morgans-portrait{min-height:520px!important;background-size:cover!important}
+  .morgans-paper{padding:30px 32px!important}
+  .crew-strip{grid-template-columns:260px 1fr!important;min-height:170px!important}
+
+  .search-scroll,.collection-desk,.journal-controls{max-width:1120px;margin-left:auto!important;margin-right:auto!important}
+  .page-banner,.journal-frontpage{max-width:1320px;margin-left:auto!important;margin-right:auto!important}
+  .treasure-grid,.wanted-grid,.newspaper-grid{grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:22px!important}
+  .tcg-card img{aspect-ratio:5/7!important;object-fit:cover!important}
+  .journal-frontpage{display:grid!important;grid-template-columns:1.1fr .9fr!important;overflow:hidden!important}
+  .journal-masthead{grid-column:1/-1!important}
+  .journal-hero-row{grid-column:1/-1!important;display:grid!important;grid-template-columns:420px 1fr!important;min-height:360px!important}
+  .morgans-news-photo{min-height:360px!important}
+  .journal-lead{padding:48px!important;display:flex!important;flex-direction:column!important;justify-content:center!important}
+  .journal-lead h2{font-size:clamp(38px,4vw,64px)!important;line-height:.98!important}
+}
+
+/* Desktop navigation becomes a dock instead of giant mobile bar */
+@media(min-width:900px){
+  body{padding-bottom:0!important}
+  .app{padding-bottom:28px!important}
+  .bottom-nav{
+    position:sticky!important;
+    bottom:18px!important;
+    left:auto!important;
+    transform:none!important;
+    width:min(720px,calc(100% - 48px))!important;
+    margin:34px auto 0!important;
+    height:76px!important;
+    border:1px solid rgba(224,187,111,.3)!important;
+    border-radius:16px!important;
+    overflow:hidden!important;
+    box-shadow:0 18px 40px rgba(0,0,0,.28)!important;
+  }
+  .bottom-nav button{min-height:60px!important}
+  .nav-icon{font-size:24px!important}
+  .bottom-nav small{font-size:10px!important;letter-spacing:.12em!important}
+}
+
+/* Responsive cards: never stretch pixelated backgrounds */
+.news-reader-image,.morgans-news-photo,.morgans-portrait,.hero-art,.wanted-banner-bg{image-rendering:auto}
+.news-reader-image img{width:100%;height:100%;object-fit:cover;image-rendering:auto}
+
+/* Tablet */
+@media(min-width:700px) and (max-width:1099px){
+  .app{width:min(1040px,calc(100% - 28px))!important}
+  .op-hero{min-height:620px!important}
+  .hero-paper{width:min(520px,62%)!important;margin-left:34px!important}
+  .treasure-grid,.wanted-grid,.newspaper-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+  .morgans-layout{grid-template-columns:280px 1fr!important}
+}
+
+/* Mobile keeps existing layout but uses HD assets */
+@media(max-width:699px){
+  .app{width:100%!important}
+  .brand-wrap::before{width:92px;height:36px;flex-basis:92px}
+  .brand-overline{font-size:8px!important}.brand-title{font-size:20px!important}
+  .op-hero{min-height:560px!important;border-radius:0!important;margin-inline:-16px!important}
+  .hero-paper{width:calc(100% - 34px)!important;margin:190px 17px 22px!important;padding:24px 22px!important}
+  .hero-paper h1{font-size:42px!important}
+  .hero-vignette{background:linear-gradient(0deg,rgba(4,15,23,.88) 0,rgba(4,15,23,.2) 62%,rgba(4,15,23,.08) 100%)!important}
+  .stats-grid{grid-template-columns:1fr 1fr!important}
+  .morgans-layout{grid-template-columns:1fr!important}
+  .morgans-portrait{height:260px!important;border-right:0!important;border-bottom:2px solid #6f5333!important}
+}
