@@ -1,0 +1,39 @@
+/* Mobile-first polish for Grand Line Vault */
+:root{--phone-pad:14px;--safe-bottom:max(14px,env(safe-area-inset-bottom))}
+html,body{overflow-x:hidden}
+body{padding-bottom:calc(94px + var(--safe-bottom))}
+.topbar.ship-header{position:sticky;top:0;z-index:50;padding:12px var(--phone-pad);backdrop-filter:blur(14px)}
+.page{padding-inline:var(--phone-pad)}
+.op-hero{border-radius:22px;overflow:hidden}
+.hero-paper{width:auto!important;max-width:none!important;margin:14px!important;padding:18px 16px 16px!important;border-radius:20px!important}
+.hero-paper h1{font-size:clamp(2rem,8vw,3rem)!important;line-height:.95}
+.hero-paper p{font-size:.95rem;line-height:1.45}
+.hero-actions{gap:10px;flex-direction:column}
+.hero-actions .primary-btn,.hero-actions .ghost-btn{width:100%;justify-content:center}
+.stats-grid.treasure-stats{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px}
+.section,.bounty-ledger,.wanted-board,.morgans-paper,.crew-strip,.news-reader-content{border-radius:18px}
+.card-row{grid-auto-columns:140px!important;gap:12px!important;padding-bottom:4px;overflow-x:auto;scroll-snap-type:x proximity}
+.card-row>*{scroll-snap-align:start}
+.tcg-card,.mini-card{display:flex!important;flex-direction:column;align-items:stretch;gap:8px;min-width:0;overflow:hidden}
+.tcg-card img,.mini-card img,#modalImage{width:100%!important;display:block!important;opacity:1!important;aspect-ratio:63/88;object-fit:cover;object-position:center top;min-height:160px;background:linear-gradient(180deg,#efe4c8,#dbc08e);border-radius:12px;box-shadow:0 8px 20px rgba(0,0,0,.15)}
+.tcg-card strong,.mini-card strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tcg-card small,.mini-card small{display:block;opacity:.9}
+#collectionGrid,#searchResults{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px!important}
+.news-list,.news-list.compact{grid-template-columns:1fr!important;gap:14px!important}
+.news-item{border-radius:18px!important;overflow:hidden}
+.news-item .news-cover{min-height:150px!important;background-size:cover!important;background-repeat:no-repeat!important}
+.news-item .news-cover img{width:100%;height:100%;display:block;object-fit:cover;object-position:center top;filter:saturate(1.02) contrast(1.02)}
+.news-item h3{font-size:1.55rem;line-height:1.03;letter-spacing:-.02em}
+.news-item .news-body{padding:14px 14px 12px}
+.news-item .news-meta{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:.74rem}
+.news-item .news-source-inline{padding-top:10px;font-size:.78rem}
+.news-reader{align-items:flex-end}
+.news-reader-sheet{width:100%;max-height:90vh;border-radius:22px 22px 0 0}
+.news-reader-image{height:210px!important;background-size:cover!important;background-position:center top!important}
+.news-reader-content h2{font-size:2rem;line-height:.95}
+.modal-sheet.dossier-sheet{width:calc(100% - 18px)!important;max-width:none!important;max-height:90vh;overflow:auto;border-radius:22px;padding:14px}
+.bottom-nav{position:fixed!important;left:12px!important;right:12px!important;bottom:calc(10px + env(safe-area-inset-bottom))!important;width:auto!important;transform:none!important;border-radius:20px!important;z-index:60;padding:10px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.bottom-nav button{min-height:68px;border-radius:16px;font-size:.92rem;padding:10px 6px}
+.bottom-nav button span{font-size:1.3rem}
+@media(min-width:700px){body{padding-bottom:40px}.page{padding-inline:18px}#collectionGrid,#searchResults{grid-template-columns:repeat(3,minmax(0,1fr))!important}.news-list,.news-list.compact{grid-template-columns:repeat(2,minmax(0,1fr))!important}.bottom-nav{position:sticky!important;left:auto!important;right:auto!important;bottom:12px!important;width:min(680px,100%)!important;margin:14px auto 0!important}}
+@media(min-width:1100px){#collectionGrid,#searchResults{grid-template-columns:repeat(5,minmax(0,1fr))!important}.news-list,.news-list.compact{grid-template-columns:repeat(3,minmax(0,1fr))!important}}
