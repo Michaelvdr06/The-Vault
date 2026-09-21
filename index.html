@@ -17,7 +17,7 @@
   <link rel="stylesheet" href="styles.css?v=20260914" />
   <link rel="stylesheet" href="onepiece-theme.css?v=20260915g" />
   <link rel="stylesheet" href="desktop-polish.css?v=20260921a" />
-  <link rel="stylesheet" href="mobile-phone-fixes.css?v=20260921a" />
+  <link rel="stylesheet" href="mobile-phone-fixes.css?v=20260921b" />
 </head>
 <body>
   <div class="ocean-map" aria-hidden="true"></div>
@@ -155,6 +155,33 @@
           </div>
         </section>
 
+        <section class="set-intel-panel paper-panel">
+          <div class="set-intel-head">
+            <div>
+              <span class="eyebrow ink">SET INTEL</span>
+              <h2>Track the next booster</h2>
+              <p>Kies een OP-set en haal alleen nieuws + reeds bekende kaarten voor die set op.</p>
+            </div>
+            <div class="set-intel-controls">
+              <select id="setIntelSelect" aria-label="Set Intel">
+                <option value="OP18" selected>OP-18 · The Dominance of God</option>
+                <option value="OP17">OP-17 · The World's Strongest Warriors</option>
+                <option value="OP16">OP-16 · The Time of Battle</option>
+                <option value="OP15">OP-15</option>
+                <option value="OP14">OP-14</option>
+              </select>
+              <button class="primary-btn" id="setIntelRefresh">↻ FETCH SET INTEL</button>
+            </div>
+          </div>
+          <div class="set-intel-stats">
+            <article><span>SET</span><strong id="setIntelCode">OP-18</strong><small id="setIntelStatus">upcoming</small></article>
+            <article><span>KNOWN CARDS</span><strong id="setIntelCards">0</strong><small>in live card DB</small></article>
+            <article><span>HEADLINES</span><strong id="setIntelNewsCount">0</strong><small>set-specific</small></article>
+          </div>
+          <div id="setIntelCardsGrid" class="set-intel-cardstrip"></div>
+          <div id="setIntelNews" class="set-intel-news"></div>
+        </section>
+
         <section class="journal-controls paper-panel">
           <div class="news-controls"><label class="search-box parchment-search"><span>⌕</span><input id="newsQuery" type="search" placeholder="OP-18, manga, release, event…" /></label><button class="ghost-btn paper-button" id="reloadNewsBtn">↻ NEW EDITION</button></div>
           <div class="news-tabs-ui"><button class="active" data-news-ui-filter="all">FRONT PAGE</button><button data-news-ui-filter="op18">OP-18</button><button data-news-ui-filter="official">OFFICIAL</button><button data-news-ui-filter="events">EVENTS</button></div>
@@ -200,9 +227,9 @@
   </div>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="app.js?v=20260914" defer></script>
-  <script src="news-ui.js?v=20260915h" defer></script>
+  <script src="app.js?v=20260921b" defer></script>
+  <script src="news-ui.js?v=20260921b" defer></script>
   <script src="image-polish.js?v=20260921a" defer></script>
-  <script src="news-cover-upgrade.js?v=20260921a" defer></script>
+  <script src="news-cover-upgrade.js?v=20260921b" defer></script>
 </body>
 </html>
