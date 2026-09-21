@@ -95,6 +95,7 @@
     $('#cardDbStatus').textContent=`${state.cards.length.toLocaleString('nl-NL')} printings · ${source}${time?' · '+time:''}`;
     $('#liveStatus').textContent=`${state.cards.length.toLocaleString('nl-NL')} kaarten beschikbaar`;
     renderSearch();
+    if($('#setIntelSelect')) loadSetIntel(false);
   }
 
   function cardButton(card, mini=false, owned=null){
@@ -210,17 +211,67 @@
       let items=[];
       for(const result of settled){ if(result.status==='fulfilled'&&result.value.status==='ok') items.push(...(result.value.items||[])); }
       const seen=new Set();
-      state.news=items.map(i=>({title:i.title||'',link:i.link||'',date:i.pubDate||'',source:(i.author||'').trim()||extractPublisher(i.title),description:i.description||''}))
+      state.news=items.map(i=>({title:i.title||'',link:i.link||'',date:i.pubDate||'',source:(i.author||'').trim()||extractPublisher(i.title),description:i.description||i.content||'',image:i.thumbnail||i.enclosure?.link||extractNewsImage(i.description||i.content||'')}))
         .filter(i=>i.title&&i.link).filter(i=>{const k=i.title.toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();if(seen.has(k))return false;seen.add(k);return true;})
         .sort((a,b)=>Date.parse(b.date)-Date.parse(a.date)).slice(0,30);
-      renderNews(); const now=new Date().toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit'}); $('#newsStatus').textContent=`${state.news.length} live headlines · bijgewerkt ${now}`; $('#liveStatus').textContent=state.cards.length?`${state.cards.length.toLocaleString('nl-NL')} kaarten · nieuws live`:'nieuws live';
+      renderNews(); if($('#setIntelSelect')) loadSetIntel(false); const now=new Date().toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit'}); $('#newsStatus').textContent=`${state.news.length} live headlines · bijgewerkt ${now}`; $('#liveStatus').textContent=state.cards.length?`${state.cards.length.toLocaleString('nl-NL')} kaarten · nieuws live`:'nieuws live';
     }catch(err){ $('#newsStatus').textContent='Nieuwsbron tijdelijk niet bereikbaar.'; }
   }
 
   function extractPublisher(title=''){ const parts=title.split(' - '); return parts.length>1?parts.at(-1):'Google News'; }
   function cleanTitle(title=''){ const parts=title.split(' - '); return parts.length>1?parts.slice(0,-1).join(' - '):title; }
   function fmtDate(v){ const d=new Date(v); return Number.isNaN(d.getTime())?v:d.toLocaleDateString('nl-NL',{day:'numeric',month:'short',year:'numeric'}); }
-  function newsHtml(i){ const title=cleanTitle(i.title); const op18=/\bOP[- ]?18\b/i.test(title+' '+i.description); return `<a class="news-item ${op18?'op18':''}" href="${esc(i.link)}" target="_blank" rel="noopener"><div class="news-meta"><span>${op18?'OP-18 · ':''}${esc(fmtDate(i.date))}</span><span>•</span><span>${esc(i.source)}</span></div><h3>${esc(title)}</h3></a>`; }
+  function extractNewsImage(html=''){
+    const s=String(html||'');
+    const m=s.match(/<img[^>]+src=["']([^"']+)["']/i);
+    return m?m[1]:'';
+  }
+  function setCodeDisplay(v=''){ return String(v).replace(/^OP/i,'OP-'); }
+  function setIntelMeta(code){
+    const map={
+      OP18:{name:'The Dominance of God',status:'Upcoming · Nov 2026'},
+      OP17:{name:"The World's Strongest Warriors",status:'Released · Aug 2026'},
+      OP16:{name:'The Time of Battle',status:'Released · Jun 2026'},
+      OP15:{name:'OP-15',status:'Released'},
+      OP14:{name:'OP-14',status:'Released'}
+    };
+    return map[code]||{name:code,status:'Set'};
+  }
+  async function loadSetIntel(force=false){
+    const select=$('#setIntelSelect'); if(!select) return;
+    const code=select.value||'OP18';
+    const term=code.replace(/^OP/,'OP-');
+    const meta=setIntelMeta(code);
+    $('#setIntelCode').textContent=term;
+    $('#setIntelStatus').textContent=meta.status;
+    const known=state.cards.filter(c=>(c._set||'').replace('-','')===code);
+    $('#setIntelCards').textContent=known.length;
+    $('#setIntelCardsGrid').innerHTML=known.slice(0,10).map(c=>cardButton(c,true)).join('')||'<div class="set-intel-empty">Nog geen kaarten uit deze set in de live kaartdatabase.</div>';
+    bindCardButtons($('#setIntelCardsGrid'));
+    let related=state.news.filter(n=>(n.title+' '+n.description).toUpperCase().includes(term)|| (n.title+' '+n.description).toUpperCase().includes(code));
+    if(force){
+      try{
+        const q='"One Piece Card Game" "'+term+'"';
+        const feed='https://news.google.com/rss/search?q='+encodeURIComponent(q)+'&hl=en&gl=US&ceid=US:en';
+        const res=await fetch(RSS2JSON+encodeURIComponent(feed)+'&_='+Date.now(),{cache:'no-store'});
+        const json=await res.json();
+        if(json.status==='ok'){
+          const fresh=(json.items||[]).map(i=>({
+            title:i.title||'',link:i.link||'',date:i.pubDate||'',
+            source:(i.author||'').trim()||extractPublisher(i.title),
+            description:i.description||i.content||'',
+            image:i.thumbnail||i.enclosure?.link||extractNewsImage(i.description||i.content||'')
+          }));
+          const seen=new Set();
+          related=[...fresh,...related].filter(i=>i.title&&i.link).filter(i=>{const k=i.link||i.title;if(seen.has(k))return false;seen.add(k);return true;}).slice(0,12);
+        }
+      }catch{}
+    }
+    $('#setIntelNewsCount').textContent=related.length;
+    $('#setIntelNews').innerHTML=related.slice(0,6).map(newsHtml).join('')||'<div class="set-intel-empty">Nog geen set-specifieke headlines gevonden.</div>';
+    if(window.__glvEnhanceNews) window.__glvEnhanceNews(document);
+  }
+  function newsHtml(i){ const title=cleanTitle(i.title); const op18=/\bOP[- ]?18\b/i.test(title+' '+i.description); return `<a class="news-item ${op18?'op18':''}" data-image="${esc(i.image||'')}" href="${esc(i.link)}" target="_blank" rel="noopener"><div class="news-meta"><span>${op18?'OP-18 · ':''}${esc(fmtDate(i.date))}</span><span>•</span><span>${esc(i.source)}</span></div><h3>${esc(title)}</h3></a>`; }
   function renderNews(){ const q=$('#newsQuery').value.trim().toLowerCase(); const rows=state.news.filter(i=>!q||(i.title+' '+i.source+' '+i.description).toLowerCase().includes(q)); $('#newsList').innerHTML=rows.map(newsHtml).join('')||'<div class="empty-state">Geen nieuws gevonden.</div>'; $('#homeNews').innerHTML=state.news.slice(0,4).map(newsHtml).join(''); }
 
   function exportCollection(){ const blob=new Blob([JSON.stringify({app:'Grand Line Vault',version:2,exportedAt:new Date().toISOString(),collection:state.collection},null,2)],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a');a.href=url;a.download=`grand-line-vault-${new Date().toISOString().slice(0,10)}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),500); }
@@ -241,7 +292,7 @@
     $('#reloadCardsBtn').addEventListener('click',()=>loadCards(true));
     $('#collectionQuery').addEventListener('input',renderCollection); $('#collectionSort').addEventListener('change',renderCollection);
     $('#exportBtn').addEventListener('click',exportCollection); $('#importBtn').addEventListener('click',()=>$('#importFile').click()); $('#importFile').addEventListener('change',e=>{if(e.target.files[0])importCollection(e.target.files[0]);e.target.value='';});
-    $('#reloadNewsBtn').addEventListener('click',()=>loadNews(true)); $('#newsQuery').addEventListener('input',renderNews);
+    $('#reloadNewsBtn').addEventListener('click',()=>loadNews(true)); $('#newsQuery').addEventListener('input',renderNews); if($('#setIntelRefresh')) $('#setIntelRefresh').addEventListener('click',()=>loadSetIntel(true)); if($('#setIntelSelect')) $('#setIntelSelect').addEventListener('change',()=>loadSetIntel(false));
     $('#refreshAllBtn').addEventListener('click',()=>{loadCards(true);loadNews(true);notify('Live data wordt vernieuwd');});
     $('#modalBackdrop').addEventListener('click',closeModal); $('#modalClose').addEventListener('click',closeModal);
     $('#modalPrimary').addEventListener('click',()=>state.selectedOwnedKey?saveOwned():addSelected()); $('#deleteBtn').addEventListener('click',deleteOwned); $('#favoriteBtn').addEventListener('click',toggleFavorite);
