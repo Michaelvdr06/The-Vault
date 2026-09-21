@@ -18,6 +18,7 @@
 
   let currentFilter='all';
   const pickImage=(title)=>imageMap.find(([re])=>re.test(title))?.[1]||imageMap.at(-1)[1];
+  const articleImage=(item,title)=>item.dataset.image||pickImage(title);
 
   function sourceFrom(item){
     const spans=item.querySelectorAll('.news-meta span');
@@ -90,7 +91,7 @@
     item.dataset.title=title;
     item.dataset.href=href;
     item.classList.toggle('op18',/OP[- ]?18/i.test(title));
-    item.innerHTML=`<div class="news-cover"><img src="${pickImage(title)}" alt="" loading="lazy" onerror="this.src='https://en.onepiece-cardgame.com/images/cardlist/card/OP01-003.png'"></div><div class="news-body">${meta}<h3>${title}</h3><div class="news-source-inline"><span>${source}</span><strong>Lees in krantstijl →</strong></div></div>`;
+    item.innerHTML=`<div class="news-cover"><img src="${articleImage(item,title)}" alt="" loading="lazy" onerror="this.src='${pickImage(title)}'"></div><div class="news-body">${meta}<h3>${title}</h3><div class="news-source-inline"><span>${source}</span><strong>Lees in krantstijl →</strong></div></div>`;
     item.removeAttribute('target');
     item.addEventListener('click',e=>{e.preventDefault();openReader(item);});
   }
@@ -109,7 +110,7 @@
     $('#newsReaderLink').href=href;
     $('#newsReaderKicker').textContent=`WORLD ECONOMY JOURNAL • ${sectionFromTitle(title).toUpperCase()}`;
     $('#newsReaderSummary').textContent=buildSummary(title, source);
-    $('#newsReaderImage').innerHTML=`<img src="${pickImage(title)}" alt="One Piece TCG illustratie" onerror="this.src='https://en.onepiece-cardgame.com/images/cardlist/card/OP01-003.png'">`;
+    $('#newsReaderImage').innerHTML=`<img src="${item.dataset.image||pickImage(title)}" alt="One Piece TCG illustratie" onerror="this.src='${pickImage(title)}'">`;
 
     let blocks = document.getElementById('newsReaderBlocks');
     if(!blocks){
@@ -155,5 +156,6 @@
 
   const observer=new MutationObserver(enhanceAll);
   ['#newsList','#homeNews'].forEach(sel=>{const el=$(sel); if(el) observer.observe(el,{childList:true,subtree:false});});
+  window.__glvEnhanceNews=enhanceAll;
   enhanceAll();
 })();
