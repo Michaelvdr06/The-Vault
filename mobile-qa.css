@@ -1,0 +1,222 @@
+/* Grand Line Vault — mobile QA pass */
+:root{
+  --accent:#d8aa4b!important;
+  --muted:#b9ad99!important;
+  --safe-bottom:env(safe-area-inset-bottom,0px);
+}
+
+/* Decorative layers must never block taps */
+.ocean-map,.jolly-watermark,.hero-art,.hero-vignette,.wanted-board-photo,.wanted-banner-bg,
+.paper-pin,.banner-compass,.morgans-portrait,.morgans-news-photo{pointer-events:none!important}
+
+/* Warmer One Piece palette: remove accidental bright-cyan UI */
+.text-btn,.ink-link,.external-link{color:#d8aa4b!important}
+.brand-overline,.eyebrow{color:#e4bd69!important}
+.data-meta,.muted,.news-meta{color:#8b7b67!important}
+input::placeholder,textarea::placeholder{color:#9d8e7c!important;opacity:1}
+.live-strip{color:#b8aa97!important}
+.badge:not(.alt){color:#f2dfb5!important;background:rgba(69,45,23,.78)!important;border-color:rgba(226,180,90,.24)!important}
+
+/* iPhone tap reliability */
+button,a,[data-nav],[data-card],select,input{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+button,[data-nav],[data-card]{user-select:none;-webkit-user-select:none}
+.bottom-nav{
+  pointer-events:auto!important;
+  z-index:999!important;
+  isolation:isolate;
+}
+.bottom-nav::before,.bottom-nav::after{pointer-events:none!important}
+.bottom-nav button{
+  pointer-events:auto!important;
+  position:relative!important;
+  z-index:2!important;
+  min-width:0!important;
+  min-height:58px!important;
+  border:0!important;
+}
+.bottom-nav button.active{
+  background:linear-gradient(180deg,#a9352c,#7e241f)!important;
+  color:#fff1d1!important;
+  box-shadow:inset 0 0 0 1px rgba(255,217,132,.28),0 6px 16px rgba(0,0,0,.18)!important;
+}
+
+/* General mobile containment */
+main,.page,.section,.paper-panel,.journal-frontpage,.journal-controls,.set-intel-panel,
+.collection-desk,.search-scroll,.morgans-layout,.morgans-paper{min-width:0!important;max-width:100%!important}
+img{max-width:100%}
+select,input,textarea{max-width:100%;min-width:0}
+.filter-row,.news-controls,.collection-tools,.collection-actions,.set-intel-controls{min-width:0}
+.search-box{min-width:0!important}
+
+/* Cards: consistent, readable sizes */
+.tcg-card,.mini-card{
+  position:relative;
+  overflow:visible!important;
+}
+.tcg-card>div:first-child,.mini-card>div:first-child{overflow:hidden;border-radius:13px}
+.tcg-card img,.mini-card img{
+  width:100%!important;
+  height:auto!important;
+  aspect-ratio:63/88!important;
+  object-fit:contain!important;
+  object-position:center!important;
+  background:linear-gradient(145deg,#162332,#0a1119)!important;
+}
+.tcg-card strong,.mini-card strong{line-height:1.25!important}
+
+/* News images: don't brutally crop card art */
+.news-cover{overflow:hidden!important}
+.news-cover img{
+  width:100%!important;height:100%!important;
+  object-position:center 22%!important;
+}
+.news-cover[data-card-art="1"] img{
+  object-fit:contain!important;
+  padding:10px!important;
+  background:radial-gradient(circle at 50% 25%,#263a4a,#101923 70%)!important;
+}
+.news-reader-image img{object-position:center 20%!important}
+
+/* Modal fixes */
+.modal,.news-reader{z-index:1100!important}
+.modal-backdrop,.news-reader-backdrop{z-index:0!important}
+.modal-sheet,.news-reader-sheet{z-index:1!important}
+.modal-close,.news-reader-close{z-index:4!important;min-width:44px;min-height:44px}
+
+/* iPhone */
+@media(max-width:699px){
+  body{padding-bottom:calc(104px + var(--safe-bottom))!important}
+  .app{width:100%!important;max-width:100%!important;padding-bottom:0!important}
+  .topbar.ship-header{
+    padding:max(10px,env(safe-area-inset-top)) 14px 10px!important;
+    min-height:70px;
+  }
+  .brand-wrap::before{width:84px!important;height:34px!important;flex-basis:84px!important}
+  .brand-overline{font-size:7px!important;letter-spacing:.12em!important}
+  .brand-title{font-size:18px!important}
+  .icon-btn{width:46px!important;height:46px!important;flex:0 0 46px!important}
+
+  .page{padding:14px 12px 8px!important}
+  .page.active{display:block!important}
+
+  .op-hero{
+    min-height:0!important;
+    margin:0!important;
+    border-radius:20px!important;
+    padding-top:180px!important;
+    background:#0d1d29!important;
+  }
+  .hero-art{inset:0 0 auto!important;height:230px!important;background-position:center 18%!important}
+  .hero-vignette{inset:0!important}
+  .hero-paper{
+    position:relative!important;
+    width:calc(100% - 16px)!important;
+    margin:0 8px 8px!important;
+    padding:18px 16px!important;
+    transform:none!important;
+  }
+  .hero-paper h1{font-size:38px!important}
+  .hero-stamp{transform:scale(.82);transform-origin:top right}
+
+  .bounty-ledger{margin-top:14px!important;padding:12px!important}
+  .ledger-title{gap:6px;align-items:center}
+  .stats-grid.treasure-stats{grid-template-columns:1fr 1fr!important;gap:8px!important}
+  .treasure-stats article{padding:12px 10px!important}
+  .treasure-stats strong{font-size:21px!important}
+
+  .section-head{align-items:flex-start!important;gap:8px!important}
+  .section-head>div{min-width:0}
+  .section-head h2{font-size:22px!important}
+  .section-head p{font-size:13px!important}
+  .text-btn{flex:0 0 auto;font-size:11px!important}
+
+  .wanted-board{padding:12px!important}
+  .card-row{grid-auto-columns:42%!important}
+
+  .morgans-layout{display:block!important}
+  .morgans-portrait{height:190px!important;min-height:190px!important;background-position:center 18%!important}
+  .morgans-paper{padding:14px!important}
+  #homeNews.news-list{display:grid!important;grid-template-columns:1fr!important}
+
+  .page-banner{padding:20px 16px!important;border-radius:20px!important}
+  .page-banner h1{font-size:36px!important;line-height:1!important}
+
+  .search-scroll,.collection-desk,.journal-controls,.set-intel-panel{padding:13px!important;border-radius:18px!important}
+  .filter-row,.news-controls,.collection-tools,.collection-actions,.set-intel-controls{
+    display:grid!important;grid-template-columns:1fr!important;gap:9px!important;
+  }
+  .filter-row>*,
+  .news-controls>*,
+  .collection-tools>*,
+  .collection-actions>*,
+  .set-intel-controls>*{width:100%!important}
+  select,input[type="search"],input[type="number"],textarea{font-size:16px!important}
+
+  #searchResults,#collectionGrid{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:10px!important;
+  }
+
+  .journal-frontpage{border-radius:20px!important;overflow:hidden!important}
+  .journal-masthead{padding:14px 12px!important}
+  .journal-masthead h1{font-size:40px!important;line-height:.84!important}
+  .journal-subline{gap:5px!important;flex-wrap:wrap!important;font-size:9px!important}
+  .journal-hero-row{display:block!important}
+  .morgans-news-photo{height:190px!important;min-height:190px!important;background-position:center 14%!important}
+  .journal-lead{padding:16px!important}
+  .journal-lead h2{font-size:30px!important}
+
+  .set-intel-head{display:block!important}
+  .set-intel-stats{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+  .set-intel-stats article{min-width:0!important;padding:9px 6px!important}
+  .set-intel-stats strong{font-size:1rem!important}
+  .set-intel-stats small{font-size:.58rem!important}
+  .set-intel-cardstrip{grid-auto-columns:104px!important}
+
+  .news-tabs-ui{
+    display:flex!important;overflow-x:auto!important;gap:7px!important;
+    padding:3px 0 8px!important;scrollbar-width:none;
+  }
+  .news-tabs-ui::-webkit-scrollbar{display:none}
+  .news-tabs-ui button{flex:0 0 auto!important;min-height:40px!important;padding:9px 12px!important}
+
+  .news-item.glv-news-card{border-radius:20px!important}
+  .news-item.glv-news-card .news-cover{height:180px!important;min-height:180px!important}
+  .news-item.glv-news-card h3{font-size:1.38rem!important;line-height:1.04!important}
+  .news-item.glv-news-card .news-blurb{font-size:.86rem!important}
+  .news-item.glv-news-card.featured{display:block!important}
+  .news-item.glv-news-card.featured .news-cover{min-height:200px!important;height:200px!important}
+
+  .bottom-nav{
+    left:10px!important;right:10px!important;
+    bottom:calc(10px + var(--safe-bottom))!important;
+    width:auto!important;height:auto!important;
+    padding:8px!important;gap:5px!important;
+    border-radius:18px!important;
+    background:rgba(32,20,12,.96)!important;
+    border:1px solid rgba(221,175,89,.34)!important;
+    box-shadow:0 14px 34px rgba(0,0,0,.42)!important;
+  }
+  .bottom-nav button{min-height:60px!important;padding:7px 3px!important;border-radius:13px!important}
+  .bottom-nav .nav-icon{font-size:20px!important;line-height:1!important}
+  .bottom-nav small{font-size:9px!important;letter-spacing:.06em!important}
+
+  .modal-sheet.dossier-sheet,.news-reader-sheet{
+    width:calc(100% - 12px)!important;
+    max-height:calc(100dvh - 72px)!important;
+    margin:0 6px!important;
+  }
+  .news-reader-image{height:190px!important}
+  .news-reader-content{padding:16px!important}
+  .news-reader-content h2{font-size:28px!important}
+}
+
+/* Narrow iPhones */
+@media(max-width:390px){
+  .page{padding-inline:9px!important}
+  #searchResults,#collectionGrid{gap:8px!important}
+  .card-row{grid-auto-columns:46%!important}
+  .bottom-nav{left:7px!important;right:7px!important}
+  .bottom-nav small{font-size:8px!important}
+  .journal-masthead h1{font-size:35px!important}
+}
