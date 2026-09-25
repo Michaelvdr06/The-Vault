@@ -40,24 +40,49 @@
     return true;
   }
 
-  const fallback='assets/hero.jpg';
-  function polishImages(){
-    document.querySelectorAll('img').forEach(img=>{
-      if(img.dataset.glvPolished) return;
-      img.dataset.glvPolished='1';
-      img.addEventListener('error',()=>{
-        if(img.dataset.glvFallbackDone) return;
-        img.dataset.glvFallbackDone='1';
-        img.src=fallback;
-      });
+  function placeholderData(name='CARD IMAGE'){
+    const safe=String(name).replace(/[<>&"]/g,'');
+    const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="630" height="880" viewBox="0 0 630 880">
+      <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#182837"/><stop offset="1" stop-color="#0a121a"/></linearGradient></defs>
+      <rect width="630" height="880" rx="30" fill="url(#g)"/>
+      <rect x="22" y="22" width="586" height="836" rx="24" fill="none" stroke="#d5ad57" stroke-width="5" opacity=".65"/>
+      <text x="315" y="405" text-anchor="middle" font-family="Georgia,serif" font-size="66" fill="#efd99e">☠</text>
+      <text x="315" y="480" text-anchor="middle" font-family="Arial,sans-serif" font-size="25" font-weight="700" fill="#efd99e">GRAND LINE VAULT</text>
+      <text x="315" y="525" text-anchor="middle" font-family="Arial,sans-serif" font-size="19" fill="#b9aa90">${safe.slice(0,34)}</text>
+    </svg>`;
+    return 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);
+  }
+  function proxy(url=''){
+    const clean=String(url||'').trim();
+    if(!clean) return '';
+    return 'https://wsrv.nl/?url='+encodeURIComponent(clean.split('?')[0])+'&w=700&output=webp&q=92';
+  }
+  function bindCardImage(img){
+    if(img.dataset.glvCardBound==='1') return;
+    img.dataset.glvCardBound='1';
+    img.loading='lazy'; img.decoding='async';
+    const original=img.dataset.original||img.getAttribute('data-original')||img.getAttribute('src')||'';
+    let stage=0;
+    img.addEventListener('error',()=>{
+      stage++;
+      if(stage===1 && original){
+        img.src=original;
+        return;
+      }
+      if(stage===2 && original){
+        img.src=proxy(original);
+        return;
+      }
+      img.src=placeholderData(img.alt||'CARD IMAGE');
     });
+    img.style.opacity='1';
+    img.style.display='block';
+  }
+  function polishImages(){
+    document.querySelectorAll('.tcg-card img,.mini-card img,#modalImage').forEach(bindCardImage);
   }
 
-  if(seedDemoCollection()){
-    location.reload();
-    return;
-  }
-
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',polishImages); else polishImages();
+  if(seedDemoCollection()){ location.reload(); return; }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',polishImages);else polishImages();
   new MutationObserver(polishImages).observe(document.documentElement,{childList:true,subtree:true});
 })();
