@@ -1,0 +1,14 @@
+{
+  "name": "Grand Line Vault",
+  "version": "0.4.0",
+  "channel": "beta",
+  "build": "2026.09.25-a",
+  "released": "2026-09-25",
+  "scheme": "semver",
+  "notes": [
+    "Personal collection tracker",
+    "World Economy Journal news",
+    "Set Intel",
+    "Mobile motion and image reliability pass"
+  ]
+}
