@@ -17,6 +17,13 @@
   function esc(v=''){ return String(v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
   function money(v){ return new Intl.NumberFormat('nl-NL',{style:'currency',currency:'EUR'}).format(Number(v)||0); }
   function normalizeCode(v=''){ return String(v).replace(/^#/,'').trim().toUpperCase(); }
+  function cleanImageUrl(url=''){ return String(url||'').trim(); }
+  function cardImageProxy(url=''){
+    const clean=cleanImageUrl(url);
+    if(!clean) return '';
+    return 'https://wsrv.nl/?url='+encodeURIComponent(clean.split('?')[0])+'&w=700&output=webp&q=92';
+  }
+  function cardImagePrimary(card){ return cardImageProxy(card?.Img||'') || cleanImageUrl(card?.Img||''); }
   function setCode(card){ const m=normalizeCode(card.CardNum).match(/^([A-Z]+\d{2})-/); return m?m[1]:''; }
   function variantId(card){ return `${normalizeCode(card.CardNum)}|${card.Img || ''}`; }
   function isAlt(card){ return !!card.Alt || /alt|parallel|manga/i.test(String(card.Rarity||'')); }
@@ -102,7 +109,7 @@
     const alt=card._alt ?? isAlt(card);
     const code=card._code ?? normalizeCode(card.CardNum);
     return `<button class="${mini?'mini-card':'tcg-card'}" data-card="${esc(card._variant || variantId(card))}"${owned?` data-owned="${esc(owned.key)}"`:''}>
-      <div style="position:relative"><img loading="lazy" src="${esc(card.Img)}" alt="${esc(card.Name)}" onerror="this.style.opacity=.25">
+      <div style="position:relative"><img loading="lazy" decoding="async" src="${esc(cardImagePrimary(card))}" data-original="${esc(card.Img||'')}" alt="${esc(card.Name)}">
       ${mini?'':`<div class="badges"><span class="badge">${esc(rarity(card))}</span>${alt?'<span class="badge alt">ALT</span>':''}</div>`}</div>
       <strong>${esc(card.Name)}</strong><small>${esc(code)}${owned?` · ×${owned.quantity}`:''}</small>
     </button>`;
@@ -171,7 +178,7 @@
 
   function openCard(card,ownedKey=null){
     state.selected=card; state.selectedOwnedKey=ownedKey;
-    $('#modalImage').src=card.Img||''; $('#modalImage').alt=card.Name||'One Piece kaart';
+    $('#modalImage').src=cardImagePrimary(card); $('#modalImage').dataset.original=card.Img||''; $('#modalImage').alt=card.Name||'One Piece kaart';
     $('#modalCode').textContent=card._code||normalizeCode(card.CardNum); $('#modalRarity').textContent=rarity(card); $('#modalName').textContent=card.Name||'Kaart';
     $('#modalVariant').classList.toggle('hidden',!isAlt(card)); $('#tiltCard').classList.toggle('is-alt',isAlt(card));
     $('#modalMeta').textContent=[typeLine(card), types(card)].filter(Boolean).join(' · ');
