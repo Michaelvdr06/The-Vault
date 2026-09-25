@@ -1,0 +1,151 @@
+/* Grand Line Vault — mobile motion + polish */
+:root{
+  --spring:cubic-bezier(.2,.85,.2,1.15);
+  --ease:cubic-bezier(.22,.61,.36,1);
+}
+@media (prefers-reduced-motion:no-preference){
+  .page.active{
+    animation:glvPageIn .38s var(--ease) both;
+  }
+  @keyframes glvPageIn{
+    from{opacity:0;transform:translateY(12px) scale(.992)}
+    to{opacity:1;transform:none}
+  }
+
+  .bottom-nav button{
+    transition:transform .2s var(--spring),background .24s ease,color .24s ease,box-shadow .24s ease;
+  }
+  .bottom-nav button:active{transform:scale(.93)}
+  .bottom-nav button.active{transform:translateY(-2px)}
+  .bottom-nav button.active .nav-icon{animation:glvPop .38s var(--spring)}
+  @keyframes glvPop{0%{transform:scale(.72) rotate(-8deg)}60%{transform:scale(1.18) rotate(4deg)}100%{transform:scale(1)}}
+
+  .tcg-card,.mini-card,.news-item,.treasure-stats article,.set-intel-stats article{
+    transition:transform .22s var(--spring),box-shadow .22s ease,filter .22s ease;
+  }
+  .tcg-card:active,.mini-card:active,.news-item:active{transform:scale(.965)}
+  .treasure-stats article:active,.set-intel-stats article:active{transform:scale(.98)}
+
+  .tcg-card img,.mini-card img{
+    transition:transform .32s var(--ease),filter .32s ease;
+  }
+  .tcg-card:active img,.mini-card:active img{transform:scale(1.025)}
+
+  .modal:not(.hidden) .modal-sheet,
+  .news-reader:not(.hidden) .news-reader-sheet{
+    animation:glvSheetUp .42s var(--spring) both;
+  }
+  .modal:not(.hidden) .modal-backdrop,
+  .news-reader:not(.hidden) .news-reader-backdrop{
+    animation:glvFade .24s ease both;
+  }
+  @keyframes glvSheetUp{
+    from{opacity:0;transform:translateY(34px) scale(.985)}
+    to{opacity:1;transform:none}
+  }
+  @keyframes glvFade{from{opacity:0}to{opacity:1}}
+
+  .live-dot{animation:glvPulse 1.8s ease-in-out infinite}
+  @keyframes glvPulse{
+    0%,100%{box-shadow:0 0 0 3px rgba(78,225,160,.08)}
+    50%{box-shadow:0 0 0 8px rgba(78,225,160,.02)}
+  }
+
+  .hero-paper{animation:glvHeroFloat 5s ease-in-out infinite alternate}
+  @keyframes glvHeroFloat{
+    from{transform:translateY(0)}
+    to{transform:translateY(-3px)}
+  }
+
+  .reveal-on-scroll{opacity:0;transform:translateY(14px);transition:opacity .45s var(--ease),transform .45s var(--ease)}
+  .reveal-on-scroll.is-visible{opacity:1;transform:none}
+}
+
+/* premium card treatment */
+.tcg-card,.mini-card{
+  border-radius:16px!important;
+  -webkit-tap-highlight-color:transparent;
+}
+.tcg-card>div:first-child,.mini-card>div:first-child{
+  position:relative;
+}
+.tcg-card>div:first-child::after,.mini-card>div:first-child::after{
+  content:"";
+  position:absolute;
+  inset:-30%;
+  pointer-events:none;
+  background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.24) 48%,transparent 61%);
+  transform:translateX(-70%) rotate(8deg);
+  transition:transform .55s var(--ease);
+  mix-blend-mode:screen;
+}
+.tcg-card:active>div:first-child::after,.mini-card:active>div:first-child::after{
+  transform:translateX(70%) rotate(8deg);
+}
+
+/* improved touch controls */
+.primary-btn,.ghost-btn,.paper-button,.icon-btn,.text-btn{
+  transition:transform .16s var(--spring),box-shadow .2s ease,filter .2s ease!important;
+}
+.primary-btn:active,.ghost-btn:active,.paper-button:active,.icon-btn:active,.text-btn:active{
+  transform:scale(.96)!important;
+  filter:brightness(.96);
+}
+
+/* fancy mobile topbar */
+@media(max-width:699px){
+  .topbar.ship-header{
+    background:linear-gradient(180deg,rgba(8,24,34,.96),rgba(8,24,34,.9))!important;
+    box-shadow:0 8px 24px rgba(0,0,0,.22);
+  }
+  .refresh-seal{
+    box-shadow:inset 0 0 0 1px rgba(255,220,140,.12),0 8px 18px rgba(0,0,0,.18)!important;
+  }
+
+  .bottom-nav{
+    backdrop-filter:blur(18px) saturate(1.15)!important;
+    -webkit-backdrop-filter:blur(18px) saturate(1.15)!important;
+  }
+
+  .tcg-card,.mini-card{
+    padding:8px!important;
+    background:linear-gradient(180deg,rgba(255,244,213,.96),rgba(231,207,158,.96))!important;
+    border:1px solid rgba(100,68,32,.18)!important;
+    box-shadow:0 8px 18px rgba(40,24,10,.16)!important;
+  }
+  .tcg-card strong,.mini-card strong{color:#2c1d13!important}
+  .tcg-card small,.mini-card small{color:#766048!important}
+
+  .wanted-grid,.treasure-grid{
+    align-items:start;
+  }
+
+  .news-item.glv-news-card,
+  .paper-panel,
+  .bounty-ledger,
+  .wanted-board,
+  .journal-frontpage{
+    box-shadow:0 12px 26px rgba(0,0,0,.13)!important;
+  }
+
+  .toast{
+    bottom:calc(98px + env(safe-area-inset-bottom,0px))!important;
+    background:rgba(31,20,13,.96)!important;
+    border-color:rgba(222,176,86,.25)!important;
+    color:#f8e7bd!important;
+    backdrop-filter:blur(14px);
+  }
+
+  .modal-card-visual{perspective:1000px}
+  .tilt-card{transition:transform .18s var(--ease)!important}
+}
+
+/* desktop hover remains tasteful */
+@media(hover:hover) and (pointer:fine){
+  .tcg-card:hover,.mini-card:hover{
+    transform:translateY(-5px);
+    box-shadow:0 16px 32px rgba(0,0,0,.22);
+  }
+  .tcg-card:hover img,.mini-card:hover img{transform:scale(1.02)}
+  .news-item:hover{transform:translateY(-4px)}
+}
