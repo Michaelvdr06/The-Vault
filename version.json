@@ -1,14 +1,14 @@
 {
   "name": "Grand Line Vault",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "channel": "beta",
-  "build": "2026.09.25-a",
+  "build": "2026.09.25-b",
   "released": "2026-09-25",
   "scheme": "semver",
   "notes": [
-    "Personal collection tracker",
-    "World Economy Journal news",
-    "Set Intel",
-    "Mobile motion and image reliability pass"
+    "Modern One Piece visual polish",
+    "Cleaner collection cards",
+    "Refined news and Set Intel styling",
+    "Improved mobile spacing and navigation"
   ]
 }
