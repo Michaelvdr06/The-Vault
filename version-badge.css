@@ -1,0 +1,32 @@
+/* subtle app version badge */
+.brand-version{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  margin-top:3px;
+  padding:2px 7px;
+  border:1px solid rgba(222,181,93,.18);
+  border-radius:999px;
+  background:rgba(255,240,199,.045);
+  color:rgba(236,211,156,.68);
+  font-size:9px;
+  font-weight:800;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  line-height:1.45;
+  white-space:nowrap;
+}
+.brand-version::before{
+  content:"";
+  width:5px;height:5px;border-radius:50%;
+  background:#d7a84b;
+  box-shadow:0 0 0 3px rgba(215,168,75,.08);
+}
+@media(max-width:699px){
+  .brand-version{
+    font-size:7px;
+    padding:1px 5px;
+    margin-top:2px;
+    letter-spacing:.06em;
+  }
+}
